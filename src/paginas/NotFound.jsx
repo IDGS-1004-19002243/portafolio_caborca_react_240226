@@ -1,12 +1,36 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const NotFound = () => {
+    const [content, setContent] = useState({
+        titulo: '¡Esa ruta no existe, vaquero!',
+        mensaje: 'Parece que te has alejado demasiado del camino.\nNo te preocupes, endereza las riendas y vuelve con nosotros.',
+        textoBoton: 'Volver al pueblito',
+        imagenFondo: 'https://blocks.astratic.com/img/general-img-landscape.png'
+    });
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('cms:notfound');
+            if (stored) {
+                const data = JSON.parse(stored);
+                setContent(prev => ({
+                    ...prev,
+                    titulo: data.titulo || prev.titulo,
+                    mensaje: data.mensaje || prev.mensaje,
+                    textoBoton: data.textoBoton || prev.textoBoton,
+                    imagenFondo: data.imagenFondo || prev.imagenFondo
+                }));
+            }
+        } catch (e) { console.error(e); }
+    }, []);
+
     return (
         <div className="relative min-h-screen flex items-center justify-center bg-gray-900 text-white font-sans overflow-hidden">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <img
-                    src="https://blocks.astratic.com/img/general-img-landscape.png"
+                    src={content.imagenFondo}
                     alt="Página no encontrada"
                     className="w-full h-full object-cover opacity-50"
                 />
@@ -20,14 +44,13 @@ const NotFound = () => {
                 </h1>
 
                 <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6 -mt-10 md:-mt-16 text-white drop-shadow-lg tracking-wide">
-                    ¡Esa ruta no existe, vaquero!
+                    {content.titulo}
                 </h2>
 
                 <div className="w-32 h-2 bg-caborca-bronce mx-auto mb-8 rounded-full shadow-lg"></div>
 
-                <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto mb-12 leading-relaxed font-light drop-shadow-md">
-                    Parece que te has alejado demasiado del camino.<br className="hidden md:block" />
-                    No te preocupes, endereza las riendas y vuelve con nosotros.
+                <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto mb-12 leading-relaxed font-light drop-shadow-md whitespace-pre-wrap">
+                    {content.mensaje}
                 </p>
 
                 <Link
@@ -37,7 +60,7 @@ const NotFound = () => {
                     <svg className="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    <span>Volver al pueblito</span>
+                    <span>{content.textoBoton}</span>
                 </Link>
             </div>
         </div>

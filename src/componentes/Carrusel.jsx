@@ -1,15 +1,40 @@
 import { useState, useEffect, useRef } from 'react';
+import homeService from '../api/homeService';
+
+// Datos por defecto (fallback si la API no responde)
+const SLIDES_DEFAULT = [
+  { titulo: "Colección Premium", subtitulo: "BOTAS DE LUJO HECHAS A MANO", imagen: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton: "Descubre Más" },
+  { titulo: "Elegancia Mexicana", subtitulo: "TRADICIÓN Y ESTILO", imagen: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton: "Descubre Más" },
+  { titulo: "Botas Caborca", subtitulo: "SOMOS LO QUE HACEMOS", imagen: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton: "Descubre Más" }
+];
 
 const Carrusel = () => {
   const [diapositivaActual, setDiapositivaActual] = useState(0);
   const [posicionMouse, setPosicionMouse] = useState({ x: 0.5, y: 0.5 });
+  const [diapositivas, setDiapositivas] = useState(SLIDES_DEFAULT);
   const intervalRef = useRef(null);
 
-  const diapositivas = [
-    { titulo: "Colección Premium", subtitulo: "BOTAS DE LUJO HECHAS A MANO", imagen: "https://blocks.astratic.com/img/general-img-landscape.png" },
-    { titulo: "Elegancia Mexicana", subtitulo: "TRADICIÓN Y ESTILO", imagen: "https://blocks.astratic.com/img/general-img-landscape.png" },
-    { titulo: "Botas Caborca", subtitulo: "SOMOS LO QUE HACEMOS", imagen: "https://blocks.astratic.com/img/general-img-landscape.png" }
-  ];
+  // Cargar datos de la API
+  useEffect(() => {
+    homeService.getHomeContent()
+      .then(data => {
+        if (data?.carousel?.length > 0) {
+          const slides = data.carousel
+            .sort((a, b) => a.orden - b.orden)
+            .map(s => ({
+              titulo: s.titulo_ES || s.titulo,
+              subtitulo: s.subtitulo_ES || s.subtitulo,
+              imagen: s.imagenUrl || "https://blocks.astratic.com/img/general-img-landscape.png",
+              textoBoton: s.textoBoton_ES || "Descubre Más",
+              link: s.linkBoton || '#'
+            }));
+          setDiapositivas(slides);
+        }
+      })
+      .catch(() => {
+        console.warn('API no disponible, usando datos por defecto del carrusel.');
+      });
+  }, []);
 
   useEffect(() => {
     const startAutoSlide = () => {
@@ -67,7 +92,7 @@ const Carrusel = () => {
           <div className="carousel-content">
             <h1 className="carousel-title font-serif">{diapositiva.titulo}</h1>
             <p className="carousel-subtitle font-sans tracking-wider">{diapositiva.subtitulo}</p>
-            <button className="carousel-btn">Descubre Más</button>
+            <button className="carousel-btn">{diapositiva.textoBoton}</button>
           </div>
         </div>
       ))}

@@ -1,7 +1,73 @@
+import { useState, useEffect } from 'react';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
+import { textosService } from '../api/textosService';
 
 const ResponsabilidadAmbiental = () => {
+  const defaultContent = {
+    hero: {
+      badge: 'COMPROMISO CON EL FUTURO',
+      title: 'Responsabilidad Ambiental',
+      subtitle: 'Nuestro compromiso con el planeta y las futuras generaciones a través de prácticas sostenibles',
+      image: 'https://blocks.astratic.com/img/general-img-landscape.png'
+    },
+    compania: {
+      title: 'Compañía\nresponsable',
+      p1: 'Como empresa, elegimos conscientemente preocuparnos por mejorar el mundo social, económico y ambiental que nos rodea.',
+      p2: 'También basamos nuestras decisiones en ideales éticos y valores humanos.',
+      highlight: 'Hemos asumido la tarea de crear programas estratégicos para dar un destino a todos los elementos y materiales.',
+      image: 'https://blocks.astratic.com/img/general-img-landscape.png'
+    },
+    energia: {
+      title: 'Consumo de\nelectricidad',
+      p1: 'Para reducir el impacto del calentamiento global, hemos instalado un sistema de paneles de energía solar.',
+      p2: 'La energía solar no genera residuos ni contaminación del agua.',
+      stat1: '0%', stat1Label: 'Emisiones CO₂',
+      stat2: '100%', stat2Label: 'Energía Limpia',
+      image: 'https://blocks.astratic.com/img/general-img-landscape.png'
+    },
+    video: {
+      title: 'Nuestro compromiso en acción',
+      description: 'Descubre cómo transformamos nuestros valores en acciones concretas cada día',
+      videoUrl: 'https://www.youtube.com/embed/3nT5QS6h-tY'
+    },
+    pieles: {
+      title: 'Pieles libres de\nmetales pesados',
+      p1: 'Tenemos nuestro propio analizador de metales X-MET7500.',
+      p2: 'Realizamos inspecciones diarias en todas las pieles que recibimos de nuestros proveedores.',
+      image: 'https://blocks.astratic.com/img/general-img-landscape.png'
+    },
+    shambhala: {
+      title: 'Un lugar para renacer',
+      subtitle: 'Un ecosistema biodiverso donde la naturaleza y la producción sostenible se encuentran en perfecta armonía',
+      missionTitle: 'Nuestra Misión',
+      missionText: 'Shambhala es un proyecto que nació con el objetivo de convertirse en parte de los pulmones del planeta Tierra.',
+      granjaTitle: 'Granja Biodinámica',
+      granjaText: 'Esta granja biodinámica es uno de nuestros mayores logros.',
+      educTitle: 'Educación Ambiental',
+      educText: 'Realizamos talleres y charlas sobre ecología, reciclaje y concienciación.',
+      statNumber: '148', statLabel: 'ACRES DE ESPACIO\nAgroecológico',
+      statDesc: 'Un ciclo natural donde los desechos orgánicos enriquecen el suelo.',
+      image: 'https://blocks.astratic.com/img/general-img-landscape.png',
+      thumb1: 'https://blocks.astratic.com/img/general-img-landscape.png',
+      thumb2: 'https://blocks.astratic.com/img/general-img-landscape.png'
+    }
+  };
+
+  const [content, setContent] = useState(defaultContent);
+
+  useEffect(() => {
+    textosService.getTextos('responsabilidad')
+      .then(data => {
+        if (data && Object.keys(data).length > 0) {
+          setContent(prev => ({ ...prev, ...data }));
+        }
+      })
+      .catch(() => console.warn('Responsabilidad: usando datos por defecto'));
+  }, []);
+
+  const renderTitle = (raw) => raw?.split('\n').map((line, i) => <span key={i}>{line}{i < raw.split('\n').length - 1 && <br />}</span>);
+
   return (
     <div className="bg-white text-caborca-cafe font-sans">
       <Encabezado />
@@ -11,15 +77,16 @@ const ResponsabilidadAmbiental = () => {
         <section className="relative pt-[95px] bg-gray-50">
           {/* Espacio para imagen principal */}
           <div className="relative w-full overflow-hidden shadow-2xl">
-            <img src="https://blocks.astratic.com/img/general-img-landscape.png" alt="Responsabilidad Ambiental Caborca Boots" className="w-full h-[600px] object-cover" />
+            <img src={content.hero.image} alt="Responsabilidad Ambiental Caborca Boots" className="w-full h-[600px] object-cover"
+              onError={e => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }} />
             {/* Overlay con texto centrado */}
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <div className="text-center text-white px-4">
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
-                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">COMPROMISO CON EL FUTURO</p>
+                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{content.hero.badge}</p>
                 </div>
-                <h1 className="text-5xl md:text-7xl font-serif mb-6">Responsabilidad Ambiental</h1>
-                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">Nuestro compromiso con el planeta y las futuras generaciones a través de prácticas sostenibles</p>
+                <h1 className="text-5xl md:text-7xl font-serif mb-6">{content.hero.title}</h1>
+                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{content.hero.subtitle}</p>
               </div>
             </div>
           </div>
@@ -41,20 +108,13 @@ const ResponsabilidadAmbiental = () => {
                   </div>
 
                   <h2 className="text-4xl md:text-5xl font-serif text-caborca-beige-fuerte font-bold leading-tight">
-                    Compañía<br />responsable
+                    {renderTitle(content.compania.title)}
                   </h2>
                   <div className="w-24 h-1 bg-caborca-beige-fuerte"></div>
-
                   <div className="space-y-4 text-caborca-negro/80 leading-relaxed">
-                    <p>
-                      Como empresa, elegimos conscientemente preocuparnos por mejorar el mundo social, económico y ambiental que nos rodea. Por lo tanto, somos una empresa socialmente responsable que busca lograr un equilibrio mediante la adopción de prácticas, programas, actividades y sistemas de gestión adecuados.
-                    </p>
-                    <p>
-                      También basamos nuestras decisiones en ideales éticos y valores humanos, prestamos especial atención a las leyes laborales y a los estándares relacionados con el medio ambiente y el desarrollo sostenible.
-                    </p>
-                    <p className="font-medium text-caborca-beige-fuerte font-bold">
-                      Hemos asumido la tarea de crear programas estratégicos para dar un destino a todos los elementos y materiales que participan directa o indirectamente en la fabricación de nuestras botas.
-                    </p>
+                    <p>{content.compania.p1}</p>
+                    <p>{content.compania.p2}</p>
+                    <p className="font-medium text-caborca-beige-fuerte font-bold">{content.compania.highlight}</p>
                   </div>
 
                 </div>
@@ -62,7 +122,9 @@ const ResponsabilidadAmbiental = () => {
                 <div className="relative">
                   <div className="absolute -top-8 -left-8 w-full h-full bg-caborca-cafe/5 rounded-2xl"></div>
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                    <img src="https://blocks.astratic.com/img/general-img-landscape.png" alt="Responsabilidad Ambiental" className="w-full h-[500px] object-cover" />
+                    <img src={content.compania.image} alt="Responsabilidad Ambiental"
+                      className="w-full h-[500px] object-cover"
+                      onError={e => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }} />
                   </div>
                   {/* Floating badge */}
                   <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-xl border border-gray-100">
@@ -106,28 +168,21 @@ const ResponsabilidadAmbiental = () => {
                   </div>
 
                   <h2 className="text-4xl md:text-5xl font-serif text-caborca-beige-fuerte font-bold leading-tight">
-                    Consumo de<br />electricidad
+                    {renderTitle(content.energia.title)}
                   </h2>
                   <div className="w-24 h-1 bg-yellow-400"></div>
-
                   <div className="space-y-4 text-caborca-negro/80 leading-relaxed">
-                    <p>
-                      Para reducir el impacto del calentamiento global, hemos instalado un sistema de paneles de energía solar que contribuye a un mejor desarrollo sostenible.
-                    </p>
-                    <p className="font-medium text-caborca-beige-fuerte font-bold">
-                      La energía solar no genera residuos ni contaminación del agua, un factor muy importante teniendo en cuenta la escasez de agua.
-                    </p>
+                    <p>{content.energia.p1}</p>
+                    <p className="font-medium text-caborca-beige-fuerte font-bold">{content.energia.p2}</p>
                   </div>
-
-                  {/* Benefits */}
                   <div className="grid grid-cols-2 gap-6 pt-6">
                     <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                      <div className="text-3xl font-bold text-yellow-500 mb-2">0%</div>
-                      <div className="text-sm text-caborca-negro/70">Emisiones CO₂</div>
+                      <div className="text-3xl font-bold text-yellow-500 mb-2">{content.energia.stat1}</div>
+                      <div className="text-sm text-caborca-negro/70">{content.energia.stat1Label}</div>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                      <div className="text-3xl font-bold text-yellow-500 mb-2">100%</div>
-                      <div className="text-sm text-caborca-negro/70">Energía Limpia</div>
+                      <div className="text-3xl font-bold text-yellow-500 mb-2">{content.energia.stat2}</div>
+                      <div className="text-sm text-caborca-negro/70">{content.energia.stat2Label}</div>
                     </div>
                   </div>
                 </div>
@@ -157,18 +212,21 @@ const ResponsabilidadAmbiental = () => {
                 </div>
 
                 <h2 className="text-4xl md:text-5xl font-serif mb-4 text-white">
-                  Nuestro compromiso en acción
+                  {content.video.title}
                 </h2>
                 <div className="w-32 h-1 bg-white mx-auto mb-4"></div>
                 <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                  Descubre cómo transformamos nuestros valores en acciones concretas cada día
+                  {content.video.description}
                 </p>
               </div>
 
               <div className="relative group">
                 {/* Video container with hover effect */}
                 <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10">
-                  <iframe width="100%" height="100%" src="https://www.youtube.com/embed/3nT5QS6h-tY" title="Responsabilidad Ambiental Caborca Boots" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full"></iframe>
+                  <iframe width="100%" height="100%" src={content.video.videoUrl}
+                    title="Responsabilidad Ambiental Caborca Boots" frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen className="w-full h-full"></iframe>
                 </div>
               </div>
             </div>
@@ -191,17 +249,12 @@ const ResponsabilidadAmbiental = () => {
                   </div>
 
                   <h2 className="text-4xl md:text-5xl font-serif text-caborca-beige-fuerte font-bold leading-tight">
-                    Pieles libres de<br />metales pesados
+                    {renderTitle(content.pieles.title)}
                   </h2>
                   <div className="w-24 h-1 bg-green-500"></div>
-
                   <div className="space-y-4 text-caborca-negro/80 leading-relaxed">
-                    <p>
-                      Tenemos nuestro propio <span className="font-semibold text-caborca-bronce">analizador de metales X-MET7500</span>, un dispositivo de tecnología avanzada que utilizamos para garantizar que nuestros productos estén libres de plomo y productos químicos tóxicos como el arsénico, el cadmio, el cloroformo, el cromo, entre otros, que son muy perjudiciales para la salud.
-                    </p>
-                    <p className="font-medium text-caborca-beige-fuerte">
-                      Realizamos inspecciones diarias en todas las pieles que recibimos de nuestros proveedores y, por lo tanto, en nuestros productos solo utilizamos aquellos materiales que pasan las pruebas.
-                    </p>
+                    <p>{content.pieles.p1}</p>
+                    <p className="font-medium text-caborca-beige-fuerte">{content.pieles.p2}</p>
                   </div>
 
                   {/* Toxins list */}
@@ -282,12 +335,12 @@ const ResponsabilidadAmbiental = () => {
                 </div>
 
                 <h2 className="text-5xl md:text-6xl font-serif mb-6 text-caborca-beige-fuerte font-bold leading-tight">
-                  Un lugar para renacer
+                  {content.shambhala.title}
                 </h2>
                 <div className="w-32 h-1 bg-green-600 mx-auto mb-6"></div>
                 <p className="text-3xl font-serif text-green-700 mb-4">Shambhala</p>
                 <p className="text-caborca-negro/70 text-lg max-w-3xl mx-auto">
-                  Un ecosistema biodiverso donde la naturaleza y la producción sostenible se encuentran en perfecta armonía
+                  {content.shambhala.subtitle}
                 </p>
               </div>
 
@@ -303,10 +356,8 @@ const ResponsabilidadAmbiental = () => {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="font-serif text-xl text-caborca-bronce font-bold">Nuestra Misión</h3>
-                        <p className="text-caborca-negro/80 leading-relaxed text-sm">
-                          Shambhala es un proyecto que nació con el objetivo de convertirse en parte de los pulmones del planeta Tierra.
-                        </p>
+                        <h3 className="font-serif text-xl text-caborca-bronce font-bold">{content.shambhala.missionTitle}</h3>
+                        <p className="text-caborca-negro/80 leading-relaxed text-sm">{content.shambhala.missionText}</p>
                       </div>
                     </div>
                   </div>
@@ -319,10 +370,8 @@ const ResponsabilidadAmbiental = () => {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="font-serif text-xl text-caborca-bronce font-bold">Granja Biodinámica</h3>
-                        <p className="text-caborca-negro/80 leading-relaxed text-sm">
-                          Esta granja biodinámica es uno de nuestros mayores logros, produciendo frutas, verduras, huevos, miel y más de forma orgánica.
-                        </p>
+                        <h3 className="font-serif text-xl text-caborca-bronce font-bold">{content.shambhala.granjaTitle}</h3>
+                        <p className="text-caborca-negro/80 leading-relaxed text-sm">{content.shambhala.granjaText}</p>
                       </div>
                     </div>
                   </div>
@@ -335,25 +384,22 @@ const ResponsabilidadAmbiental = () => {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="font-serif text-xl text-caborca-bronce font-bold">Educación Ambiental</h3>
-                        <p className="text-caborca-negro/80 leading-relaxed text-sm">
-                          Realizamos talleres y charlas sobre ecología, reciclaje y concienciación de recursos naturales para nuestros colaboradores y sus familias.
-                        </p>
+                        <h3 className="font-serif text-xl text-caborca-bronce font-bold">{content.shambhala.educTitle}</h3>
+                        <p className="text-caborca-negro/80 leading-relaxed text-sm">{content.shambhala.educText}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-gradient-to-r from-green-600 to-green-700 p-8 rounded-2xl shadow-xl text-white">
                     <div className="flex items-center gap-4 mb-3">
-                      <div className="text-5xl font-bold">148</div>
+                      <div className="text-5xl font-bold">{content.shambhala.statNumber}</div>
                       <div>
-                        <div className="text-sm uppercase tracking-wide opacity-90">Acres de espacio</div>
-                        <div className="text-lg font-semibold">Agroecológico</div>
+                        {content.shambhala.statLabel.split('\n').map((l, i) => (
+                          <div key={i} className={i === 0 ? 'text-sm uppercase tracking-wide opacity-90' : 'text-lg font-semibold'}>{l}</div>
+                        ))}
                       </div>
                     </div>
-                    <p className="text-white/90 text-sm leading-relaxed">
-                      Un ciclo natural donde los desechos orgánicos enriquecen el suelo y nutren las verduras
-                    </p>
+                    <p className="text-white/90 text-sm leading-relaxed">{content.shambhala.statDesc}</p>
                   </div>
                 </div>
 
@@ -361,7 +407,8 @@ const ResponsabilidadAmbiental = () => {
                 <div className="space-y-3">
                   {/* Main Image */}
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                    <img src="https://blocks.astratic.com/img/general-img-landscape.png" alt="Shambhala Principal" className="w-full aspect-[16/10] object-cover" />
+                    <img src={content.shambhala.image} alt="Shambhala Principal" className="w-full aspect-[16/10] object-cover"
+                      onError={e => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }} />
                   </div>
 
                   {/* Grid of 2 images */}

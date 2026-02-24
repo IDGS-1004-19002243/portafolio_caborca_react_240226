@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
+import { textosService } from '../api/textosService';
 
 const Distribuidores = () => {
   const [formulario, setFormulario] = useState({
@@ -16,8 +17,48 @@ const Distribuidores = () => {
   const [resultados, setResultados] = useState([]);
   const [mensajeUbicacion, setMensajeUbicacion] = useState('');
   const [mapSrc, setMapSrc] = useState("https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120615.72236587609!2d-99.2840989!3d19.432608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce0026db097507%3A0x54061076265ee841!2sCiudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx");
+  const [hero, setHero] = useState({
+    badge: 'ÚNETE A NOSOTROS',
+    titulo: '¿Quieres ser distribuidor?',
+    subtitulo: 'Únete a nuestra red de distribuidores y forma parte de la familia Caborca',
+    imagen: 'https://blocks.astratic.com/img/general-img-landscape.png'
+  });
 
-  // Datos de distribuidores (Ported from MockUp V1)
+  const [formDist, setFormDist] = useState({
+    titulo: '¿Quieres ser distribuidor?',
+    subtitulo: 'Si estás interesado, déjanos tus datos y nuestro equipo se pondrá en contacto contigo.',
+    submitLabel: 'ENVIAR SOLICITUD',
+    responseTime: 'Respuesta en 24-48 hrs',
+    distribuidores: '+500',
+    estados: '20+',
+  });
+
+  const [mapInfo, setMapInfo] = useState({
+    mapTitle: 'Encúentranos en el mapa',
+    mapText: 'Visita nuestras tiendas y distribuidores autorizados en todo México.'
+  });
+
+  useEffect(() => {
+    textosService.getTextos('distribuidores')
+      .then(data => {
+        if (!data || Object.keys(data).length === 0) return;
+        if (data.hero) setHero(prev => ({ ...prev, ...data.hero }));
+        if (data.formulario) setFormDist(prev => ({
+          titulo: data.formulario.titulo || prev.titulo,
+          subtitulo: data.formulario.subtitulo || prev.subtitulo,
+          submitLabel: data.formulario.submitLabel || prev.submitLabel,
+          responseTime: data.formulario.responseTime || prev.responseTime,
+          distribuidores: data.counters?.distribuidores || prev.distribuidores,
+          estados: data.counters?.estados || prev.estados
+        }));
+        setMapInfo(prev => ({
+          mapTitle: data.mapTitle || prev.mapTitle,
+          mapText: data.mapText || prev.mapText
+        }));
+      })
+      .catch(() => console.warn('Distribuidores: usando datos por defecto'));
+  }, []);
+  // Datos de distribuidores
   const distribuidoresData = [
     { nombre: "AZ Boot Bootique", estado: "arizona", ciudad: "Phoenix", tipo: "ambos", lat: 33.4484, lng: -112.0740 },
     { nombre: "Texas Boot Company", estado: "texas", ciudad: "Houston", tipo: "tienda", lat: 29.7604, lng: -95.3698 },
@@ -128,20 +169,21 @@ const Distribuidores = () => {
         <section className="relative pt-[95px] bg-gray-50">
           <div className="relative w-full overflow-hidden shadow-2xl">
             <img
-              src="https://blocks.astratic.com/img/general-img-landscape.png"
+              src={hero.imagen}
               alt="Distribuidores Caborca Boots"
               className="w-full h-[600px] object-cover"
+              onError={e => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }}
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <div className="text-center text-white px-4">
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
                   <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">
-                    ÚNETE A NOSOTROS
+                    {hero.badge}
                   </p>
                 </div>
-                <h1 className="text-5xl md:text-7xl font-serif mb-6">¿Quieres ser distribuidor?</h1>
+                <h1 className="text-5xl md:text-7xl font-serif mb-6">{hero.titulo}</h1>
                 <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">
-                  Únete a nuestra red de distribuidores y forma parte de la familia Caborca
+                  {hero.subtitulo}
                 </p>
               </div>
             </div>
@@ -155,10 +197,10 @@ const Distribuidores = () => {
               <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
                 <div className="text-center mb-6">
                   <h3 className="text-2xl sm:text-3xl font-serif text-caborca-beige-fuerte font-bold mb-2">
-                    ¿Quieres ser distribuidor?
+                    {formDist.titulo}
                   </h3>
                   <p className="text-lg md:text-xl text-caborca-cafe/90 max-w-3xl mx-auto">
-                    Si estás interesado, déjanos tus datos y nuestro equipo se pondrá en contacto contigo.
+                    {formDist.subtitulo}
                   </p>
                 </div>
                 <br />
@@ -239,22 +281,19 @@ const Distribuidores = () => {
                   </div>
 
                   <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
-                    <button
-                      type="submit"
-                      className="bg-caborca-beige-fuerte text-white px-8 py-3 rounded-lg font-bold"
-                    >
-                      ENVIAR SOLICITUD
+                    <button type="submit" className="bg-caborca-beige-fuerte text-white px-8 py-3 rounded-lg font-bold">
+                      {formDist.submitLabel}
                     </button>
                     <div className="flex items-center gap-3 text-caborca-bronce/70">
                       <svg className="w-5 h-5 text-caborca-bronce" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                         <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                       </svg>
-                      <span className="text-sm text-caborca-bronce">Respuesta en 24-48 hrs</span>
+                      <span className="text-sm text-caborca-bronce">{formDist.responseTime}</span>
                     </div>
                     <div className="flex items-center gap-8">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-caborca-bronce">+500</div>
+                        <div className="text-2xl font-bold text-caborca-bronce">{formDist.distribuidores}</div>
                         <div className="text-xs text-caborca-bronce/60">Distribuidores</div>
                       </div>
                       <div className="w-16 h-16 bg-caborca-bronce rounded-full flex items-center justify-center">
@@ -263,7 +302,7 @@ const Distribuidores = () => {
                         </svg>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-caborca-bronce">20+</div>
+                        <div className="text-2xl font-bold text-caborca-bronce">{formDist.estados}</div>
                         <div className="text-xs text-caborca-bronce/60">Estados</div>
                       </div>
                     </div>
@@ -278,10 +317,10 @@ const Distribuidores = () => {
         <section className="py-8 bg-gray-100">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-serif mb-8 text-caborca-beige-fuerte font-bold text-center">
-              Encuéntranos en el mapa
+              {mapInfo.mapTitle}
             </h2>
             <p className="text-center mb-8 text-caborca-cafe font-bold">
-              Visita nuestras tiendas y distribuidores autorizados en todo México.
+              {mapInfo.mapText}
             </p>
 
             {/* Filtros de Búsqueda */}
