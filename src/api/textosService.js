@@ -1,5 +1,5 @@
 // API del Portafolio: Solo lectура (GET), sin autenticación.
-const API_URL = "https://localhost:7020/api";
+const API_URL = "https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api";
 
 export const textosService = {
     getTextos: async (pagina) => {
