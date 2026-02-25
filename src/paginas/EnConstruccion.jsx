@@ -12,19 +12,24 @@ const EnConstruccion = () => {
     useEffect(() => {
         const fetchContent = async () => {
             try {
-                const response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/Textos/mantenimiento');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data && Object.keys(data).length > 0) {
-                        setContent(prev => ({
-                            ...prev,
-                            titulo: data.titulo || prev.titulo,
-                            subtitulo: data.subtitulo || prev.subtitulo,
-                            mensaje: data.mensaje || prev.mensaje,
-                            imagenFondo: data.imagenFondo || prev.imagenFondo,
-                            redes: data.redes || prev.redes
-                        }));
-                    }
+                let response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/cms/content/mantenimiento');
+                let data = await response.json().catch(() => ({}));
+
+                // Fallback a Settings si aún no se ha publicado el contenido nuevo
+                if (!data || Object.keys(data).length === 0) {
+                    response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/Settings/Mantenimiento');
+                    data = await response.json().catch(() => ({}));
+                }
+
+                if (data && Object.keys(data).length > 0) {
+                    setContent(prev => ({
+                        ...prev,
+                        titulo: data.titulo || prev.titulo,
+                        subtitulo: data.subtitulo || prev.subtitulo,
+                        mensaje: data.mensaje || prev.mensaje,
+                        imagenFondo: data.imagenFondo || prev.imagenFondo,
+                        redes: data.redes || prev.redes
+                    }));
                 }
             } catch (error) {
                 console.error('Error fetching maintenance content:', error);
