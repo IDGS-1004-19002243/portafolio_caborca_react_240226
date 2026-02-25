@@ -1,32 +1,37 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const EnConstruccion = () => {
-    const [content] = useState(() => {
-        const defaultContent = {
-            titulo: 'Página en Construcción',
-            subtitulo: 'ESTAMOS PREPARANDO ALGO INCREÍBLE',
-            mensaje: 'Estamos trabajando arduamente para traerte una experiencia renovada.',
-            imagenFondo: 'https://blocks.astratic.com/img/general-img-landscape.png'
-        };
-        try {
-            const stored = localStorage.getItem('cms:mantenimiento');
-            if (stored) {
-                const data = JSON.parse(stored);
-                return {
-                    ...defaultContent,
-                    titulo: data.titulo || defaultContent.titulo,
-                    subtitulo: data.subtitulo || defaultContent.subtitulo,
-                    mensaje: data.mensaje || defaultContent.mensaje,
-                    imagenFondo: data.imagenFondo || defaultContent.imagenFondo,
-                    redes: data.redes || defaultContent.redes // In caso de que existan redes
-                };
-            }
-        } catch (e) {
-            console.error(e);
-        }
-        return defaultContent;
+    const [content, setContent] = useState({
+        titulo: 'Página en Construcción',
+        subtitulo: 'ESTAMOS PREPARANDO ALGO INCREÍBLE',
+        mensaje: 'Estamos trabajando arduamente para traerte una experiencia renovada.',
+        imagenFondo: 'https://blocks.astratic.com/img/general-img-landscape.png'
     });
+
+    useEffect(() => {
+        const fetchContent = async () => {
+            try {
+                const response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/Textos/mantenimiento');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && Object.keys(data).length > 0) {
+                        setContent(prev => ({
+                            ...prev,
+                            titulo: data.titulo || prev.titulo,
+                            subtitulo: data.subtitulo || prev.subtitulo,
+                            mensaje: data.mensaje || prev.mensaje,
+                            imagenFondo: data.imagenFondo || prev.imagenFondo,
+                            redes: data.redes || prev.redes
+                        }));
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching maintenance content:', error);
+            }
+        };
+        fetchContent();
+    }, []);
 
     return (
         <div className="relative min-h-screen flex items-center justify-center bg-gray-900 text-white font-sans overflow-hidden">

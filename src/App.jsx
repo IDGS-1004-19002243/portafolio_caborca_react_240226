@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 // Pages (usar `Inicio` como root)
 import Inicio from './paginas/Inicio';
@@ -13,6 +14,44 @@ import NotFound from './paginas/NotFound';
 import EnConstruccion from './paginas/EnConstruccion';
 
 function App() {
+  const [isMaintenance, setIsMaintenance] = useState(false);
+  const [loadingConfig, setLoadingConfig] = useState(true);
+
+  useEffect(() => {
+    const checkMaintenance = async () => {
+      try {
+        const response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/Settings/Mantenimiento');
+        const data = await response.json();
+        if (data && data.activo) {
+          setIsMaintenance(true);
+        }
+      } catch (error) {
+        console.error('Error verificando modo mantenimiento:', error);
+      } finally {
+        setLoadingConfig(false);
+      }
+    };
+    checkMaintenance();
+  }, []);
+
+  if (loadingConfig) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#5C4A3A]"></div>
+      </div>
+    );
+  }
+
+  if (isMaintenance) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="*" element={<EnConstruccion />} />
+        </Routes>
+      </Router>
+    );
+  }
+
   return (
     <Router>
       <Routes>
