@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { textosService } from '../api/textosService';
 
 const NotFound = () => {
     const [content, setContent] = useState({
@@ -10,19 +11,21 @@ const NotFound = () => {
     });
 
     useEffect(() => {
-        try {
-            const stored = localStorage.getItem('cms:notfound');
-            if (stored) {
-                const data = JSON.parse(stored);
-                setContent(prev => ({
-                    ...prev,
-                    titulo: data.titulo || prev.titulo,
-                    mensaje: data.mensaje || prev.mensaje,
-                    textoBoton: data.textoBoton || prev.textoBoton,
-                    imagenFondo: data.imagenFondo || prev.imagenFondo
-                }));
-            }
-        } catch (e) { console.error(e); }
+        const fetchContent = async () => {
+            try {
+                const data = await textosService.getTextos('notfound');
+                if (data && Object.keys(data).length > 0) {
+                    setContent(prev => ({
+                        ...prev,
+                        titulo: data.titulo || prev.titulo,
+                        mensaje: data.mensaje || prev.mensaje,
+                        textoBoton: data.textoBoton || prev.textoBoton,
+                        imagenFondo: data.imagenFondo || prev.imagenFondo
+                    }));
+                }
+            } catch (e) { console.error('Error fetching 404 content:', e); }
+        };
+        fetchContent();
     }, []);
 
     return (

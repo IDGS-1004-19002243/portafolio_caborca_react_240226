@@ -1,5 +1,5 @@
-// API del Portafolio: Solo lectура (GET), sin autenticación.
-const API_URL = "https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api";
+// API del Portafolio: Solo lectura (GET), sin autenticación.
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "https://localhost:7020/api" : "https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api");
 
 const homeService = {
     getHomeContent: async () => {

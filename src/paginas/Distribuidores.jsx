@@ -43,14 +43,16 @@ const Distribuidores = () => {
       .then(data => {
         if (!data || Object.keys(data).length === 0) return;
         if (data.hero) setHero(prev => ({ ...prev, ...data.hero }));
-        if (data.formulario) setFormDist(prev => ({
-          titulo: data.formulario.titulo || prev.titulo,
-          subtitulo: data.formulario.subtitulo || prev.subtitulo,
-          submitLabel: data.formulario.submitLabel || prev.submitLabel,
-          responseTime: data.formulario.responseTime || prev.responseTime,
-          distribuidores: data.counters?.distribuidores || prev.distribuidores,
-          estados: data.counters?.estados || prev.estados
-        }));
+        if (data.formulario || data.counters) {
+          setFormDist(prev => ({
+            titulo: data.formulario?.titulo || prev.titulo,
+            subtitulo: data.formulario?.subtitulo || prev.subtitulo,
+            submitLabel: data.formulario?.submitLabel || prev.submitLabel,
+            responseTime: data.formulario?.responseTime || prev.responseTime,
+            distribuidores: data.counters?.distribuidores || prev.distribuidores,
+            estados: data.counters?.estados || prev.estados
+          }));
+        }
         setMapInfo(prev => ({
           mapTitle: data.mapTitle || prev.mapTitle,
           mapText: data.mapText || prev.mapText

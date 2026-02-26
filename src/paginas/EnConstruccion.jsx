@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { textosService } from '../api/textosService';
 
 const EnConstruccion = () => {
     const [content, setContent] = useState({
@@ -12,24 +13,26 @@ const EnConstruccion = () => {
     useEffect(() => {
         const fetchContent = async () => {
             try {
-                let response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/cms/content/mantenimiento');
-                let data = await response.json().catch(() => ({}));
-
-                // Fallback a Settings si aún no se ha publicado el contenido nuevo
-                if (!data || Object.keys(data).length === 0) {
-                    response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/Settings/Mantenimiento');
-                    data = await response.json().catch(() => ({}));
-                }
-
+                const data = await textosService.getTextos('mantenimiento');
                 if (data && Object.keys(data).length > 0) {
-                    setContent(prev => ({
-                        ...prev,
-                        titulo: data.titulo || prev.titulo,
-                        subtitulo: data.subtitulo || prev.subtitulo,
-                        mensaje: data.mensaje || prev.mensaje,
-                        imagenFondo: data.imagenFondo || prev.imagenFondo,
-                        redes: data.redes || prev.redes
-                    }));
+                    const parsed = data;
+                    const migratedRedes = {};
+                    if (parsed.redes) {
+                        Object.keys(parsed.redes).forEach(key => {
+                            const val = parsed.redes[key];
+                            if (typeof val === 'string') {
+                                migratedRedes[key] = { url: val, enabled: !!val };
+                            } else {
+                                migratedRedes[key] = val;
+                            }
+                        });
+                        setContent(prev => {
+                            parsed.redes = { ...prev.redes, ...migratedRedes };
+                            return { ...prev, ...parsed };
+                        });
+                    } else {
+                        setContent(prev => ({ ...prev, ...parsed }));
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching maintenance content:', error);

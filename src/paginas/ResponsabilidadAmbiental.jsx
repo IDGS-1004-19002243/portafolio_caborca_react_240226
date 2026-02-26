@@ -35,6 +35,7 @@ const ResponsabilidadAmbiental = () => {
       title: 'Pieles libres de\nmetales pesados',
       p1: 'Tenemos nuestro propio analizador de metales X-MET7500.',
       p2: 'Realizamos inspecciones diarias en todas las pieles que recibimos de nuestros proveedores.',
+      sustanciasText: 'Plomo, Arsénico, Cadmio, Cloroformo, Cromo hexavalente, Mercurio',
       image: 'https://blocks.astratic.com/img/general-img-landscape.png'
     },
     shambhala: {
@@ -147,7 +148,7 @@ const ResponsabilidadAmbiental = () => {
                 <div className="relative order-2 lg:order-1">
                   <div className="absolute -top-8 -right-8 w-full h-full bg-yellow-400/10 rounded-2xl"></div>
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                    <img src="https://blocks.astratic.com/img/general-img-landscape.png" alt="Paneles Solares" className="w-full h-[500px] object-cover" />
+                    <img src={content.energia.image || "https://blocks.astratic.com/img/general-img-landscape.png"} alt="Paneles Solares" className="w-full h-[500px] object-cover" />
                   </div>
                   {/* Solar icon decoration */}
                   <div className="absolute -top-6 -left-6 w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
@@ -266,30 +267,16 @@ const ResponsabilidadAmbiental = () => {
                       Sustancias eliminadas
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-2 text-sm text-caborca-negro/70">
-                        <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                        Plomo
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-caborca-negro/70">
-                        <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                        Arsénico
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-caborca-negro/70">
-                        <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                        Cadmio
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-caborca-negro/70">
-                        <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                        Cloroformo
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-caborca-negro/70">
-                        <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                        Cromo hexavalente
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-caborca-negro/70">
-                        <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                        Mercurio
-                      </div>
+                      {(content.pieles.sustanciasText || 'Plomo, Arsénico, Cadmio, Cloroformo, Cromo hexavalente, Mercurio').split(',').map((sustancia, i) => {
+                        const s = sustancia.trim();
+                        if (!s) return null;
+                        return (
+                          <div key={i} className="flex items-center gap-2 text-sm text-caborca-negro/70">
+                            <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                            {s}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -297,7 +284,7 @@ const ResponsabilidadAmbiental = () => {
                 <div className="relative">
                   <div className="absolute -top-8 -right-8 w-full h-full bg-green-500/5 rounded-2xl"></div>
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                    <img src="https://blocks.astratic.com/img/general-img-landscape.png" alt="Analizador de Metales" className="w-full h-[500px] object-cover" />
+                    <img src={content.pieles.image || "https://blocks.astratic.com/img/general-img-landscape.png"} alt="Analizador de Metales" className="w-full h-[500px] object-cover" />
                   </div>
                   {/* Badge */}
                   <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-xl border border-gray-100">
@@ -414,10 +401,10 @@ const ResponsabilidadAmbiental = () => {
                   {/* Grid of 2 images */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="relative rounded-xl overflow-hidden shadow-lg">
-                      <img src="https://blocks.astratic.com/img/general-img-landscape.png" alt="Shambhala 1" className="w-full aspect-square object-cover" />
+                      <img src={content.shambhala.thumb1 || "https://blocks.astratic.com/img/general-img-landscape.png"} alt="Shambhala 1" className="w-full aspect-square object-cover" />
                     </div>
                     <div className="relative rounded-xl overflow-hidden shadow-lg">
-                      <img src="https://blocks.astratic.com/img/general-img-landscape.png" alt="Shambhala 2" className="w-full aspect-square object-cover" />
+                      <img src={content.shambhala.thumb2 || "https://blocks.astratic.com/img/general-img-landscape.png"} alt="Shambhala 2" className="w-full aspect-square object-cover" />
                     </div>
                   </div>
                 </div>

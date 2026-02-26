@@ -44,7 +44,19 @@ const Inicio = () => {
             { titulo: "Excelencia Garantizada", descripcion: "Nuestro compromiso con la excelencia nos ha convertido en líderes en calzado vaquero de lujo." }
         ],
         boton: "CONOCE NUESTRA HISTORIA",
-        nota: "Calidad certificada"
+        nota: "Calidad certificada",
+        imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png"
+    });
+    const [dondeComprar, setDondeComprar] = useState({
+        titulo: "¿Dónde comprar?",
+        descripcion: "Encuentra nuestras tiendas y distribuidores autorizados en todo el mundo.",
+        textoBoton: "VER TODOS LOS DISTRIBUIDORES",
+        linkBoton: "/distribuidores",
+        mapaUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120615.72236587609!2d-99.2840989!3d19.432608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce0026db097507%3A0x54061076265ee841!2sCiudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx",
+        nota: "Conoce la ubicación y contacto de todos nuestros distribuidores autorizados"
+    });
+    const [productosDestacados, setProductosDestacados] = useState({
+        titulo: "Conoce nuestros nuevos estilos"
     });
 
     // Cargar datos dinámicos de la API
@@ -71,7 +83,10 @@ const Inicio = () => {
                         imagenUrl: data.sustentabilidad.imagenUrl || prev.imagenUrl,
                         badge: data.sustentabilidad.badge_ES || prev.badge,
                         tituloDerecho: data.sustentabilidad.tituloDerecho_ES || prev.tituloDerecho,
-                        notaCertificacion: data.sustentabilidad.notaCertificacion_ES || prev.notaCertificacion
+                        notaCertificacion: data.sustentabilidad.notaCertificacion_ES || prev.notaCertificacion,
+                        features: data.sustentabilidad.features?.length > 0
+                            ? data.sustentabilidad.features.map(f => ({ titulo: f.titulo_ES, descripcion: f.descripcion_ES }))
+                            : prev.features || []
                     }));
                 }
                 // 3. Formulario Distribuidor
@@ -95,7 +110,24 @@ const Inicio = () => {
                             ? data.arteCreacion.features.map(f => ({ titulo: f.titulo_ES, descripcion: f.descripcion_ES }))
                             : prev.features,
                         boton: data.arteCreacion.boton_ES || prev.boton,
-                        nota: data.arteCreacion.nota_ES || prev.nota
+                        nota: data.arteCreacion.nota_ES || prev.nota,
+                        imagenUrl: data.arteCreacion.imagenUrl || prev.imagenUrl
+                    }));
+                }
+                // 5. Productos Destacados
+                if (data?.productosDestacados?.titulo_ES) {
+                    setProductosDestacados(prev => ({
+                        titulo: data.productosDestacados.titulo_ES || prev.titulo
+                    }));
+                }
+                // 6. Donde Comprar
+                if (data?.dondeComprar?.titulo_ES) {
+                    setDondeComprar(prev => ({
+                        titulo: data.dondeComprar.titulo_ES || prev.titulo,
+                        descripcion: data.dondeComprar.descripcion_ES || prev.descripcion,
+                        textoBoton: data.dondeComprar.textoBoton_ES || prev.textoBoton,
+                        mapaUrl: data.dondeComprar.mapaUrl || prev.mapaUrl,
+                        nota: data.dondeComprar.nota_ES || prev.nota
                     }));
                 }
             })
@@ -137,7 +169,7 @@ const Inicio = () => {
                 <section className="py-12 sm:py-16">
                     <div className="container mx-auto px-4">
                         <h2 className="text-center text-2xl sm:text-3xl font-serif font-bold mb-8 sm:mb-10 text-caborca-beige-fuerte">
-                            Conoce nuestros nuevos estilos
+                            {productosDestacados.titulo}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto">
                             {/* Product 1: Diseño Exclusivo */}
@@ -196,7 +228,8 @@ const Inicio = () => {
                             <div className="order-2 md:order-1 relative group">
                                 <div className="relative overflow-hidden rounded-lg shadow-2xl">
                                     <img
-                                        src="https://blocks.astratic.com/img/general-img-landscape.png"
+                                        src={arteCreacion.imagenUrl}
+                                        onError={(e) => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }}
                                         className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-caborca-cafe/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -324,16 +357,16 @@ const Inicio = () => {
                     <div className="container mx-auto px-4">
                         <div className="max-w-6xl mx-auto text-center mb-6">
                             <h2 className="text-2xl sm:text-3xl font-serif mb-3 text-caborca-beige-fuerte font-bold">
-                                ¿Dónde comprar?
+                                {dondeComprar.titulo}
                             </h2>
                             <p className="text-caborca-cafe font-bold text-sm sm:text-base">
-                                Encuentra nuestras tiendas y distribuidores autorizados en todo el mundo.
+                                {dondeComprar.descripcion}
                             </p>
                         </div>
                         <div className="w-full">
                             <div className="bg-gray-200 rounded-lg overflow-hidden shadow-lg" style={{ height: '400px' }}>
                                 <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120615.72236587609!2d-99.2840989!3d19.432608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce0026db097507%3A0x54061076265ee841!2sCiudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx"
+                                    src={dondeComprar.mapaUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120615.72236587609!2d-99.2840989!3d19.432608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce0026db097507%3A0x54061076265ee841!2sCiudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx"}
                                     width="100%"
                                     height="100%"
                                     style={{ border: 0 }}
@@ -343,17 +376,17 @@ const Inicio = () => {
                             </div>
                             {/* CTA to distributors page */}
                             <div className="text-center mt-6">
-                                <Link to={distribuidores.linkBoton} className="inline-flex items-center gap-2 bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-8 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg group">
+                                <Link to={dondeComprar.linkBoton} className="inline-flex items-center gap-2 bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-8 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg group">
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L10 4.414l6.293 6.293a1 1 0 001.414-1.414l-7-7z" />
                                     </svg>
-                                    <span>{distribuidores.textoBoton}</span>
+                                    <span>{dondeComprar.textoBoton}</span>
                                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                     </svg>
                                 </Link>
                                 <p className="text-caborca-beige-fuerte text-xs mt-3">
-                                    Conoce la ubicación y contacto de todos nuestros distribuidores autorizados
+                                    {dondeComprar.nota}
                                 </p>
                             </div>
                         </div>
@@ -401,41 +434,20 @@ const Inicio = () => {
 
                                 {/* Features Grid */}
                                 <div className="grid grid-cols-2 gap-4 mb-8">
-                                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                                        <div className="text-caborca-beige-fuerte mb-2">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" >
-                                                <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-sm font-semibold text-caborca-beige-fuerte">Materiales Sostenibles</p>
-                                    </div>
-
-                                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                                        <div className="text-caborca-beige-fuerte mb-2">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-sm font-semibold text-caborca-beige-fuerte">Reciclaje Responsable</p>
-                                    </div>
-
-                                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                                        <div className="text-caborca-beige-fuerte mb-2">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-sm font-semibold text-caborca-beige-fuerte">Reducción de Huella</p>
-                                    </div>
-
-                                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                                        <div className="text-caborca-beige-fuerte mb-2">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-sm font-semibold text-caborca-beige-fuerte">Producción Ética</p>
-                                    </div>
+                                    {(sustentabilidad.features && sustentabilidad.features.length > 0) ? (
+                                        sustentabilidad.features.map((feature, idx) => (
+                                            <div key={idx} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                                                <div className="text-caborca-beige-fuerte mb-2">
+                                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                                <p className="text-sm font-semibold text-caborca-beige-fuerte">{feature.titulo}</p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500">No hay características definidas</p>
+                                    )}
                                 </div>
 
                                 {/* CTA Button */}

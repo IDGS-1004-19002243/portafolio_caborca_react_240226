@@ -20,7 +20,8 @@ function App() {
   useEffect(() => {
     const checkMaintenance = async () => {
       try {
-        const response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/Settings/Mantenimiento');
+        // const response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/Settings/Mantenimiento');
+        const response = await fetch('https://localhost:7020/api/Settings/Mantenimiento');
         const data = await response.json();
         if (data && data.activo) {
           setIsMaintenance(true);
