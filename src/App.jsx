@@ -20,8 +20,8 @@ function App() {
   useEffect(() => {
     const checkMaintenance = async () => {
       try {
-        // const response = await fetch('https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api/Settings/Mantenimiento');
-        const response = await fetch('https://localhost:7020/api/Settings/Mantenimiento');
+        const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "https://localhost:7020/api" : "https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api");
+        const response = await fetch(`${API_URL}/Settings/Mantenimiento`);
         const data = await response.json();
         if (data && data.activo) {
           setIsMaintenance(true);
