@@ -43,7 +43,6 @@ const Header = () => {
             <Link to="/responsabilidad-ambiental" className="text-white">RESPONSABILIDAD AMBIENTAL</Link>
             <Link to="/distribuidores" className="text-white">DISTRIBUIDORES</Link>
             <Link to="/contacto" className="text-white">CONTACTO</Link>
-            <Link to="/mantenimiento" className="text-white">EN CONSTRUCCIÓN</Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -137,7 +136,6 @@ const Header = () => {
                 <Link to="/responsabilidad-ambiental" className="text-white font-medium tracking-wider py-2" onClick={toggleMobileMenu}>RESPONSABILIDAD AMBIENTAL</Link>
                 <Link to="/distribuidores" className="text-white font-medium tracking-wider py-2" onClick={toggleMobileMenu}>DISTRIBUIDORES</Link>
                 <Link to="/contacto" className="text-white font-medium tracking-wider py-2" onClick={toggleMobileMenu}>CONTACTO</Link>
-                <Link to="/mantenimiento" className="text-white font-medium tracking-wider py-2" onClick={toggleMobileMenu}>EN CONSTRUCCIÓN</Link>
                 <div className="flex gap-3 pt-4">
                   <a href="#" className="hover:opacity-75 transition-opacity" title="Español">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 480" className="w-8 h-5 border border-gray-300">
