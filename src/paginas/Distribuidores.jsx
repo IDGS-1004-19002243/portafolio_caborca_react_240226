@@ -14,31 +14,29 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Custom Caborca-colored marker
+const BOOT_SVG = (fill, stroke = 'rgba(0,0,0,0.25)') => btoa(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 60" width="48" height="60">` +
+  `<g filter="url(#shadow)">` +
+  `<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.35)"/></filter></defs>` +
+  `<path d="M18 2 Q14 2 13 6 L13 30 Q9 33 7 38 Q5 43 5 46 Q5 50 9 51 L38 51 Q42 51 43 48 Q44 45 41 43 L36 40 L36 28 Q36 26 34 26 L20 26 L20 6 Q20 2 18 2 Z" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>` +
+  `<rect x="13" y="2" width="7" height="3" rx="1.5" fill="${fill}" opacity="0.6"/>` +
+  `<line x1="16" y1="8" x2="16" y2="26" stroke="white" stroke-width="1" stroke-dasharray="2,3" opacity="0.45"/>` +
+  `<ellipse cx="24" cy="55" rx="15" ry="3.5" fill="rgba(0,0,0,0.15)"/>` +
+  `</g></svg>`
+);
+
 const caborcaIcon = new L.Icon({
-  iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" width="32" height="42">
-      <path d="M16 0C7.163 0 0 7.163 0 16c0 10.627 16 26 16 26S32 26.627 32 16C32 7.163 24.837 0 16 0z" fill="#7C5C3E"/>
-      <circle cx="16" cy="16" r="8" fill="white"/>
-      <circle cx="16" cy="16" r="5" fill="#7C5C3E"/>
-    </svg>
-  `),
-  iconSize: [32, 42],
-  iconAnchor: [16, 42],
-  popupAnchor: [0, -42],
+  iconUrl: 'data:image/svg+xml;base64,' + BOOT_SVG('#7C5C3E'),
+  iconSize: [40, 52],
+  iconAnchor: [20, 51],
+  popupAnchor: [0, -54],
 });
 
 const selectedIcon = new L.Icon({
-  iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" width="32" height="42">
-      <path d="M16 0C7.163 0 0 7.163 0 16c0 10.627 16 26 16 26S32 26.627 32 16C32 7.163 24.837 0 16 0z" fill="#2d8a4e"/>
-      <circle cx="16" cy="16" r="8" fill="white"/>
-      <circle cx="16" cy="16" r="5" fill="#2d8a4e"/>
-    </svg>
-  `),
-  iconSize: [38, 50],
-  iconAnchor: [19, 50],
-  popupAnchor: [0, -50],
+  iconUrl: 'data:image/svg+xml;base64,' + BOOT_SVG('#1e7a40', 'rgba(0,0,0,0.3)'),
+  iconSize: [48, 62],
+  iconAnchor: [24, 61],
+  popupAnchor: [0, -64],
 });
 
 // Component to fly map to coordinates
