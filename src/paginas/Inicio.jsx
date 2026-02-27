@@ -5,6 +5,8 @@ import Carrusel from '../componentes/Carrusel';
 import PieDePagina from '../componentes/PieDePagina';
 import homeService from '../api/homeService';
 
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'https://localhost:7020/api' : 'https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api');
+
 const Inicio = () => {
     const [activeFilter, setActiveFilter] = useState('todos');
 
@@ -58,6 +60,21 @@ const Inicio = () => {
     const [productosDestacados, setProductosDestacados] = useState({
         titulo: "Conoce nuestros nuevos estilos"
     });
+
+    // ── Logos de distribuidores desde ConfiguracionGeneral ─────────────────────
+    const [logosConfig, setLogosConfig] = useState([]);
+
+    // Cargar logos de distribuidores de la configuración general
+    useEffect(() => {
+        fetch(`${API_URL}/Settings/ConfiguracionGeneral`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data && Array.isArray(data.distribuidoresList) && data.distribuidoresList.length > 0) {
+                    setLogosConfig(data.distribuidoresList);
+                }
+            })
+            .catch(() => { });
+    }, []);
 
     // Cargar datos dinámicos de la API
     useEffect(() => {
@@ -146,10 +163,23 @@ const Inicio = () => {
         { id: 6, name: "Botas Caborca Store", category: "premium", logo: "https://blocks.astratic.com/img/general-img-landscape.png" }
     ];
 
-    // Usar logos de la API o los estáticos de respaldo
-    const distribuidoresLogos = distribuidores.logos.length > 0
-        ? distribuidores.logos.map((l, i) => ({ id: l.id, name: `Distribuidor ${i + 1}`, category: "todos", logo: l.imagenUrl }))
-        : logosEstaticos;
+    // Logos: prioridad ConfiguracionGeneral → distribuidoresLogos del Home → estáticos
+    const distribuidoresLogos = (() => {
+        if (logosConfig.length > 0) {
+            return logosConfig
+                .filter(l => l.logo)
+                .map((l, idx) => ({
+                    id: l.id || idx,
+                    name: l.negocioNombre || l.contactoNombre || 'Distribuidor',
+                    category: l.clasificacion || 'todos',
+                    logo: l.logo
+                }));
+        }
+        if (distribuidores.logos.length > 0) {
+            return distribuidores.logos.map((l, i) => ({ id: l.id, name: `Distribuidor ${i + 1}`, category: 'todos', logo: l.imagenUrl }));
+        }
+        return logosEstaticos;
+    })();
 
     const filteredDistributors = activeFilter === 'todos'
         ? distribuidoresLogos
