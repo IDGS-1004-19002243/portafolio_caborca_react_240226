@@ -1,29 +1,99 @@
 import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
 import { textosService } from '../api/textosService';
 
-const Distribuidores = () => {
-  const [formulario, setFormulario] = useState({
-    nombreCompleto: '',
-    correoElectronico: '',
-    telefono: '',
-    ciudad: '',
-    mensaje: ''
-  });
+// Fix Leaflet default marker icons broken by bundlers
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
 
+// Custom Caborca-colored marker
+const caborcaIcon = new L.Icon({
+  iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" width="32" height="42">
+      <path d="M16 0C7.163 0 0 7.163 0 16c0 10.627 16 26 16 26S32 26.627 32 16C32 7.163 24.837 0 16 0z" fill="#7C5C3E"/>
+      <circle cx="16" cy="16" r="8" fill="white"/>
+      <circle cx="16" cy="16" r="5" fill="#7C5C3E"/>
+    </svg>
+  `),
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42],
+});
+
+const selectedIcon = new L.Icon({
+  iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" width="32" height="42">
+      <path d="M16 0C7.163 0 0 7.163 0 16c0 10.627 16 26 16 26S32 26.627 32 16C32 7.163 24.837 0 16 0z" fill="#2d8a4e"/>
+      <circle cx="16" cy="16" r="8" fill="white"/>
+      <circle cx="16" cy="16" r="5" fill="#2d8a4e"/>
+    </svg>
+  `),
+  iconSize: [38, 50],
+  iconAnchor: [19, 50],
+  popupAnchor: [0, -50],
+});
+
+// Component to fly map to coordinates
+const FlyToMarker = ({ center, zoom }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center) map.flyTo(center, zoom, { duration: 1.2 });
+  }, [center, zoom, map]);
+  return null;
+};
+
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV
+  ? 'https://localhost:7020/api'
+  : 'https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api');
+
+// Static fallback demo distributors
+const DEMO_DISTRIBUIDORES = [
+  { nombre: 'AZ Boot Boutique', estado: 'arizona', ciudad: 'Phoenix', tipo: 'ambos', lat: 33.4484, lng: -112.0740 },
+  { nombre: 'Texas Boot Company', estado: 'texas', ciudad: 'Houston', tipo: 'tienda', lat: 29.7604, lng: -95.3698 },
+  { nombre: "Allens Boots", estado: 'texas', ciudad: 'Austin', tipo: 'ambos', lat: 30.2672, lng: -97.7431 },
+  { nombre: "Cavender's", estado: 'texas', ciudad: 'San Antonio', tipo: 'tienda', lat: 29.4241, lng: -98.4936 },
+  { nombre: 'Lost Creek', estado: 'california', ciudad: 'Los Angeles', tipo: 'online', lat: 34.0522, lng: -118.2437 },
+  { nombre: 'Melbelle', estado: 'cdmx', ciudad: 'Ciudad de México', tipo: 'ambos', lat: 19.4326, lng: -99.1332 },
+  { nombre: 'Boot Barn Jalisco', estado: 'jalisco', ciudad: 'Guadalajara', tipo: 'tienda', lat: 20.6597, lng: -103.3496 },
+  { nombre: 'Botas del Norte', estado: 'nuevo-leon', ciudad: 'Monterrey', tipo: 'ambos', lat: 25.6866, lng: -100.3161 },
+  { nombre: 'Caborca Sonora Store', estado: 'sonora', ciudad: 'Hermosillo', tipo: 'tienda', lat: 29.0729, lng: -110.9559 },
+  { nombre: 'Chihuahua Boots', estado: 'chihuahua', ciudad: 'Chihuahua', tipo: 'tienda', lat: 28.6353, lng: -106.0889 },
+];
+
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+const Distribuidores = () => {
+  const [formulario, setFormulario] = useState({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
   const [tipoCompra, setTipoCompra] = useState('');
   const [estadoFiltro, setEstadoFiltro] = useState('');
   const [resultados, setResultados] = useState([]);
   const [mensajeUbicacion, setMensajeUbicacion] = useState('');
-  const [mapSrc, setMapSrc] = useState("https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120615.72236587609!2d-99.2840989!3d19.432608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce0026db097507%3A0x54061076265ee841!2sCiudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx");
+  const [selectedStore, setSelectedStore] = useState(null);
+  const [mapCenter, setMapCenter] = useState([23.5, -102.3]); // Mexico centrado
+  const [mapZoom, setMapZoom] = useState(5);
+  const [allDistribuidores, setAllDistribuidores] = useState(DEMO_DISTRIBUIDORES);
+
   const [hero, setHero] = useState({
     badge: 'ÚNETE A NOSOTROS',
     titulo: '¿Quieres ser distribuidor?',
     subtitulo: 'Únete a nuestra red de distribuidores y forma parte de la familia Caborca',
     imagen: 'https://blocks.astratic.com/img/general-img-landscape.png'
   });
-
   const [formDist, setFormDist] = useState({
     titulo: '¿Quieres ser distribuidor?',
     subtitulo: 'Si estás interesado, déjanos tus datos y nuestro equipo se pondrá en contacto contigo.',
@@ -32,12 +102,12 @@ const Distribuidores = () => {
     distribuidores: '+500',
     estados: '20+',
   });
-
   const [mapInfo, setMapInfo] = useState({
-    mapTitle: 'Encúentranos en el mapa',
-    mapText: 'Visita nuestras tiendas y distribuidores autorizados en todo México.'
+    mapTitle: 'Encuéntranos en el mapa',
+    mapText: 'Visita nuestras tiendas y distribuidores autorizados en todo México.',
   });
 
+  // Load CMS text content
   useEffect(() => {
     textosService.getTextos('distribuidores')
       .then(data => {
@@ -50,240 +120,162 @@ const Distribuidores = () => {
             submitLabel: data.formulario?.submitLabel || prev.submitLabel,
             responseTime: data.formulario?.responseTime || prev.responseTime,
             distribuidores: data.counters?.distribuidores || prev.distribuidores,
-            estados: data.counters?.estados || prev.estados
+            estados: data.counters?.estados || prev.estados,
           }));
         }
         setMapInfo(prev => ({
           mapTitle: data.mapTitle || prev.mapTitle,
-          mapText: data.mapText || prev.mapText
+          mapText: data.mapText || prev.mapText,
         }));
       })
-      .catch(() => console.warn('Distribuidores: usando datos por defecto'));
+      .catch(() => { });
   }, []);
-  // Datos de distribuidores
-  const distribuidoresData = [
-    { nombre: "AZ Boot Bootique", estado: "arizona", ciudad: "Phoenix", tipo: "ambos", lat: 33.4484, lng: -112.0740 },
-    { nombre: "Texas Boot Company", estado: "texas", ciudad: "Houston", tipo: "tienda", lat: 29.7604, lng: -95.3698 },
-    { nombre: "Allens Boots", estado: "texas", ciudad: "Austin", tipo: "ambos", lat: 30.2672, lng: -97.7431 },
-    { nombre: "Cavender's", estado: "texas", ciudad: "San Antonio", tipo: "tienda", lat: 29.4241, lng: -98.4936 },
-    { nombre: "Lost Creek", estado: "california", ciudad: "Los Angeles", tipo: "online", lat: 34.0522, lng: -118.2437 },
-    { nombre: "Melbelle", estado: "cdmx", ciudad: "Ciudad de México", tipo: "ambos", lat: 19.4326, lng: -99.1332 },
-    { nombre: "Boot Barn Jalisco", estado: "jalisco", ciudad: "Guadalajara", tipo: "tienda", lat: 20.6597, lng: -103.3496 },
-    { nombre: "Botas del Norte", estado: "nuevo-leon", ciudad: "Monterrey", tipo: "ambos", lat: 25.6866, lng: -100.3161 },
-    { nombre: "Caborca Sonora Store", estado: "sonora", ciudad: "Hermosillo", tipo: "tienda", lat: 29.0729, lng: -110.9559 },
-    { nombre: "Chihuahua Boots", estado: "chihuahua", ciudad: "Chihuahua", tipo: "tienda", lat: 28.6353, lng: -106.0889 }
-  ];
 
-  const manejarCambioFormulario = (evento) => {
-    const { name, value } = evento.target;
-    setFormulario(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const manejarEnvioFormulario = (evento) => {
-    evento.preventDefault();
-    console.log('Formulario enviado:', formulario);
-    alert('¡Gracias por tu interés! Nos pondremos en contacto contigo pronto.');
-  };
-
-  const manejarLimpiarFiltros = () => {
-    setTipoCompra('');
-    setEstadoFiltro('');
-    setResultados([]);
-    setMensajeUbicacion('');
-    setMapSrc("https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120615.72236587609!2d-99.2840989!3d19.432608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce0026db097507%3A0x54061076265ee841!2sCiudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx");
-  };
-
-  const manejarAplicarFiltros = () => {
-    let filtrados = distribuidoresData;
-
-    if (tipoCompra) {
-      filtrados = filtrados.filter(d => d.tipo === tipoCompra || d.tipo === 'ambos');
-    }
-
-    if (estadoFiltro) {
-      filtrados = filtrados.filter(d => d.estado === estadoFiltro);
-    }
-
-    setResultados(filtrados);
-
-    if (filtrados.length > 0) {
-      actualizarMapa(filtrados[0]);
-    }
-  };
-
-  const actualizarMapa = (store) => {
-    setMapSrc(`https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15000!2d${store.lng}!3d${store.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx`);
-  };
-
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radio de la Tierra en km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  };
+  // Load real distributors from ConfiguracionGeneral
+  useEffect(() => {
+    fetch(`${API_URL}/Settings/ConfiguracionGeneral`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && Array.isArray(data.distribuidoresList) && data.distribuidoresList.length > 0) {
+          const mapped = data.distribuidoresList
+            .filter(d => d.lat && d.lng)
+            .map(d => ({
+              nombre: d.negocioNombre || d.contactoNombre || 'Distribuidor',
+              ciudad: d.ciudad || '',
+              estado: (d.estado || '').toLowerCase().replace(/\s+/g, '-'),
+              tipo: d.tipo || 'tienda',
+              lat: parseFloat(d.lat),
+              lng: parseFloat(d.lng),
+              logo: d.logo || null,
+              telefono: d.contactoTelefono || '',
+            }));
+          if (mapped.length > 0) setAllDistribuidores(mapped);
+        }
+      })
+      .catch(() => { });
+  }, []);
 
   const manejarUbicarme = () => {
     setMensajeUbicacion('Obteniendo ubicación...');
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (posicion) => {
-          const userLat = posicion.coords.latitude;
-          const userLng = posicion.coords.longitude;
-
-          setMensajeUbicacion('✓ Ubicación obtenida');
-
-          const storesWithDistance = distribuidoresData.map(store => ({
-            ...store,
-            distance: calculateDistance(userLat, userLng, store.lat, store.lng)
-          })).sort((a, b) => a.distance - b.distance);
-
-          const nearby = storesWithDistance.slice(0, 5);
-          setResultados(nearby);
-
-          if (nearby.length > 0) {
-            actualizarMapa(nearby[0]);
-          }
-        },
-        (error) => {
-          console.error('Error:', error);
-          setMensajeUbicacion('✗ No se pudo obtener la ubicación');
-        }
-      );
-    } else {
+    if (!navigator.geolocation) {
       setMensajeUbicacion('✗ Geolocalización no soportada');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const { latitude: uLat, longitude: uLng } = pos.coords;
+        setMensajeUbicacion('✓ Ubicación obtenida');
+        const sorted = [...allDistribuidores]
+          .map(s => ({ ...s, distance: calculateDistance(uLat, uLng, s.lat, s.lng) }))
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 5);
+        setResultados(sorted);
+        if (sorted[0]) {
+          setSelectedStore(sorted[0]);
+          setMapCenter([sorted[0].lat, sorted[0].lng]);
+          setMapZoom(12);
+        }
+      },
+      () => setMensajeUbicacion('✗ No se pudo obtener la ubicación')
+    );
+  };
+
+  const manejarAplicarFiltros = () => {
+    let filtrados = allDistribuidores;
+    if (tipoCompra) filtrados = filtrados.filter(d => d.tipo === tipoCompra || d.tipo === 'ambos');
+    if (estadoFiltro) filtrados = filtrados.filter(d => d.estado === estadoFiltro);
+    setResultados(filtrados);
+    if (filtrados[0]) {
+      setSelectedStore(filtrados[0]);
+      setMapCenter([filtrados[0].lat, filtrados[0].lng]);
+      setMapZoom(10);
     }
   };
+
+  const manejarLimpiarFiltros = () => {
+    setTipoCompra(''); setEstadoFiltro('');
+    setResultados([]); setMensajeUbicacion('');
+    setSelectedStore(null);
+    setMapCenter([23.5, -102.3]); setMapZoom(5);
+  };
+
+  const seleccionarTienda = (store) => {
+    setSelectedStore(store);
+    setMapCenter([store.lat, store.lng]);
+    setMapZoom(14);
+  };
+
+  const displayedMarkers = resultados.length > 0 ? resultados : allDistribuidores;
 
   return (
     <div className="bg-white text-caborca-cafe font-sans">
       <Encabezado />
 
       <main>
-        {/* HERO IMAGE SECTION */}
+        {/* HERO */}
         <section className="relative pt-[95px] bg-gray-50">
           <div className="relative w-full overflow-hidden shadow-2xl">
             <img
-              src={hero.imagen}
-              alt="Distribuidores Caborca Boots"
+              src={hero.imagen} alt="Distribuidores Caborca Boots"
               className="w-full h-[600px] object-cover"
               onError={e => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }}
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <div className="text-center text-white px-4">
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
-                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">
-                    {hero.badge}
-                  </p>
+                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{hero.badge}</p>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-serif mb-6">{hero.titulo}</h1>
-                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">
-                  {hero.subtitulo}
-                </p>
+                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{hero.subtitulo}</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* FORMULARIO DISTRIBUIDOR */}
+        {/* FORMULARIO SOLICITUD */}
         <section className="py-16 bg-caborca-beige-suave">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl sm:text-3xl font-serif text-caborca-beige-fuerte font-bold mb-2">
-                    {formDist.titulo}
-                  </h3>
-                  <p className="text-lg md:text-xl text-caborca-cafe/90 max-w-3xl mx-auto">
-                    {formDist.subtitulo}
-                  </p>
+                  <h3 className="text-2xl sm:text-3xl font-serif text-caborca-beige-fuerte font-bold mb-2">{formDist.titulo}</h3>
+                  <p className="text-lg text-caborca-cafe/90 max-w-3xl mx-auto">{formDist.subtitulo}</p>
                 </div>
                 <br />
-                <form onSubmit={manejarEnvioFormulario} className="space-y-6">
+                <form onSubmit={e => { e.preventDefault(); alert('¡Gracias por tu interés! Nos pondremos en contacto contigo pronto.'); }} className="space-y-6">
                   <div className="grid md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">
-                        Nombre completo
-                      </label>
-                      <input
-                        type="text"
-                        name="nombreCompleto"
-                        value={formulario.nombreCompleto}
-                        onChange={manejarCambioFormulario}
-                        placeholder="Tu nombre"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">
-                        Correo electrónico
-                      </label>
-                      <input
-                        type="email"
-                        name="correoElectronico"
-                        value={formulario.correoElectronico}
-                        onChange={manejarCambioFormulario}
-                        placeholder="correo@ejemplo.com"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">
-                        Teléfono
-                      </label>
-                      <input
-                        type="tel"
-                        name="telefono"
-                        value={formulario.telefono}
-                        onChange={manejarCambioFormulario}
-                        placeholder="(123) 456-7890"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe focus:border-transparent"
-                        required
-                      />
-                    </div>
+                    {[
+                      { label: 'Nombre completo', name: 'nombreCompleto', type: 'text', placeholder: 'Tu nombre' },
+                      { label: 'Correo electrónico', name: 'correoElectronico', type: 'email', placeholder: 'correo@ejemplo.com' },
+                      { label: 'Teléfono', name: 'telefono', type: 'tel', placeholder: '(123) 456-7890' },
+                    ].map(f => (
+                      <div key={f.name}>
+                        <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">{f.label}</label>
+                        <input type={f.type} name={f.name} value={formulario[f.name]}
+                          onChange={e => setFormulario(p => ({ ...p, [e.target.name]: e.target.value }))}
+                          placeholder={f.placeholder} required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe" />
+                      </div>
+                    ))}
                   </div>
-
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">
-                        Ciudad
-                      </label>
-                      <input
-                        type="text"
-                        name="ciudad"
-                        value={formulario.ciudad}
-                        onChange={manejarCambioFormulario}
-                        placeholder="Tu ciudad"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe focus:border-transparent"
-                        required
-                      />
+                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">Ciudad</label>
+                      <input type="text" name="ciudad" value={formulario.ciudad}
+                        onChange={e => setFormulario(p => ({ ...p, ciudad: e.target.value }))}
+                        placeholder="Tu ciudad" required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">
-                        Mensaje
-                      </label>
-                      <textarea
-                        rows="1"
-                        name="mensaje"
-                        value={formulario.mensaje}
-                        onChange={manejarCambioFormulario}
+                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">Mensaje</label>
+                      <textarea rows="1" name="mensaje" value={formulario.mensaje}
+                        onChange={e => setFormulario(p => ({ ...p, mensaje: e.target.value }))}
                         placeholder="Cuéntanos sobre tu negocio..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe focus:border-transparent resize-none"
-                      ></textarea>
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe resize-none" />
                     </div>
                   </div>
-
                   <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
-                    <button type="submit" className="bg-caborca-beige-fuerte text-white px-8 py-3 rounded-lg font-bold">
+                    <button type="submit" className="bg-caborca-beige-fuerte text-white px-8 py-3 rounded-lg font-bold hover:bg-caborca-cafe transition-colors">
                       {formDist.submitLabel}
                     </button>
                     <div className="flex items-center gap-3 text-caborca-bronce/70">
@@ -315,55 +307,32 @@ const Distribuidores = () => {
           </div>
         </section>
 
-        {/* MAP SECTION */}
+        {/* MAPA REACT-LEAFLET */}
         <section className="py-8 bg-gray-100">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-serif mb-8 text-caborca-beige-fuerte font-bold text-center">
-              {mapInfo.mapTitle}
-            </h2>
-            <p className="text-center mb-8 text-caborca-cafe font-bold">
-              {mapInfo.mapText}
-            </p>
+            <h2 className="text-4xl font-serif mb-3 text-caborca-beige-fuerte font-bold text-center">{mapInfo.mapTitle}</h2>
+            <p className="text-center mb-8 text-caborca-cafe font-bold">{mapInfo.mapText}</p>
 
-            {/* Filtros de Búsqueda */}
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-8 max-w-7xl mx-auto">
+            {/* Filtros */}
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-6 max-w-7xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Filtro por Tipo de Compra */}
+                {/* Tipo */}
                 <div className="flex flex-col">
-                  <label htmlFor="purchaseType" className="block text-sm font-bold text-caborca-beige-fuerte mb-2">
-                    <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    Tipo de compra
-                  </label>
-                  <select
-                    id="purchaseType"
-                    value={tipoCompra}
-                    onChange={(e) => setTipoCompra(e.target.value)}
-                    className="border-2 border-gray-300 rounded py-2 px-4 focus:border-caborca-cafe focus:outline-none transition-colors w-full"
-                  >
+                  <label className="block text-sm font-bold text-caborca-beige-fuerte mb-2">Tipo de compra</label>
+                  <select value={tipoCompra} onChange={e => setTipoCompra(e.target.value)}
+                    className="border-2 border-gray-300 rounded py-2 px-4 focus:border-caborca-cafe focus:outline-none">
                     <option value="">Todos los tipos</option>
                     <option value="tienda">Tienda física</option>
-                    <option value="online">Compra en línea</option>
-                    <option value="ambos">Tienda física y en línea</option>
+                    <option value="online">En línea</option>
+                    <option value="ambos">Física y en línea</option>
                   </select>
                 </div>
-
-                {/* Filtro por Estado/Ciudad */}
+                {/* Estado */}
                 <div className="flex flex-col">
-                  <label htmlFor="stateFilter" className="block text-sm font-bold text-caborca-beige-fuerte mb-2">
-                    <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                    </svg>
-                    Ubicación por Estado
-                  </label>
-                  <select
-                    id="stateFilter"
-                    value={estadoFiltro}
-                    onChange={(e) => setEstadoFiltro(e.target.value)}
-                    className="border-2 border-gray-300 rounded py-2 px-4 focus:border-caborca-cafe focus:outline-none transition-colors w-full"
-                  >
-                    <option value="">Selecciona un estado</option>
+                  <label className="block text-sm font-bold text-caborca-beige-fuerte mb-2">Estado / Región</label>
+                  <select value={estadoFiltro} onChange={e => setEstadoFiltro(e.target.value)}
+                    className="border-2 border-gray-300 rounded py-2 px-4 focus:border-caborca-cafe focus:outline-none">
+                    <option value="">Selecciona una región</option>
                     <option value="cdmx">Ciudad de México</option>
                     <option value="jalisco">Jalisco</option>
                     <option value="nuevo-leon">Nuevo León</option>
@@ -374,44 +343,31 @@ const Distribuidores = () => {
                     <option value="california">California, USA</option>
                   </select>
                 </div>
-
-                {/* Botón Usar mi ubicación */}
+                {/* Ubicarme */}
                 <div className="flex flex-col justify-end">
-                  <button
-                    onClick={manejarUbicarme}
-                    className="bg-caborca-beige-fuerte text-white py-2 px-4 rounded hover:bg-caborca-cafe/80 transition-colors whitespace-nowrap w-full"
-                    title="Usar mi ubicación"
-                  >
-                    <svg className="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <button onClick={manejarUbicarme}
+                    className="bg-caborca-beige-fuerte text-white py-2 px-4 rounded hover:bg-caborca-cafe transition-colors w-full flex items-center justify-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     Usar mi ubicación
                   </button>
                   {mensajeUbicacion && (
-                    <p className={`text-xs mt-1 ${mensajeUbicacion.includes('✓') ? 'text-green-600' : 'text-red-600'}`}>
-                      {mensajeUbicacion}
-                    </p>
+                    <p className={`text-xs mt-1 ${mensajeUbicacion.includes('✓') ? 'text-green-600' : 'text-red-500'}`}>{mensajeUbicacion}</p>
                   )}
                 </div>
-
-                {/* Botones de acción */}
+                {/* Acciones */}
                 <div className="flex flex-col justify-end">
                   <div className="flex gap-2">
-                    <button
-                      onClick={manejarLimpiarFiltros}
-                      className="bg-gray-200 text-caborca-beige-fuerte py-2 px-3 rounded hover:bg-gray-300 transition-colors flex-1"
-                      title="Limpiar filtros"
-                    >
+                    <button onClick={manejarLimpiarFiltros}
+                      className="bg-gray-200 text-caborca-beige-fuerte py-2 px-3 rounded hover:bg-gray-300 transition-colors flex-1" title="Limpiar">
                       <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
-                    <button
-                      onClick={manejarAplicarFiltros}
-                      className="bg-caborca-beige-fuerte text-white py-2 px-3 rounded hover:bg-caborca-cafe/80 transition-colors flex-1"
-                      title="Buscar distribuidores"
-                    >
+                    <button onClick={manejarAplicarFiltros}
+                      className="bg-caborca-beige-fuerte text-white py-2 px-3 rounded hover:bg-caborca-cafe transition-colors flex-1" title="Buscar">
                       <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
@@ -420,43 +376,70 @@ const Distribuidores = () => {
                 </div>
               </div>
 
-              {/* Resultados de búsqueda */}
+              {/* Resultados */}
               {resultados.length > 0 && (
-                <div className="mt-6">
-                  <div className="border-t-2 border-gray-200 pt-4">
-                    <p className="text-xs font-semibold text-caborca-beige-fuerte font-boldmb-3">Distribuidores encontrados:</p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {resultados.map((store, index) => (
-                        <div
-                          key={index}
-                          className="bg-gray-100 p-2 rounded hover:bg-gray-200 transition-colors cursor-pointer"
-                          onClick={() => actualizarMapa(store)}
-                        >
-                          <p className="font-semibold text-caborca-cafe text-sm">{store.nombre}</p>
-                          <p className="text-xs text-caborca-beige-fuerte mb-1">{store.ciudad}</p>
-                          <span className="text-xs px-2 py-0.5 bg-caborca-beige-fuerte text-white rounded inline-block">
-                            {store.tipo === 'tienda' ? 'Tienda física' : store.tipo === 'online' ? 'En línea' : 'Física y Online'}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                <div className="mt-6 border-t-2 border-gray-200 pt-4">
+                  <p className="text-xs font-bold text-caborca-beige-fuerte mb-3">
+                    {resultados.length} distribuidor{resultados.length > 1 ? 'es' : ''} encontrado{resultados.length > 1 ? 's' : ''}:
+                  </p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {resultados.map((store, idx) => (
+                      <div key={idx}
+                        onClick={() => seleccionarTienda(store)}
+                        className={`p-3 rounded-lg cursor-pointer transition-all border-2 ${selectedStore === store ? 'border-caborca-cafe bg-caborca-cafe/5' : 'border-gray-200 bg-gray-50 hover:border-caborca-cafe/50'}`}>
+                        <p className="font-semibold text-caborca-cafe text-sm truncate">{store.nombre}</p>
+                        <p className="text-xs text-caborca-beige-fuerte mb-1">{store.ciudad}</p>
+                        <span className="text-xs px-2 py-0.5 bg-caborca-beige-fuerte text-white rounded">
+                          {store.tipo === 'tienda' ? 'Tienda' : store.tipo === 'online' ? 'En línea' : 'Física y Online'}
+                        </span>
+                        {store.distance && (
+                          <p className="text-xs text-gray-400 mt-1">{store.distance.toFixed(0)} km</p>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="bg-gray-200 rounded-lg overflow-hidden shadow-xl max-w-7xl mx-auto" style={{ height: '500px' }}>
-              <iframe
-                id="mapFrame"
-                src={mapSrc}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                title="Mapa de distribuidores"
-              ></iframe>
+            {/* MAPA */}
+            <div className="rounded-xl overflow-hidden shadow-2xl max-w-7xl mx-auto" style={{ height: '520px' }}>
+              <MapContainer
+                center={mapCenter}
+                zoom={mapZoom}
+                style={{ height: '100%', width: '100%' }}
+                scrollWheelZoom={true}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <FlyToMarker center={mapCenter} zoom={mapZoom} />
+
+                {displayedMarkers.map((store, idx) => (
+                  <Marker
+                    key={idx}
+                    position={[store.lat, store.lng]}
+                    icon={selectedStore === store ? selectedIcon : caborcaIcon}
+                    eventHandlers={{ click: () => seleccionarTienda(store) }}
+                  >
+                    <Popup>
+                      <div className="min-w-[160px]">
+                        <p className="font-bold text-caborca-cafe text-sm">{store.nombre}</p>
+                        <p className="text-xs text-gray-500">{store.ciudad}</p>
+                        <span className="inline-block mt-1 text-xs bg-caborca-beige-fuerte text-white px-2 py-0.5 rounded">
+                          {store.tipo === 'tienda' ? 'Tienda física' : store.tipo === 'online' ? 'En línea' : 'Física y Online'}
+                        </span>
+                        {store.telefono && (
+                          <p className="text-xs text-gray-500 mt-1">📞 {store.telefono}</p>
+                        )}
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
             </div>
+            <p className="text-center text-xs text-gray-400 mt-2">Mapa © OpenStreetMap contributors</p>
           </div>
         </section>
       </main>
