@@ -449,61 +449,63 @@ const Inicio = () => {
                         </div>
                         <div className="w-full">
                             {/* Mapa React-Leaflet */}
-                            <div className="rounded-xl overflow-hidden shadow-xl" style={{ height: '400px' }}>
-                                <MapContainer
-                                    center={[23.5, -100]}
-                                    zoom={5}
-                                    style={{ height: '100%', width: '100%' }}
-                                    scrollWheelZoom={false}
-                                    zoomControl={true}
-                                >
-                                    <TileLayer
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    />
-                                    {/* Pines de distribuidores */}
-                                    {(logosConfig.filter(d => d.lat && d.lng).length > 0
-                                        ? logosConfig.filter(d => d.lat && d.lng)
-                                        : DEMO_MARKERS
-                                    ).map((d, idx) => (
-                                        <Marker
-                                            key={idx}
-                                            position={[parseFloat(d.lat), parseFloat(d.lng)]}
-                                            icon={createMapPin()}
-                                        >
-                                            <Popup>
-                                                <div className="min-w-[140px]">
-                                                    <p className="font-bold text-sm" style={{ color: '#7C5C3E' }}>
-                                                        {d.negocioNombre || d.nombre || 'Distribuidor'}
-                                                    </p>
-                                                    <p className="text-xs text-gray-500">{d.ciudad || ''}</p>
-                                                    <Link
-                                                        to="/distribuidores"
-                                                        className="text-xs font-semibold mt-1 inline-block"
-                                                        style={{ color: '#7C5C3E' }}
-                                                    >
-                                                        Ver detalles →
-                                                    </Link>
-                                                </div>
-                                            </Popup>
-                                        </Marker>
-                                    ))}
-                                </MapContainer>
-                            </div>
-                            {/* CTA to distributors page */}
-                            <div className="text-center mt-6">
-                                <Link to={dondeComprar.linkBoton} className="inline-flex items-center gap-2 bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-8 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg group">
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L10 4.414l6.293 6.293a1 1 0 001.414-1.414l-7-7z" />
-                                    </svg>
-                                    <span>{dondeComprar.textoBoton}</span>
-                                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                    </svg>
-                                </Link>
-                                <p className="text-caborca-beige-fuerte text-xs mt-3">
-                                    {dondeComprar.nota}
-                                </p>
+                            <div style={{ isolation: 'isolate', position: 'relative' }}>
+                                <div className="rounded-xl overflow-hidden shadow-xl" style={{ height: '400px' }}>
+                                    <MapContainer
+                                        center={[23.5, -100]}
+                                        zoom={5}
+                                        style={{ height: '100%', width: '100%' }}
+                                        scrollWheelZoom={false}
+                                        zoomControl={true}
+                                    >
+                                        <TileLayer
+                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        />
+                                        {/* Pines de distribuidores */}
+                                        {(logosConfig.filter(d => d.lat && d.lng).length > 0
+                                            ? logosConfig.filter(d => d.lat && d.lng)
+                                            : DEMO_MARKERS
+                                        ).map((d, idx) => (
+                                            <Marker
+                                                key={idx}
+                                                position={[parseFloat(d.lat), parseFloat(d.lng)]}
+                                                icon={createMapPin()}
+                                            >
+                                                <Popup>
+                                                    <div className="min-w-[140px]">
+                                                        <p className="font-bold text-sm" style={{ color: '#7C5C3E' }}>
+                                                            {d.negocioNombre || d.nombre || 'Distribuidor'}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">{d.ciudad || ''}</p>
+                                                        <Link
+                                                            to="/distribuidores"
+                                                            className="text-xs font-semibold mt-1 inline-block"
+                                                            style={{ color: '#7C5C3E' }}
+                                                        >
+                                                            Ver detalles →
+                                                        </Link>
+                                                    </div>
+                                                </Popup>
+                                            </Marker>
+                                        ))}
+                                    </MapContainer>
+                                </div>
+                                {/* CTA to distributors page */}
+                                <div className="text-center mt-6">
+                                    <Link to={dondeComprar.linkBoton} className="inline-flex items-center gap-2 bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-8 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg group">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L10 4.414l6.293 6.293a1 1 0 001.414-1.414l-7-7z" />
+                                        </svg>
+                                        <span>{dondeComprar.textoBoton}</span>
+                                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                        </svg>
+                                    </Link>
+                                    <p className="text-caborca-beige-fuerte text-xs mt-3">
+                                        {dondeComprar.nota}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

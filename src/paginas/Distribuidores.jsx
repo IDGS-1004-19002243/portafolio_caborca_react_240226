@@ -409,41 +409,44 @@ const Distribuidores = () => {
             </div>
 
             {/* MAPA */}
-            <div className="rounded-xl overflow-hidden shadow-2xl max-w-7xl mx-auto" style={{ height: '520px' }}>
-              <MapContainer
-                center={mapCenter}
-                zoom={mapZoom}
-                style={{ height: '100%', width: '100%' }}
-                scrollWheelZoom={true}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <FlyToMarker center={mapCenter} zoom={mapZoom} />
+            <div style={{ isolation: 'isolate', position: 'relative' }}
+              className="rounded-xl overflow-hidden shadow-2xl max-w-7xl mx-auto">
+              <div style={{ height: '520px' }}>
+                <MapContainer
+                  center={mapCenter}
+                  zoom={mapZoom}
+                  style={{ height: '100%', width: '100%' }}
+                  scrollWheelZoom={true}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <FlyToMarker center={mapCenter} zoom={mapZoom} />
 
-                {displayedMarkers.map((store, idx) => (
-                  <Marker
-                    key={idx}
-                    position={[store.lat, store.lng]}
-                    icon={createMapPin(selectedStore === store)}
-                    eventHandlers={{ click: () => seleccionarTienda(store) }}
-                  >
-                    <Popup>
-                      <div className="min-w-[160px]">
-                        <p className="font-bold text-caborca-cafe text-sm">{store.nombre}</p>
-                        <p className="text-xs text-gray-500">{store.ciudad}</p>
-                        <span className="inline-block mt-1 text-xs bg-caborca-beige-fuerte text-white px-2 py-0.5 rounded">
-                          {store.tipo === 'tienda' ? 'Tienda física' : store.tipo === 'online' ? 'En línea' : 'Física y Online'}
-                        </span>
-                        {store.telefono && (
-                          <p className="text-xs text-gray-500 mt-1">📞 {store.telefono}</p>
-                        )}
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
+                  {displayedMarkers.map((store, idx) => (
+                    <Marker
+                      key={idx}
+                      position={[store.lat, store.lng]}
+                      icon={createMapPin(selectedStore === store)}
+                      eventHandlers={{ click: () => seleccionarTienda(store) }}
+                    >
+                      <Popup>
+                        <div className="min-w-[160px]">
+                          <p className="font-bold text-caborca-cafe text-sm">{store.nombre}</p>
+                          <p className="text-xs text-gray-500">{store.ciudad}</p>
+                          <span className="inline-block mt-1 text-xs bg-caborca-beige-fuerte text-white px-2 py-0.5 rounded">
+                            {store.tipo === 'tienda' ? 'Tienda física' : store.tipo === 'online' ? 'En línea' : 'Física y Online'}
+                          </span>
+                          {store.telefono && (
+                            <p className="text-xs text-gray-500 mt-1">📞 {store.telefono}</p>
+                          )}
+                        </div>
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MapContainer>
+              </div>
             </div>
             <p className="text-center text-xs text-gray-400 mt-2">Mapa © OpenStreetMap contributors</p>
           </div>
