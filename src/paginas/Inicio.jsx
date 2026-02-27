@@ -1,11 +1,65 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import Encabezado from '../componentes/Encabezado';
 import Carrusel from '../componentes/Carrusel';
 import PieDePagina from '../componentes/PieDePagina';
 import homeService from '../api/homeService';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'https://localhost:7020/api' : 'https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api');
+
+// Fix Leaflet marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+// Pin CB — mismo que Distribuidores.jsx
+const createMapPin = (selected = false) => {
+    const color = selected ? '#1a6b36' : '#7C5C3E';
+    const w = selected ? 32 : 26;
+    const h = selected ? 44 : 36;
+    return L.divIcon({
+        html: `
+      <div class="map-pin${selected ? ' selected' : ''}">
+        <svg viewBox="0 0 32 46" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
+          <ellipse cx="16" cy="44" rx="7" ry="2.2" fill="rgba(0,0,0,0.18)"/>
+          <path d="M16 2C9.4 2 4 7.4 4 14c0 9.5 12 30 12 30S28 23.5 28 14C28 7.4 22.6 2 16 2z"
+                fill="${color}" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M16 2C9.4 2 4 7.4 4 14c0 9.5 12 30 12 30S28 23.5 28 14C28 7.4 22.6 2 16 2z"
+                fill="url(#shine${selected ? 'S' : 'N'})"/>
+          <defs>
+            <radialGradient id="shine${selected ? 'S' : 'N'}" cx="35%" cy="30%" r="55%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            </radialGradient>
+          </defs>
+          <circle cx="16" cy="14" r="8" fill="white"/>
+          <text x="16" y="18" text-anchor="middle"
+                font-family="Georgia,'Playfair Display',serif"
+                font-size="7.5" font-weight="bold" fill="${color}" letter-spacing="0.5">CB</text>
+        </svg>
+      </div>`,
+        className: '',
+        iconSize: [w, h],
+        iconAnchor: [w / 2, h],
+        popupAnchor: [0, -(h + 2)],
+    });
+};
+
+// Distribuidores demo (se reemplazan con datos reales de la API)
+const DEMO_MARKERS = [
+    { nombre: 'AZ Boot Boutique', ciudad: 'Phoenix, AZ', lat: 33.4484, lng: -112.0740 },
+    { nombre: 'Texas Boot Company', ciudad: 'Houston, TX', lat: 29.7604, lng: -95.3698 },
+    { nombre: 'Melbelle', ciudad: 'Ciudad de México', lat: 19.4326, lng: -99.1332 },
+    { nombre: 'Boot Barn Jalisco', ciudad: 'Guadalajara', lat: 20.6597, lng: -103.3496 },
+    { nombre: 'Botas del Norte', ciudad: 'Monterrey', lat: 25.6866, lng: -100.3161 },
+    { nombre: 'Caborca Sonora Store', ciudad: 'Hermosillo', lat: 29.0729, lng: -110.9559 },
+];
 
 const Inicio = () => {
     const [activeFilter, setActiveFilter] = useState('todos');
@@ -394,15 +448,47 @@ const Inicio = () => {
                             </p>
                         </div>
                         <div className="w-full">
-                            <div className="bg-gray-200 rounded-lg overflow-hidden shadow-lg" style={{ height: '400px' }}>
-                                <iframe
-                                    src={dondeComprar.mapaUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120615.72236587609!2d-99.2840989!3d19.432608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce0026db097507%3A0x54061076265ee841!2sCiudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx"}
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0 }}
-                                    allowFullScreen=""
-                                    loading="lazy"
-                                ></iframe>
+                            {/* Mapa React-Leaflet */}
+                            <div className="rounded-xl overflow-hidden shadow-xl" style={{ height: '400px' }}>
+                                <MapContainer
+                                    center={[23.5, -100]}
+                                    zoom={5}
+                                    style={{ height: '100%', width: '100%' }}
+                                    scrollWheelZoom={false}
+                                    zoomControl={true}
+                                >
+                                    <TileLayer
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    {/* Pines de distribuidores */}
+                                    {(logosConfig.filter(d => d.lat && d.lng).length > 0
+                                        ? logosConfig.filter(d => d.lat && d.lng)
+                                        : DEMO_MARKERS
+                                    ).map((d, idx) => (
+                                        <Marker
+                                            key={idx}
+                                            position={[parseFloat(d.lat), parseFloat(d.lng)]}
+                                            icon={createMapPin()}
+                                        >
+                                            <Popup>
+                                                <div className="min-w-[140px]">
+                                                    <p className="font-bold text-sm" style={{ color: '#7C5C3E' }}>
+                                                        {d.negocioNombre || d.nombre || 'Distribuidor'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">{d.ciudad || ''}</p>
+                                                    <Link
+                                                        to="/distribuidores"
+                                                        className="text-xs font-semibold mt-1 inline-block"
+                                                        style={{ color: '#7C5C3E' }}
+                                                    >
+                                                        Ver detalles →
+                                                    </Link>
+                                                </div>
+                                            </Popup>
+                                        </Marker>
+                                    ))}
+                                </MapContainer>
                             </div>
                             {/* CTA to distributors page */}
                             <div className="text-center mt-6">
