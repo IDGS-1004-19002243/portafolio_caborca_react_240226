@@ -14,29 +14,49 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-const BOOT_SVG = (fill, stroke = 'rgba(0,0,0,0.25)') => btoa(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 60" width="48" height="60">` +
-  `<g filter="url(#shadow)">` +
-  `<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.35)"/></filter></defs>` +
-  `<path d="M18 2 Q14 2 13 6 L13 30 Q9 33 7 38 Q5 43 5 46 Q5 50 9 51 L38 51 Q42 51 43 48 Q44 45 41 43 L36 40 L36 28 Q36 26 34 26 L20 26 L20 6 Q20 2 18 2 Z" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>` +
-  `<rect x="13" y="2" width="7" height="3" rx="1.5" fill="${fill}" opacity="0.6"/>` +
-  `<line x1="16" y1="8" x2="16" y2="26" stroke="white" stroke-width="1" stroke-dasharray="2,3" opacity="0.45"/>` +
-  `<ellipse cx="24" cy="55" rx="15" ry="3.5" fill="rgba(0,0,0,0.15)"/>` +
-  `</g></svg>`
-);
+const BOOT_SVG = (fill, shade) => {
+  const dark = shade || 'rgba(0,0,0,0.28)';
+  const light = 'rgba(255,255,255,0.18)';
+  const stitch = 'rgba(255,255,255,0.55)';
+  // Boot faces right. Shaft on left, toe points right.
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68 86" width="48" height="62">` +
+    // --- sombra suelo ---
+    `<ellipse cx="36" cy="82" rx="18" ry="3.5" fill="rgba(0,0,0,0.18)"/>` +
+    // --- cuerpo principal de la bota ---
+    `<path d="M13,4 L34,4 L34,46 C40,49 52,57 60,65 L62,70 L62,73 C50,76 28,76 14,75 L7,75 L7,83 L25,83 L25,75 C23,69 19,61 13,53 Z" fill="${fill}" stroke="${dark}" stroke-width="1.2" stroke-linejoin="round"/>` +
+    // --- highlight frontal de la cana ---
+    `<path d="M18,6 L30,6 L30,43 Q26,42 18,38 Z" fill="${light}"/>` +
+    // --- jalador izquierdo (tira en la cana) ---
+    `<rect x="12" y="1" width="5" height="13" rx="2.5" fill="${fill}" stroke="${dark}" stroke-width="0.8"/>` +
+    // --- jalador derecho ---
+    `<rect x="27" y="1" width="5" height="13" rx="2.5" fill="${fill}" stroke="${dark}" stroke-width="0.8"/>` +
+    // --- costura vertical en la cana ---
+    `<line x1="22" y1="9" x2="22" y2="44" stroke="${stitch}" stroke-width="1" stroke-dasharray="2,4"/>` +
+    // --- arco decorativo superior de la cana ---
+    `<path d="M14,18 Q22,14 32,18" stroke="${stitch}" stroke-width="1" fill="none"/>` +
+    // --- seam de la punta (toe cap) ---
+    `<path d="M55,64 C58,67 61,70 62,73" stroke="${stitch}" stroke-width="1.2" fill="none"/>` +
+    // --- suela inferior oscura ---
+    `<path d="M7,75 L62,73 L62,76 C50,79 28,79 14,78 L7,78 Z" fill="${dark}"/>` +
+    // --- tacon (heel block) ---
+    `<rect x="7" y="75" width="18" height="8" rx="1.5" fill="${fill}" stroke="${dark}" stroke-width="0.8"/>` +
+    `</svg>`;
+  return btoa(svg);
+};
 
 const caborcaIcon = new L.Icon({
   iconUrl: 'data:image/svg+xml;base64,' + BOOT_SVG('#7C5C3E'),
-  iconSize: [40, 52],
-  iconAnchor: [20, 51],
-  popupAnchor: [0, -54],
+  iconSize: [48, 62],
+  iconAnchor: [12, 76],
+  popupAnchor: [12, -62],
 });
 
 const selectedIcon = new L.Icon({
-  iconUrl: 'data:image/svg+xml;base64,' + BOOT_SVG('#1e7a40', 'rgba(0,0,0,0.3)'),
-  iconSize: [48, 62],
-  iconAnchor: [24, 61],
-  popupAnchor: [0, -64],
+  iconUrl: 'data:image/svg+xml;base64,' + BOOT_SVG('#1a6b36', 'rgba(0,0,0,0.3)'),
+  iconSize: [56, 72],
+  iconAnchor: [14, 88],
+  popupAnchor: [14, -72],
 });
 
 // Component to fly map to coordinates
