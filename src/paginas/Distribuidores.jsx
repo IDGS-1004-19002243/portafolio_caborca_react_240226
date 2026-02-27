@@ -14,17 +14,38 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Boot marker usando el SVG de Cloudinary
-const BOOT_URL = 'https://res.cloudinary.com/dbcymfac0/image/upload/v1772168394/BotaCaborca_x9bnck.svg';
-
-const createBootIcon = (selected = false) => L.divIcon({
-  html: `<div class="boot-marker${selected ? ' selected' : ''}"><img src="${BOOT_URL}" alt="distribuidor" /></div>`,
-  className: '',
-  iconSize: selected ? [34, 42] : [28, 34],
-  iconAnchor: selected ? [17, 42] : [14, 34],
-  popupAnchor: [0, -36],
-});
-
+// Pin clásico con monograma CB — sin dependencias externas
+const createMapPin = (selected = false) => {
+  const color = selected ? '#1a6b36' : '#7C5C3E';
+  const w = selected ? 32 : 26;
+  const h = selected ? 44 : 36;
+  return L.divIcon({
+    html: `
+      <div class="map-pin${selected ? ' selected' : ''}">
+        <svg viewBox="0 0 32 46" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
+          <ellipse cx="16" cy="44" rx="7" ry="2.2" fill="rgba(0,0,0,0.18)"/>
+          <path d="M16 2C9.4 2 4 7.4 4 14c0 9.5 12 30 12 30S28 23.5 28 14C28 7.4 22.6 2 16 2z"
+                fill="${color}" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M16 2C9.4 2 4 7.4 4 14c0 9.5 12 30 12 30S28 23.5 28 14C28 7.4 22.6 2 16 2z"
+                fill="url(#pinShine${selected ? 'S' : 'N'})"/>
+          <defs>
+            <radialGradient id="pinShine${selected ? 'S' : 'N'}" cx="35%" cy="30%" r="55%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            </radialGradient>
+          </defs>
+          <circle cx="16" cy="14" r="8" fill="white"/>
+          <text x="16" y="18" text-anchor="middle"
+                font-family="Georgia, 'Playfair Display', serif"
+                font-size="7.5" font-weight="bold" fill="${color}" letter-spacing="0.5">CB</text>
+        </svg>
+      </div>`,
+    className: '',
+    iconSize: [w, h],
+    iconAnchor: [w / 2, h],
+    popupAnchor: [0, -(h + 2)],
+  });
+};
 
 // Component to fly map to coordinates
 const FlyToMarker = ({ center, zoom }) => {
@@ -405,7 +426,7 @@ const Distribuidores = () => {
                   <Marker
                     key={idx}
                     position={[store.lat, store.lng]}
-                    icon={createBootIcon(selectedStore === store)}
+                    icon={createMapPin(selectedStore === store)}
                     eventHandlers={{ click: () => seleccionarTienda(store) }}
                   >
                     <Popup>
