@@ -20,9 +20,9 @@ const BOOT_URL = 'https://res.cloudinary.com/dbcymfac0/image/upload/v1772168394/
 const createBootIcon = (selected = false) => L.divIcon({
   html: `<div class="boot-marker${selected ? ' selected' : ''}"><img src="${BOOT_URL}" alt="distribuidor" /></div>`,
   className: '',
-  iconSize: selected ? [56, 68] : [44, 54],
-  iconAnchor: selected ? [28, 68] : [22, 54],
-  popupAnchor: [0, -56],
+  iconSize: selected ? [34, 42] : [28, 34],
+  iconAnchor: selected ? [17, 42] : [14, 34],
+  popupAnchor: [0, -36],
 });
 
 

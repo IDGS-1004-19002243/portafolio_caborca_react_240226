@@ -468,24 +468,24 @@ a:hover {
 
 /* Imagen de la bota */
 .boot-marker img {
-    width: 44px;
+    width: 28px;
     height: auto;
     display: block;
-    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
     transition: filter 0.2s ease, width 0.2s ease;
 }
 
 /* Hover: sube y crece ligeramente */
 .boot-marker:hover img {
-    width: 50px;
-    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
-    transform: translateY(-3px);
+    width: 32px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+    transform: translateY(-2px);
 }
 
 /* Estado seleccionado: más grande + resplandor verde */
 .boot-marker.selected img {
-    width: 56px;
-    filter: drop-shadow(0 0 6px rgba(26, 107, 54, 0.9)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+    width: 34px;
+    filter: drop-shadow(0 0 5px rgba(26, 107, 54, 0.9)) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
     animation: boot-glow 2s ease-in-out infinite;
 }
 
