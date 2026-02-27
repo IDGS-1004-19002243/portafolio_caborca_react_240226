@@ -14,29 +14,30 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-const makeBootIcon = (selected = false) => L.divIcon({
-  html: `<img
-    src="/boot-marker.png"
-    alt="distribuidor"
-    style="
-      width:${selected ? '56px' : '44px'};
-      height:${selected ? '56px' : '44px'};
-      object-fit:contain;
-      filter:${selected
-      ? 'drop-shadow(0 2px 6px rgba(0,0,0,0.5)) hue-rotate(100deg) saturate(1.8) brightness(0.85)'
-      : 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))'};
-      transition: all 0.2s;
-    "
-  />`,
+// SVG de bota vaquera - sin encoding, va directo al DOM como HTML
+// Las clases boot-fill / boot-sole son controladas por index.css
+const BOOT_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68 86" width="44" height="56" style="overflow:visible;display:block">
+  <ellipse cx="36" cy="84" rx="18" ry="3" fill="rgba(0,0,0,0.15)"/>
+  <path class="boot-fill" stroke="rgba(0,0,0,0.22)" stroke-width="1.2" stroke-linejoin="round"
+    d="M13,4 L34,4 L34,46 C40,49 52,57 60,65 L62,70 L62,73 C50,76 28,76 14,75 L7,75 L7,83 L25,83 L25,75 C23,69 19,61 13,53 Z"/>
+  <path d="M18,6 L30,6 L30,43 Q26,42 18,38 Z" fill="rgba(255,255,255,0.18)"/>
+  <rect class="boot-fill" x="12" y="1" width="5" height="14" rx="2.5" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
+  <rect class="boot-fill" x="27" y="1" width="5" height="14" rx="2.5" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
+  <line x1="22" y1="10" x2="22" y2="44" stroke="rgba(255,255,255,0.55)" stroke-width="1" stroke-dasharray="2,4"/>
+  <path d="M14,20 Q22,15 32,20" stroke="rgba(255,255,255,0.55)" stroke-width="1.2" fill="none"/>
+  <path d="M55,64 C58,67 61,70 62,73" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" fill="none"/>
+  <path class="boot-sole" d="M7,75 L62,73 L62,76 C50,79 28,79 14,78 L7,78 Z"/>
+  <rect class="boot-fill" x="7" y="75" width="18" height="8" rx="2" stroke="rgba(0,0,0,0.2)" stroke-width="0.8" opacity="0.9"/>
+</svg>`;
+
+const createBootIcon = (selected = false) => L.divIcon({
+  html: `<div class="boot-marker${selected ? ' selected' : ''}">${BOOT_SVG}</div>`,
   className: '',
-  iconSize: selected ? [56, 56] : [44, 44],
-  iconAnchor: selected ? [28, 56] : [22, 44],
-  popupAnchor: [0, selected ? -58 : -46],
+  iconSize: selected ? [52, 66] : [44, 56],
+  iconAnchor: selected ? [13, 78] : [11, 66],
+  popupAnchor: selected ? [13, -68] : [11, -58],
 });
-
-const caborcaIcon = makeBootIcon(false);
-const selectedIcon = makeBootIcon(true);
-
 
 // Component to fly map to coordinates
 const FlyToMarker = ({ center, zoom }) => {
@@ -417,7 +418,7 @@ const Distribuidores = () => {
                   <Marker
                     key={idx}
                     position={[store.lat, store.lng]}
-                    icon={selectedStore === store ? selectedIcon : caborcaIcon}
+                    icon={createBootIcon(selectedStore === store)}
                     eventHandlers={{ click: () => seleccionarTienda(store) }}
                   >
                     <Popup>

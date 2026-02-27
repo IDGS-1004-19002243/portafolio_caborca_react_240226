@@ -442,3 +442,58 @@ a:hover {
 .animate-scroll:hover {
     animation-play-state: paused;
 }
+
+/* ============================================
+   BOOT MAP MARKERS (Leaflet DivIcon)
+   ============================================ */
+
+/* Reset contenedor de Leaflet para no añadir borde/fondo */
+.leaflet-div-icon {
+    background: none !important;
+    border: none !important;
+}
+
+.boot-marker {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    cursor: pointer;
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                filter 0.2s ease;
+    transform-origin: bottom center;
+}
+
+.boot-marker:hover {
+    transform: scale(1.18) translateY(-4px);
+    filter: drop-shadow(0 7px 10px rgba(0, 0, 0, 0.4));
+}
+
+/* Color cafe Caborca - estado normal */
+.boot-marker .boot-fill {
+    fill: #7C5C3E;
+    transition: fill 0.25s ease;
+}
+.boot-marker .boot-sole {
+    fill: rgba(0, 0, 0, 0.28);
+}
+
+/* Estado seleccionado - verde */
+.boot-marker.selected {
+    transform: scale(1.15) translateY(-3px);
+    filter: drop-shadow(0 5px 10px rgba(26, 107, 54, 0.55));
+    animation: boot-pulse 2s ease-in-out infinite;
+}
+
+.boot-marker.selected .boot-fill {
+    fill: #1a6b36;
+}
+.boot-marker.selected .boot-sole {
+    fill: rgba(0, 80, 30, 0.35);
+}
+
+/* Animación suave de pulso para el marcador seleccionado */
+@keyframes boot-pulse {
+    0%, 100% { filter: drop-shadow(0 5px 10px rgba(26, 107, 54, 0.55)); }
+    50%       { filter: drop-shadow(0 5px 14px rgba(26, 107, 54, 0.85)); }
+}
