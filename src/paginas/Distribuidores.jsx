@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { contactoService } from '../api/contactoService';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -85,6 +86,8 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 
 const Distribuidores = () => {
   const [formulario, setFormulario] = useState({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
+  const [enviandoDist, setEnviandoDist] = useState(false);
+  const [resultadoDist, setResultadoDist] = useState(null);
   const [tipoCompra, setTipoCompra] = useState('');
   const [estadoFiltro, setEstadoFiltro] = useState('');
   const [resultados, setResultados] = useState([]);
@@ -92,7 +95,7 @@ const Distribuidores = () => {
   const [selectedStore, setSelectedStore] = useState(null);
   const [mapCenter, setMapCenter] = useState([23.5, -102.3]); // Mexico centrado
   const [mapZoom, setMapZoom] = useState(5);
-  const [allDistribuidores, setAllDistribuidores] = useState(DEMO_DISTRIBUIDORES);
+  const [allDistribuidores, setAllDistribuidores] = useState([]);
 
   const [hero, setHero] = useState({
     badge: 'ÚNETE A NOSOTROS',
@@ -144,22 +147,49 @@ const Distribuidores = () => {
       .then(data => {
         if (data && Array.isArray(data.distribuidoresList) && data.distribuidoresList.length > 0) {
           const mapped = data.distribuidoresList
-            .filter(d => d.lat && d.lng)
+            .filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng)))
             .map(d => ({
+              id: d.id || null,
               nombre: d.negocioNombre || d.contactoNombre || 'Distribuidor',
+              contactoNombre: d.contactoNombre || '',
               ciudad: d.ciudad || '',
-              estado: (d.estado || '').toLowerCase().replace(/\s+/g, '-'),
-              tipo: d.tipo || 'tienda',
+              estado: d.estado || '',
+              pais: d.pais || '',
+              colonia: d.colonia || '',
+              calle: d.calle || '',
+              numeroExt: d.numeroExt || '',
+              cp: d.cp || '',
+              tipo: d.tipoVenta || d.tipo || 'tienda',
               lat: parseFloat(d.lat),
               lng: parseFloat(d.lng),
               logo: d.logo || null,
-              telefono: d.contactoTelefono || '',
+              telefono: d.telefono || d.contactoTelefono || '',
+              email: d.email || '',
+              sitioWeb: d.sitioWeb || '',
+              clasificacion: d.clasificacion || 'nacional',
             }));
           if (mapped.length > 0) setAllDistribuidores(mapped);
         }
       })
       .catch(() => { });
   }, []);
+
+  // Derived dynamic filter options
+  const regionesList = useMemo(() => {
+    const seen = new Set();
+    return allDistribuidores
+      .filter(d => d.estado && !seen.has(d.estado) && seen.add(d.estado))
+      .map(d => d.estado)
+      .sort((a, b) => a.localeCompare(b, 'es'));
+  }, [allDistribuidores]);
+
+  const tiposList = useMemo(() => {
+    const seen = new Set();
+    return allDistribuidores
+      .filter(d => d.tipo && !seen.has(d.tipo) && seen.add(d.tipo))
+      .map(d => d.tipo);
+  }, [allDistribuidores]);
+
 
   const manejarUbicarme = () => {
     setMensajeUbicacion('Obteniendo ubicación...');
@@ -188,7 +218,11 @@ const Distribuidores = () => {
 
   const manejarAplicarFiltros = () => {
     let filtrados = allDistribuidores;
-    if (tipoCompra) filtrados = filtrados.filter(d => d.tipo === tipoCompra || d.tipo === 'ambos');
+    if (tipoCompra) filtrados = filtrados.filter(d => {
+      const t = d.tipo;
+      if (t === 'ambas' || t === 'ambos') return true;
+      return t === tipoCompra;
+    });
     if (estadoFiltro) filtrados = filtrados.filter(d => d.estado === estadoFiltro);
     setResultados(filtrados);
     if (filtrados[0]) {
@@ -248,7 +282,20 @@ const Distribuidores = () => {
                   <p className="text-lg text-caborca-cafe/90 max-w-3xl mx-auto">{formDist.subtitulo}</p>
                 </div>
                 <br />
-                <form onSubmit={e => { e.preventDefault(); alert('¡Gracias por tu interés! Nos pondremos en contacto contigo pronto.'); }} className="space-y-6">
+                <form onSubmit={async e => {
+                  e.preventDefault();
+                  setEnviandoDist(true);
+                  setResultadoDist(null);
+                  try {
+                    await contactoService.enviarSolicitudDistribuidor(formulario);
+                    setResultadoDist({ tipo: 'exito', mensaje: '¡Solicitud enviada! Nos pondremos en contacto contigo pronto.' });
+                    setFormulario({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
+                  } catch (err) {
+                    setResultadoDist({ tipo: 'error', mensaje: err.message || 'No se pudo enviar. Intenta de nuevo.' });
+                  } finally {
+                    setEnviandoDist(false);
+                  }
+                }} className="space-y-6">
                   <div className="grid md:grid-cols-3 gap-6">
                     {[
                       { label: 'Nombre completo', name: 'nombreCompleto', type: 'text', placeholder: 'Tu nombre' },
@@ -281,9 +328,19 @@ const Distribuidores = () => {
                     </div>
                   </div>
                   <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
-                    <button type="submit" className="bg-caborca-beige-fuerte text-white px-8 py-3 rounded-lg font-bold hover:bg-caborca-cafe transition-colors">
-                      {formDist.submitLabel}
-                    </button>
+                    <div className="flex flex-col gap-2 items-start">
+                      {resultadoDist && (
+                        <div className={`px-4 py-2 rounded-lg text-sm font-semibold ${resultadoDist.tipo === 'exito' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+                          {resultadoDist.tipo === 'exito' ? '✓ ' : '✗ '}{resultadoDist.mensaje}
+                        </div>
+                      )}
+                      <button type="submit" disabled={enviandoDist}
+                        className="bg-caborca-beige-fuerte text-white px-8 py-3 rounded-lg font-bold hover:bg-caborca-cafe transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
+                        {enviandoDist ? (
+                          <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>ENVIANDO...</>
+                        ) : formDist.submitLabel}
+                      </button>
+                    </div>
                     <div className="flex items-center gap-3 text-caborca-bronce/70">
                       <svg className="w-5 h-5 text-caborca-bronce" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
@@ -328,9 +385,16 @@ const Distribuidores = () => {
                   <select value={tipoCompra} onChange={e => setTipoCompra(e.target.value)}
                     className="border-2 border-gray-300 rounded py-2 px-4 focus:border-caborca-cafe focus:outline-none">
                     <option value="">Todos los tipos</option>
-                    <option value="tienda">Tienda física</option>
-                    <option value="online">En línea</option>
-                    <option value="ambos">Física y en línea</option>
+                    {tiposList.includes('tienda') && <option value="tienda">Tienda física</option>}
+                    {tiposList.includes('online') && <option value="online">En línea</option>}
+                    {(tiposList.includes('ambas') || tiposList.includes('ambos')) && <option value="ambas">Física y en línea</option>}
+                    {tiposList.length === 0 && (
+                      <>
+                        <option value="tienda">Tienda física</option>
+                        <option value="online">En línea</option>
+                        <option value="ambas">Física y en línea</option>
+                      </>
+                    )}
                   </select>
                 </div>
                 {/* Estado */}
@@ -339,14 +403,9 @@ const Distribuidores = () => {
                   <select value={estadoFiltro} onChange={e => setEstadoFiltro(e.target.value)}
                     className="border-2 border-gray-300 rounded py-2 px-4 focus:border-caborca-cafe focus:outline-none">
                     <option value="">Selecciona una región</option>
-                    <option value="cdmx">Ciudad de México</option>
-                    <option value="jalisco">Jalisco</option>
-                    <option value="nuevo-leon">Nuevo León</option>
-                    <option value="sonora">Sonora</option>
-                    <option value="chihuahua">Chihuahua</option>
-                    <option value="texas">Texas, USA</option>
-                    <option value="arizona">Arizona, USA</option>
-                    <option value="california">California, USA</option>
+                    {regionesList.map(r => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
                   </select>
                 </div>
                 {/* Ubicarme */}
@@ -388,21 +447,41 @@ const Distribuidores = () => {
                   <p className="text-xs font-bold text-caborca-beige-fuerte mb-3">
                     {resultados.length} distribuidor{resultados.length > 1 ? 'es' : ''} encontrado{resultados.length > 1 ? 's' : ''}:
                   </p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {resultados.map((store, idx) => (
-                      <div key={idx}
-                        onClick={() => seleccionarTienda(store)}
-                        className={`p-3 rounded-lg cursor-pointer transition-all border-2 ${selectedStore === store ? 'border-caborca-cafe bg-caborca-cafe/5' : 'border-gray-200 bg-gray-50 hover:border-caborca-cafe/50'}`}>
-                        <p className="font-semibold text-caborca-cafe text-sm truncate">{store.nombre}</p>
-                        <p className="text-xs text-caborca-beige-fuerte mb-1">{store.ciudad}</p>
-                        <span className="text-xs px-2 py-0.5 bg-caborca-beige-fuerte text-white rounded">
-                          {store.tipo === 'tienda' ? 'Tienda' : store.tipo === 'online' ? 'En línea' : 'Física y Online'}
-                        </span>
-                        {store.distance && (
-                          <p className="text-xs text-gray-400 mt-1">{store.distance.toFixed(0)} km</p>
-                        )}
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {resultados.map((store, idx) => {
+                      const CardWrapper = store.sitioWeb ? 'a' : 'div';
+                      const linkProps = store.sitioWeb ? {
+                        href: store.sitioWeb.startsWith('http') ? store.sitioWeb : `https://${store.sitioWeb}`,
+                        target: "_blank",
+                        rel: "noopener noreferrer"
+                      } : {};
+
+                      return (
+                        <CardWrapper key={idx}
+                          {...linkProps}
+                          onClick={() => seleccionarTienda(store)}
+                          className={`p-3 rounded-lg cursor-pointer transition-all border-2 block ${selectedStore === store ? 'border-caborca-cafe bg-caborca-cafe/5' : 'border-gray-200 bg-gray-50 hover:border-caborca-cafe/50'}`}>
+                          <div className="flex items-center gap-2 mb-1">
+                            {store.logo && (
+                              <img src={store.logo} alt={store.nombre} className="w-8 h-8 object-contain rounded border border-gray-200 bg-white p-0.5 flex-shrink-0" />
+                            )}
+                            <p className="font-semibold text-caborca-cafe text-sm truncate">{store.nombre}</p>
+                          </div>
+                          <p className="text-xs text-gray-500 truncate">{[store.ciudad, store.estado].filter(Boolean).join(', ')}</p>
+                          <div className="flex items-center gap-1 mt-1 flex-wrap">
+                            <span className="text-xs px-2 py-0.5 bg-caborca-beige-fuerte text-white rounded">
+                              {store.tipo === 'tienda' ? '🏪 Tienda' : store.tipo === 'online' ? '🌐 Online' : '🏪🌐 Ambas'}
+                            </span>
+                            {store.clasificacion === 'internacional' && (
+                              <span className="text-xs px-2 py-0.5 bg-blue-500 text-white rounded">🌍 Intl.</span>
+                            )}
+                          </div>
+                          {store.distance && (
+                            <p className="text-xs text-gray-400 mt-1">{store.distance.toFixed(0)} km</p>
+                          )}
+                        </CardWrapper>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -417,6 +496,7 @@ const Distribuidores = () => {
                   zoom={mapZoom}
                   style={{ height: '100%', width: '100%' }}
                   scrollWheelZoom={true}
+                  attributionControl={false}
                 >
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -431,15 +511,56 @@ const Distribuidores = () => {
                       icon={createMapPin(selectedStore === store)}
                       eventHandlers={{ click: () => seleccionarTienda(store) }}
                     >
-                      <Popup>
-                        <div className="min-w-[160px]">
-                          <p className="font-bold text-caborca-cafe text-sm">{store.nombre}</p>
-                          <p className="text-xs text-gray-500">{store.ciudad}</p>
-                          <span className="inline-block mt-1 text-xs bg-caborca-beige-fuerte text-white px-2 py-0.5 rounded">
-                            {store.tipo === 'tienda' ? 'Tienda física' : store.tipo === 'online' ? 'En línea' : 'Física y Online'}
-                          </span>
-                          {store.telefono && (
-                            <p className="text-xs text-gray-500 mt-1">📞 {store.telefono}</p>
+                      <Popup minWidth={250} maxWidth={320}>
+                        <div style={{ fontFamily: 'sans-serif' }}>
+                          {/* Header: logo + nombre */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            {store.logo && (
+                              <img src={store.logo} alt={store.nombre}
+                                style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 6, background: '#f9f5f0', border: '1px solid #e5e0d8', padding: 2, flexShrink: 0 }}
+                              />
+                            )}
+                            <div>
+                              <p style={{ fontWeight: 700, fontSize: 14, margin: 0, color: '#4a3728' }}>{store.nombre}</p>
+                            </div>
+                          </div>
+
+                          {/* Badges */}
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
+                            <span style={{ fontSize: 11, background: '#8B6A42', color: 'white', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>
+                              {store.tipo === 'tienda' ? '🏪 Tienda física' : store.tipo === 'online' ? '🌐 En línea' : '🏪🌐 Física y Online'}
+                            </span>
+                            {store.clasificacion === 'internacional' && (
+                              <span style={{ fontSize: 11, background: '#3b82f6', color: 'white', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>🌍 Internacional</span>
+                            )}
+                          </div>
+
+                          {/* Dirección */}
+                          {[store.calle, store.numeroExt, store.colonia, store.ciudad, store.estado, store.cp, store.pais].some(Boolean) && (
+                            <p style={{ fontSize: 12, color: '#666', margin: '0 0 6px', lineHeight: 1.4 }}>
+                              📍 {[store.calle && `${store.calle}${store.numeroExt ? ' ' + store.numeroExt : ''}`, store.colonia, store.ciudad, store.estado, store.cp, store.pais].filter(Boolean).join(', ')}
+                            </p>
+                          )}
+
+                          {/* Contacto */}
+                          {(store.telefono || store.email || store.sitioWeb) && (
+                            <div style={{ borderTop: '1px solid #eee', paddingTop: 6 }}>
+                              {store.telefono && (
+                                <p style={{ fontSize: 12, margin: '3px 0' }}>
+                                  📞 <a href={`tel:${store.telefono}`} style={{ color: '#7C5C3E', textDecoration: 'none', fontWeight: 500 }}>{store.telefono}</a>
+                                </p>
+                              )}
+                              {store.email && (
+                                <p style={{ fontSize: 12, margin: '3px 0' }}>
+                                  ✉️ <a href={`mailto:${store.email}`} style={{ color: '#7C5C3E', textDecoration: 'none', fontWeight: 500 }}>{store.email}</a>
+                                </p>
+                              )}
+                              {store.sitioWeb && (
+                                <p style={{ fontSize: 12, margin: '3px 0' }}>
+                                  🌐 <a href={store.sitioWeb.startsWith('http') ? store.sitioWeb : `https://${store.sitioWeb}`} target="_blank" rel="noreferrer" style={{ color: '#7C5C3E', fontWeight: 500 }}>{store.sitioWeb.replace(/^https?:\/\//, '')}</a>
+                                </p>
+                              )}
+                            </div>
                           )}
                         </div>
                       </Popup>
@@ -448,7 +569,6 @@ const Distribuidores = () => {
                 </MapContainer>
               </div>
             </div>
-            <p className="text-center text-xs text-gray-400 mt-2">Mapa © OpenStreetMap contributors</p>
           </div>
         </section>
       </main>

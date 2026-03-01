@@ -7,6 +7,7 @@ import Encabezado from '../componentes/Encabezado';
 import Carrusel from '../componentes/Carrusel';
 import PieDePagina from '../componentes/PieDePagina';
 import homeService from '../api/homeService';
+import { contactoService } from '../api/contactoService';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'https://localhost:7020/api' : 'https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api');
 
@@ -63,6 +64,9 @@ const DEMO_MARKERS = [
 
 const Inicio = () => {
     const [activeFilter, setActiveFilter] = useState('todos');
+    const [formInicio, setFormInicio] = useState({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
+    const [enviandoInicio, setEnviandoInicio] = useState(false);
+    const [resultadoInicio, setResultadoInicio] = useState(null);
 
     // ── Estados dinámicos del CMS ──────────────────────────────────────────────
     const [distribuidores, setDistribuidores] = useState({
@@ -128,6 +132,21 @@ const Inicio = () => {
                 }
             })
             .catch(() => { });
+    }, []);
+
+    const [productosCatalogoDestacados, setProductosCatalogoDestacados] = useState([]);
+
+    useEffect(() => {
+        Promise.all([
+            homeService.getCatalogoHombre().catch(() => null),
+            homeService.getCatalogoMujer().catch(() => null)
+        ]).then(([dataHombre, dataMujer]) => {
+            let all = [];
+            if (dataHombre && Array.isArray(dataHombre.productos)) all = all.concat(dataHombre.productos);
+            if (dataMujer && Array.isArray(dataMujer.productos)) all = all.concat(dataMujer.productos);
+            const destacados = all.filter(p => p.destacado);
+            setProductosCatalogoDestacados(destacados.slice(0, 4));
+        });
     }, []);
 
     // Cargar datos dinámicos de la API
@@ -209,12 +228,12 @@ const Inicio = () => {
 
     // Logos estáticos de respaldo (se usan si la API no tiene logos todavía)
     const logosEstaticos = [
-        { id: 1, name: "El Palacio de Hierro", category: "premium", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 2, name: "Liverpool", category: "nacionales", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 3, name: "Boot Barn", category: "internacionales", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 4, name: "Cavender's", category: "internacionales", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 5, name: "Sears", category: "nacionales", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 6, name: "Botas Caborca Store", category: "premium", logo: "https://blocks.astratic.com/img/general-img-landscape.png" }
+        { id: 1, name: "El Palacio de Hierro", category: "destacados", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
+        { id: 2, name: "Liverpool", category: "nacional", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
+        { id: 3, name: "Boot Barn", category: "internacional", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
+        { id: 4, name: "Cavender's", category: "internacional", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
+        { id: 5, name: "Sears", category: "nacional", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
+        { id: 6, name: "Botas Caborca Store", category: "destacados", logo: "https://blocks.astratic.com/img/general-img-landscape.png" }
     ];
 
     // Logos: prioridad ConfiguracionGeneral → distribuidoresLogos del Home → estáticos
@@ -226,7 +245,9 @@ const Inicio = () => {
                     id: l.id || idx,
                     name: l.negocioNombre || l.contactoNombre || 'Distribuidor',
                     category: l.clasificacion || 'todos',
-                    logo: l.logo
+                    logo: l.logo,
+                    sitioWeb: l.sitioWeb || null,
+                    destacado: l.destacado || false
                 }));
         }
         if (distribuidores.logos.length > 0) {
@@ -237,7 +258,9 @@ const Inicio = () => {
 
     const filteredDistributors = activeFilter === 'todos'
         ? distribuidoresLogos
-        : distribuidoresLogos.filter(d => d.category === activeFilter);
+        : activeFilter === 'destacados'
+            ? distribuidoresLogos.filter(d => d.destacado)
+            : distribuidoresLogos.filter(d => d.category === activeFilter);
 
     return (
         <div className="min-h-screen">
@@ -256,50 +279,68 @@ const Inicio = () => {
                             {productosDestacados.titulo}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto">
-                            {/* Product 1: Diseño Exclusivo */}
-                            <div className="text-center group">
-                                <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
-                                    <img
-                                        src="https://blocks.astratic.com/img/general-img-landscape.png"
-                                        alt="Diseño Exclusivo"
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                </div>
-                                <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
-                            </div>
-                            {/* Product 2: Diseño Exclusivo */}
-                            <div className="text-center group">
-                                <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
-                                    <img
-                                        src="https://blocks.astratic.com/img/general-img-landscape.png"
-                                        alt="Diseño Exclusivo"
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                </div>
-                                <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
-                            </div>
-                            {/* Product 3: Diseño Exclusivo */}
-                            <div className="text-center group">
-                                <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
-                                    <img
-                                        src="https://blocks.astratic.com/img/general-img-landscape.png"
-                                        alt="Diseño Exclusivo"
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                </div>
-                                <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
-                            </div>
-                            {/* Product 4: Edición Limitada */}
-                            <div className="text-center group">
-                                <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
-                                    <img
-                                        src="https://blocks.astratic.com/img/general-img-landscape.png"
-                                        alt="Edición Limitada"
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                </div>
-                                <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">EDICIÓN LIMITADA</h3>
-                            </div>
+                            {productosCatalogoDestacados.length > 0 ? (
+                                productosCatalogoDestacados.map((producto, idx) => (
+                                    <div key={idx} className="text-center group cursor-pointer" onClick={() => window.location.href = `/catalogo/${producto.categoria || 'mujer'}`}>
+                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80 relative">
+                                            <img
+                                                src={(producto.imagenes && producto.imagenes[0]) || producto.imagen || "https://blocks.astratic.com/img/general-img-landscape.png"}
+                                                alt={producto.nombre}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                            {producto.badge && (
+                                                <span className="absolute top-2 right-2 bg-caborca-cafe text-white text-xs px-2 py-1 font-bold">{producto.badge}</span>
+                                            )}
+                                        </div>
+                                        <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte uppercase">{producto.nombre}</h3>
+                                        {producto.sku && <p className="text-xs text-gray-400 mt-1">{producto.sku}</p>}
+                                    </div>
+                                ))
+                            ) : (
+                                <>
+                                    {/* Fallback estático cuando no hay destacados */}
+                                    <div className="text-center group">
+                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
+                                            <img
+                                                src="https://blocks.astratic.com/img/general-img-landscape.png"
+                                                alt="Diseño Exclusivo"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
+                                    </div>
+                                    <div className="text-center group">
+                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
+                                            <img
+                                                src="https://blocks.astratic.com/img/general-img-landscape.png"
+                                                alt="Diseño Exclusivo"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
+                                    </div>
+                                    <div className="text-center group">
+                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
+                                            <img
+                                                src="https://blocks.astratic.com/img/general-img-landscape.png"
+                                                alt="Diseño Exclusivo"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
+                                    </div>
+                                    <div className="text-center group">
+                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
+                                            <img
+                                                src="https://blocks.astratic.com/img/general-img-landscape.png"
+                                                alt="Edición Limitada"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">EDICIÓN LIMITADA</h3>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -389,9 +430,9 @@ const Inicio = () => {
                         <div className="flex justify-center gap-6 mb-8 text-sm font-medium tracking-wide">
                             {[
                                 { id: 'todos', label: 'Todos' },
-                                { id: 'premium', label: 'Premium' },
-                                { id: 'nacionales', label: 'Nacionales' },
-                                { id: 'internacionales', label: 'Internacionales' }
+                                { id: 'destacados', label: 'Destacados' },
+                                { id: 'nacional', label: 'Nacionales' },
+                                { id: 'internacional', label: 'Internacionales' }
                             ].map((filter) => (
                                 <button
                                     key={filter.id}
@@ -409,18 +450,28 @@ const Inicio = () => {
                         {/* Carousel Automático / Centrado */}
                         <div className="w-full overflow-hidden relative group">
                             <div className={`flex items-center gap-16 ${filteredDistributors.length > 5 ? 'w-max animate-scroll' : 'justify-center w-full flex-wrap'}`}>
-                                {(filteredDistributors.length > 5 ? [...filteredDistributors, ...filteredDistributors] : filteredDistributors).map((distribuidor, index) => (
-                                    <div
-                                        key={`${distribuidor.id}-${index}`}
-                                        className="shrink-0 w-40 h-20 grayscale hover:grayscale-0 transition-all duration-500 opacity-60 hover:opacity-100 flex items-center justify-center"
-                                    >
-                                        <img
-                                            src={distribuidor.logo}
-                                            alt={distribuidor.name}
-                                            className="h-full w-full object-contain"
-                                        />
-                                    </div>
-                                ))}
+                                {(filteredDistributors.length > 5 ? [...filteredDistributors, ...filteredDistributors] : filteredDistributors).map((distribuidor, index) => {
+                                    const CardWrapper = distribuidor.sitioWeb ? 'a' : 'div';
+                                    const linkProps = distribuidor.sitioWeb ? {
+                                        href: distribuidor.sitioWeb.startsWith('http') ? distribuidor.sitioWeb : `https://${distribuidor.sitioWeb}`,
+                                        target: "_blank",
+                                        rel: "noopener noreferrer"
+                                    } : {};
+
+                                    return (
+                                        <CardWrapper
+                                            key={`${distribuidor.id}-${index}`}
+                                            {...linkProps}
+                                            className={`shrink-0 w-52 h-28 grayscale hover:grayscale-0 transition-all duration-500 opacity-60 hover:opacity-100 flex items-center justify-center ${distribuidor.sitioWeb ? 'cursor-pointer' : ''}`}
+                                        >
+                                            <img
+                                                src={distribuidor.logo}
+                                                alt={distribuidor.name}
+                                                className="h-full w-full object-contain scale-110"
+                                            />
+                                        </CardWrapper>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -457,14 +508,15 @@ const Inicio = () => {
                                         style={{ height: '100%', width: '100%' }}
                                         scrollWheelZoom={false}
                                         zoomControl={true}
+                                        attributionControl={false}
                                     >
                                         <TileLayer
                                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                         />
                                         {/* Pines de distribuidores */}
-                                        {(logosConfig.filter(d => d.lat && d.lng).length > 0
-                                            ? logosConfig.filter(d => d.lat && d.lng)
+                                        {(logosConfig.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng))).length > 0
+                                            ? logosConfig.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng)))
                                             : DEMO_MARKERS
                                         ).map((d, idx) => (
                                             <Marker
@@ -597,35 +649,53 @@ const Inicio = () => {
                                 <p className="text-caborca-cafe font-semibold text-sm sm:text-base">{formDistribuidor.descripcion}</p>
                             </div>
                             <div className="bg-white p-6 rounded-lg shadow-lg">
-                                <form className="space-y-3">
+                                <form className="space-y-3" onSubmit={async e => {
+                                    e.preventDefault();
+                                    setEnviandoInicio(true);
+                                    setResultadoInicio(null);
+                                    try {
+                                        await contactoService.enviarSolicitudDistribuidor(formInicio);
+                                        setResultadoInicio({ tipo: 'exito', mensaje: '¡Solicitud enviada! Nos pondremos en contacto contigo pronto.' });
+                                        setFormInicio({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
+                                    } catch (err) {
+                                        setResultadoInicio({ tipo: 'error', mensaje: err.message || 'No se pudo enviar. Intenta de nuevo.' });
+                                    } finally {
+                                        setEnviandoInicio(false);
+                                    }
+                                }}>
                                     <div className="grid md:grid-cols-3 gap-3">
                                         <div>
                                             <label className="block text-xs font-medium text-caborca-cafe mb-1 font-bold">Nombre completo</label>
-                                            <input type="text" placeholder="Tu nombre" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
+                                            <input type="text" value={formInicio.nombreCompleto} onChange={e => setFormInicio(p => ({ ...p, nombreCompleto: e.target.value }))} placeholder="Tu nombre" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
                                         </div>
                                         <div>
                                             <label className="block text-xs font-medium text-caborca-cafe mb-1 font-bold">Correo electrónico</label>
-                                            <input type="email" placeholder="correo@ejemplo.com" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
+                                            <input type="email" value={formInicio.correoElectronico} onChange={e => setFormInicio(p => ({ ...p, correoElectronico: e.target.value }))} placeholder="correo@ejemplo.com" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
                                         </div>
                                         <div>
                                             <label className="block text-xs font-medium text-caborca-beige-fuerte mb-1">Teléfono</label>
-                                            <input type="tel" placeholder="(123) 456-7890" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
+                                            <input type="tel" value={formInicio.telefono} onChange={e => setFormInicio(p => ({ ...p, telefono: e.target.value }))} placeholder="(123) 456-7890" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
                                         </div>
                                     </div>
                                     <div className="grid md:grid-cols-3 gap-3">
                                         <div>
                                             <label className="block text-xs font-medium text-caborca-cafe mb-1 font-bold">Ciudad</label>
-                                            <input type="text" placeholder="Tu ciudad" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
+                                            <input type="text" value={formInicio.ciudad} onChange={e => setFormInicio(p => ({ ...p, ciudad: e.target.value }))} placeholder="Tu ciudad" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
                                         </div>
                                         <div className="md:col-span-2">
                                             <label className="block text-xs font-medium text-caborca-cafe mb-1 font-bold">Mensaje</label>
-                                            <textarea placeholder="Cuéntanos sobre tu negocio..." rows="2" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors resize-none" required></textarea>
+                                            <textarea value={formInicio.mensaje} onChange={e => setFormInicio(p => ({ ...p, mensaje: e.target.value }))} placeholder="Cuéntanos sobre tu negocio..." rows="2" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors resize-none"></textarea>
                                         </div>
                                     </div>
+                                    {resultadoInicio && (
+                                        <div className={`px-3 py-2 rounded text-sm font-semibold ${resultadoInicio.tipo === 'exito' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+                                            {resultadoInicio.tipo === 'exito' ? '✓ ' : '✗ '}{resultadoInicio.mensaje}
+                                        </div>
+                                    )}
                                     <div className="grid md:grid-cols-2 gap-4 items-center pt-2">
                                         <div className="flex items-center gap-4">
-                                            <button type="submit" className="bg-caborca-beige-fuerte text-white font-bold tracking-wider text-xs px-8 py-3 rounded transition-colors shadow-md hover:shadow-lg">
-                                                {formDistribuidor.textoBoton}
+                                            <button type="submit" disabled={enviandoInicio} className="bg-caborca-beige-fuerte text-white font-bold tracking-wider text-xs px-8 py-3 rounded transition-colors shadow-md hover:shadow-lg disabled:opacity-60 flex items-center gap-2">
+                                                {enviandoInicio ? (<><svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>ENVIANDO...</>) : formDistribuidor.textoBoton}
                                             </button>
                                             <div className="hidden sm:flex items-center gap-2 text-caborca-bronce text-xs">
                                                 <svg className="w-5 h-5 text-caborca-bronce" fill="currentColor" viewBox="0 0 20 20">
@@ -643,8 +713,7 @@ const Inicio = () => {
                                                 </div>
                                                 <div className="w-16 h-16 bg-caborca-bronce rounded-full flex items-center justify-center">
                                                     <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                                                    </svg>
+                                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg>
                                                 </div>
                                                 <div>
                                                     <p className="text-xs font-semibold">{formDistribuidor.statEstados}</p>
@@ -658,6 +727,7 @@ const Inicio = () => {
                         </div>
                     </div>
                 </section>
+
             </main>
 
             <PieDePagina />

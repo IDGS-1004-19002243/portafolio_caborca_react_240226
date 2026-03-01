@@ -1,98 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
 
+import homeService from '../api/homeService';
+
 const CatalogoMujer = () => {
   const [ordenarPor, setOrdenarPor] = useState('');
   const [estilo, setEstilo] = useState('');
+  const [listaProductos, setListaProductos] = useState([]);
+  const [contenido, setContenido] = useState(null);
 
-  const listaProductos = [
-    {
-      id: 1,
-      nombre: 'Bota Vaquera Elegante',
-      descripcion: 'Piel premium con diseño femenino',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: true
-    },
-    {
-      id: 2,
-      nombre: 'Bota Texana Deluxe',
-      descripcion: 'Estilo sofisticado con detalles únicos',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: false
-    },
-    {
-      id: 3,
-      nombre: 'Bota Casual Chic',
-      descripcion: 'Comodidad y estilo para el día a día',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: false
-    },
-    {
-      id: 4,
-      nombre: 'Bota Artesanal Premium',
-      descripcion: 'Diseño exclusivo hecho a mano',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: true
-    },
-    {
-      id: 5,
-      nombre: 'Bota Ranchera Moderna',
-      descripcion: 'Tradición con toque contemporáneo',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: false
-    },
-    {
-      id: 6,
-      nombre: 'Bota Lujo Elite',
-      descripcion: 'Edición limitada para mujer',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: true
-    },
-    {
-      id: 7,
-      nombre: 'Bota Clásica Refinada',
-      descripcion: 'Elegancia atemporal',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: false
-    },
-    {
-      id: 8,
-      nombre: 'Bota Fashion Premium',
-      descripcion: 'Tendencia y calidad combinadas',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: false
-    },
-    {
-      id: 9,
-      nombre: 'Bota Vaquera Moderna',
-      descripcion: 'Diseño contemporáneo y funcional',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: true
-    },
-    {
-      id: 10,
-      nombre: 'Bota Casual Premium',
-      descripcion: 'Versatilidad y confort',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: false
-    },
-    {
-      id: 11,
-      nombre: 'Bota Texana Elite',
-      descripcion: 'Sofisticación y estilo',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: false
-    },
-    {
-      id: 12,
-      nombre: 'Bota Artesanal Especial',
-      descripcion: 'Pieza única de colección',
-      imagen: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      esNuevo: true
-    }
-  ];
+  useEffect(() => {
+    homeService.getCatalogoMujer().then(data => {
+      if (data && data.productos) {
+        setListaProductos(data.productos);
+      }
+      if (data && data.contenido) {
+        setContenido(data.contenido);
+      }
+    }).catch(console.error);
+  }, []);
 
   const manejarCambioOrdenar = (evento) => {
     setOrdenarPor(evento.target.value);
@@ -111,11 +39,11 @@ const CatalogoMujer = () => {
         <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 bg-gray-50">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif mb-4 sm:mb-6 text-caborca-cafe">
-              Botas para Mujer
+              {contenido?.titulo || 'Botas para Mujer'}
             </h1>
             <div className="w-20 sm:w-24 h-1 bg-caborca-cafe mx-auto mb-4 sm:mb-6"></div>
             <p className="text-caborca-cafe text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-              Elegancia y artesanía mexicana diseñada para la mujer moderna
+              {contenido?.subtitulo || 'Elegancia y artesanía mexicana diseñada para la mujer moderna'}
             </p>
           </div>
         </section>
@@ -160,35 +88,41 @@ const CatalogoMujer = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-7xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {listaProductos.slice(0, 3).map((producto) => (
-                  <div key={producto.id} className="group relative">
-                    <div className="relative overflow-hidden rounded-lg shadow-lg aspect-[3/4]">
-                      <img
-                        src="https://blocks.astratic.com/img/general-img-portrait.png"
-                        alt={producto.nombre}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      {producto.esNuevo && (
-                        <div className="absolute top-4 right-4 bg-caborca-cafe text-white px-3 py-1 rounded-full text-xs font-semibold tracking-wider z-10">
-                          NUEVO
+                {listaProductos.length > 0 ? (
+                  listaProductos.map((producto) => (
+                    <div key={producto.id} className="group relative">
+                      <div className="relative overflow-hidden rounded-lg shadow-lg aspect-[3/4] bg-gray-100">
+                        <img
+                          src={(producto.imagenes && producto.imagenes[0]) || producto.imagen || "https://blocks.astratic.com/img/general-img-portrait.png"}
+                          alt={producto.nombre}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        {producto.badge && (
+                          <div className="absolute top-4 right-4 bg-caborca-cafe text-white px-3 py-1 rounded-full text-xs font-semibold tracking-wider z-10 uppercase">
+                            {producto.badge}
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                          <Link to={`/producto/${producto.id}`} className="bg-white text-caborca-cafe px-8 py-3 rounded-full font-bold tracking-wider transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-gray-100 shadow-xl">
+                            VER DETALLES
+                          </Link>
                         </div>
-                      )}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <Link to={`/producto/${producto.id}`} className="bg-white text-caborca-cafe px-8 py-3 rounded-full font-bold tracking-wider transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-gray-100">
-                          VER DETALLES
-                        </Link>
+                      </div>
+                      <div className="mt-6 text-center">
+                        <h3 className="text-xl font-serif font-bold text-caborca-cafe mb-1">
+                          <Link to={`/producto/${producto.id}`}>{producto.nombre}</Link>
+                        </h3>
+                        <p className="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">
+                          {producto.sku ? `SKU: ${producto.sku}` : (producto.categoria || '')}
+                        </p>
                       </div>
                     </div>
-                    <div className="mt-6 text-center">
-                      <h3 className="text-xl font-serif font-bold text-caborca-cafe mb-1">
-                        <Link to={`/producto/${producto.id}`}>{producto.nombre}</Link>
-                      </h3>
-                      <p className="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">
-                        {producto.descripcion}
-                      </p>
-                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-1 md:col-span-3 text-center py-20 text-gray-400">
+                    <p className="text-xl">Próximamente más modelos disponibles</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>

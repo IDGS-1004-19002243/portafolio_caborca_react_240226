@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
 import { textosService } from '../api/textosService';
+import { contactoService } from '../api/contactoService';
 
 const Contacto = () => {
   const [formulario, setFormulario] = useState({
-    nombreCompleto: '', correoElectronico: '', telefono: '', mensaje: ''
+    nombreCompleto: '', correoElectronico: '', telefono: '', asunto: '', mensaje: ''
   });
+  const [enviando, setEnviando] = useState(false);
+  const [resultado, setResultado] = useState(null); // { tipo: 'exito'|'error', mensaje: '' }
 
   const [hero, setHero] = useState({
     badge: 'ESTAMOS AQUÍ PARA TI',
@@ -43,10 +46,25 @@ const Contacto = () => {
     setFormulario(prev => ({ ...prev, [name]: value }));
   };
 
-  const manejarEnvioFormulario = (evento) => {
+  const manejarEnvioFormulario = async (evento) => {
     evento.preventDefault();
-    alert('¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.');
-    setFormulario({ nombreCompleto: '', correoElectronico: '', telefono: '', mensaje: '' });
+    setEnviando(true);
+    setResultado(null);
+    try {
+      await contactoService.enviarContacto({
+        nombre: formulario.nombreCompleto,
+        correo: formulario.correoElectronico,
+        telefono: formulario.telefono,
+        asunto: formulario.asunto,
+        mensaje: formulario.mensaje,
+      });
+      setResultado({ tipo: 'exito', mensaje: '¡Mensaje enviado! Nos pondremos en contacto contigo pronto.' });
+      setFormulario({ nombreCompleto: '', correoElectronico: '', telefono: '', asunto: '', mensaje: '' });
+    } catch (err) {
+      setResultado({ tipo: 'error', mensaje: err.message || 'No se pudo enviar el mensaje. Intenta de nuevo.' });
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const iconoPorCard = (id) => {
@@ -145,15 +163,42 @@ const Contacto = () => {
                       placeholder="+52 (555) 123-4567" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" required />
                   </div>
                 </div>
+                {/* Asunto */}
+                <div>
+                  <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">Asunto</label>
+                  <input type="text" name="asunto" value={formulario.asunto} onChange={manejarCambioFormulario}
+                    placeholder="¿En qué podemos ayudarte?" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" />
+                </div>
                 <div>
                   <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">Mensaje</label>
                   <textarea name="mensaje" value={formulario.mensaje} onChange={manejarCambioFormulario}
                     placeholder="Cuéntanos cómo podemos ayudarte..." rows="5"
                     className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-beige-fuerte focus:ring-2 focus:ring-caborca-beige-fuerte/20 transition-all resize-none" required />
                 </div>
-                <div className="text-center pt-2">
-                  <button type="submit" className="bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-12 py-4 rounded-lg shadow-lg hover:bg-caborca-negro transition-colors">
-                    ENVIAR MENSAJE
+                <div className="text-center pt-2 space-y-4">
+                  {/* Banner de resultado */}
+                  {resultado && (
+                    <div className={`px-4 py-3 rounded-lg text-sm font-semibold ${resultado.tipo === 'exito'
+                      ? 'bg-green-50 border border-green-200 text-green-700'
+                      : 'bg-red-50 border border-red-200 text-red-700'
+                      }`}>
+                      {resultado.tipo === 'exito' ? '✓ ' : '✗ '}{resultado.mensaje}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={enviando}
+                    className="bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-12 py-4 rounded-lg shadow-lg hover:bg-caborca-negro transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+                  >
+                    {enviando ? (
+                      <>
+                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                        ENVIANDO...
+                      </>
+                    ) : 'ENVIAR MENSAJE'}
                   </button>
                 </div>
               </form>

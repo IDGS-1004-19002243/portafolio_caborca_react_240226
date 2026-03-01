@@ -4,10 +4,20 @@ const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "https://
 const homeService = {
     getHomeContent: async () => {
         const response = await fetch(`${API_URL}/Home`, {
-            cache: 'no-store',    // Siempre pedir datos frescos al servidor
+            cache: 'no-store',
             headers: { 'Cache-Control': 'no-cache' }
         });
         if (!response.ok) throw new Error('Error al cargar contenido');
+        return response.json();
+    },
+    getCatalogoHombre: async () => {
+        const response = await fetch(`${API_URL}/Settings/CatalogoHombre`, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Error loading CatalogoHombre');
+        return response.json();
+    },
+    getCatalogoMujer: async () => {
+        const response = await fetch(`${API_URL}/Settings/CatalogoMujer`, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Error loading CatalogoMujer');
         return response.json();
     }
 };
