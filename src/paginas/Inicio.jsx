@@ -297,7 +297,7 @@ const Inicio = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto">
                             {productosCatalogoDestacados.length > 0 ? (
                                 productosCatalogoDestacados.map((producto, idx) => (
-                                    <div key={idx} className="text-center group cursor-pointer" onClick={() => window.location.href = `/catalogo/${producto.categoria || 'mujer'}`}>
+                                    <Link key={idx} to={`/producto/${producto.id}`} className="block text-center group cursor-pointer">
                                         <div className="bg-gray-100 overflow-hidden h-64 sm:h-80 relative">
                                             <img
                                                 src={(producto.imagenes && producto.imagenes[0]) || producto.imagen || "https://blocks.astratic.com/img/general-img-landscape.png"}
@@ -310,7 +310,7 @@ const Inicio = () => {
                                         </div>
                                         <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte uppercase">{producto.nombre}</h3>
                                         {producto.sku && <p className="text-xs text-gray-400 mt-1">{producto.sku}</p>}
-                                    </div>
+                                    </Link>
                                 ))
                             ) : (
                                 <>
