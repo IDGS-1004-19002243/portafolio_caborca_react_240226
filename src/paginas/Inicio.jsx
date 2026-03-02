@@ -508,8 +508,8 @@ const Inicio = () => {
                                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                         />
                                         {/* Pines de distribuidores */}
-                                        {(logosConfig.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng))).length > 0
-                                            ? logosConfig.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng)))
+                                        {(configGeneral?.distribuidoresList?.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng))).length > 0
+                                            ? configGeneral.distribuidoresList.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng)))
                                             : DEMO_MARKERS
                                         ).map((d, idx) => (
                                             <Marker
