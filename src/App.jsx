@@ -62,7 +62,7 @@ function App() {
         {/* Rutas de catálogo */}
         <Route path="/catalogo/hombre" element={<CatalogoHombre />} />
         <Route path="/catalogo/mujer" element={<CatalogoMujer />} />
-        <Route path="/producto/:id" element={<DetalleProducto />} />
+        <Route path="/producto/:catalogo/:id" element={<DetalleProducto />} />
 
         {/* Rutas de empresa */}
         <Route path="/nosotros" element={<Nosotros />} />

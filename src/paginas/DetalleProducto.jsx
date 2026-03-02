@@ -6,7 +6,7 @@ import homeService from '../api/homeService';
 import { useLanguage } from '../context/LanguageContext';
 
 const DetalleProducto = () => {
-  const { id } = useParams();
+  const { catalogo, id } = useParams();
   const { language, t } = useLanguage();
   const [producto, setProducto] = useState(null);
   const [imagenPrincipal, setImagenPrincipal] = useState('https://blocks.astratic.com/img/general-img-landscape.png');
@@ -34,7 +34,16 @@ const DetalleProducto = () => {
         all = all.concat(p.map(x => ({ ...x, catalogoPadre: 'mujer' })));
       }
 
-      const found = all.find(p => String(p.id) === String(id));
+      // Handle both cases: matching just ID vs matching catalogue + ID
+      let found = null;
+      if (catalogo) {
+        found = all.find(p => String(p.id) === String(id) && p.catalogoPadre === catalogo);
+      }
+
+      if (!found) {
+        // Fallback for legacy URL backwards compatibility
+        found = all.find(p => String(p.id) === String(id));
+      }
       if (found) {
         setProducto(found);
         if (found.imagenes && found.imagenes.length > 0) {
@@ -267,7 +276,8 @@ const DetalleProducto = () => {
 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
                 {relatedProducts.map((p) => (
-                  <Link to={`/producto/${p.id}`} key={p.id} className="group">
+                  // Updated Link tag to use the new route format
+                  <Link to={`/producto/${p.catalogoPadre}/${p.id}`} key={p.id} className="group">
                     <div className="bg-white shadow-sm hover:shadow-lg transition-all duration-300 group rounded-xl overflow-hidden border border-gray-100">
                       {/* Image Area */}
                       <div className="relative bg-white h-48 sm:h-64 overflow-hidden flex items-center justify-center">

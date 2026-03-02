@@ -116,14 +116,14 @@ const CatalogoMujer = () => {
                           </div>
                         )}
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <Link to={`/producto/${producto.id}`} className="bg-white text-caborca-cafe px-8 py-3 rounded-full font-bold tracking-wider transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-gray-100 shadow-xl">
+                          <Link to={`/producto/mujer/${producto.id}`} className="bg-white text-caborca-cafe px-8 py-3 rounded-full font-bold tracking-wider transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-gray-100 shadow-xl">
                             {labels.verDetalles}
                           </Link>
                         </div>
                       </div>
                       <div className="mt-6 text-center">
                         <h3 className="text-xl font-serif font-bold text-caborca-cafe mb-1">
-                          <Link to={`/producto/${producto.id}`}>{t(producto, 'nombre')}</Link>
+                          <Link to={`/producto/mujer/${producto.id}`}>{t(producto, 'nombre')}</Link>
                         </h3>
                         <p className="text-sm text-gray-500 mb-2 font-medium uppercase tracking-wide">
                           {producto.sku ? `SKU: ${producto.sku}` : (producto.categoria || '')}

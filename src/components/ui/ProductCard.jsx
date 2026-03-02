@@ -38,7 +38,7 @@ const ProductCard = ({
 
   return (
     <div className={`${sizeConfig.container} ${className}`}>
-      <Link to={`/producto/${id}`} className="block">
+      <Link to={`/producto/${product.catalogoPadre || 'catalogo'}/${id}`} className="block">
         <div className={`relative bg-gray-100 rounded-2xl overflow-hidden ${sizeConfig.image} mb-6 lg:mb-8 border border-gray-200`}>
           <img
             src={image}

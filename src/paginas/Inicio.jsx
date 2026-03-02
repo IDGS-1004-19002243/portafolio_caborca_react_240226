@@ -109,7 +109,12 @@ const Inicio = () => {
             subtitulo: t(rawContent.distribuidoresLogos, 'subtitulo') || "Encuentra nuestras colecciones exclusivas",
             textoBoton: t(rawContent.distribuidoresLogos, 'textoBoton') || "VER TODOS LOS DISTRIBUIDORES",
             linkBoton: "/distribuidores",
-            logos: rawContent.distribuidoresLogos.logos || []
+            logos: [
+                { imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png" },
+                { imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png" },
+                { imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png" },
+                { imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png" }
+            ]
         };
     }, [rawContent, language, t]);
 
@@ -122,7 +127,11 @@ const Inicio = () => {
             imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png",
             badge: "COMPROMISO AMBIENTAL",
             tituloDerecho: "Nuestro compromiso con el planeta",
-            notaCertificacion: "Certificado por prácticas sustentables"
+            notaCertificacion: "Certificado por prácticas sustentables",
+            features: [
+                { titulo: "Materiales Ecólogicos", descripcion: "Seleccionamos las mejores pieles de proveedores responsables con el medio ambiente." },
+                { titulo: "Procesos Limpios", descripcion: "Optimizamos el consumo de agua y energía en la manufactura de cada par de botas." }
+            ]
         };
         const data = rawContent.sustentabilidad;
         return {
@@ -274,7 +283,7 @@ const Inicio = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto">
                             {productosCatalogoDestacados.length > 0 ? (
                                 productosCatalogoDestacados.map((producto, idx) => (
-                                    <Link key={idx} to={`/producto/${producto.id}`} className="block text-center group cursor-pointer">
+                                    <Link key={idx} to={`/producto/${producto.catalogoPadre || 'catalogo'}/${producto.id}`} className="block text-center group cursor-pointer">
                                         <div className="bg-gray-100 overflow-hidden h-64 sm:h-80 relative">
                                             <img
                                                 src={(producto.imagenes && producto.imagenes[0]) || producto.imagen || "https://blocks.astratic.com/img/general-img-landscape.png"}
