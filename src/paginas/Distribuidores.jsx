@@ -547,17 +547,17 @@ const Distribuidores = () => {
                             <div style={{ borderTop: '1px solid #eee', paddingTop: 6 }}>
                               {store.telefono && (
                                 <p style={{ fontSize: 12, margin: '3px 0' }}>
-                                  📞 <a href={`tel:${store.telefono}`} style={{ color: '#7C5C3E', textDecoration: 'none', fontWeight: 500 }}>{store.telefono}</a>
+                                  📞 <a href={`tel:${store.telefono}`} style={{ color: '#7C5C3E', textDecoration: 'none', fontWeight: 500 }}>{store.telefono}</a>
                                 </p>
                               )}
                               {store.email && (
                                 <p style={{ fontSize: 12, margin: '3px 0' }}>
-                                  ✉️ <a href={`mailto:${store.email}`} style={{ color: '#7C5C3E', textDecoration: 'none', fontWeight: 500 }}>{store.email}</a>
+                                  ✉️ <a href={`mailto:${store.email}`} style={{ color: '#7C5C3E', textDecoration: 'none', fontWeight: 500 }}>{store.email}</a>
                                 </p>
                               )}
                               {store.sitioWeb && (
                                 <p style={{ fontSize: 12, margin: '3px 0' }}>
-                                  🌐 <a href={store.sitioWeb.startsWith('http') ? store.sitioWeb : `https://${store.sitioWeb}`} target="_blank" rel="noreferrer" style={{ color: '#7C5C3E', fontWeight: 500 }}>{store.sitioWeb.replace(/^https?:\/\//, '')}</a>
+                                  🌐 <a href={store.sitioWeb.startsWith('http') ? store.sitioWeb : `https://${store.sitioWeb}`} target="_blank" rel="noreferrer" style={{ color: '#7C5C3E', fontWeight: 500 }}>{store.sitioWeb.replace(/^https?:\/\//, '')}</a>
                                 </p>
                               )}
                             </div>
@@ -574,7 +574,7 @@ const Distribuidores = () => {
       </main>
 
       <PieDePagina />
-    </div>
+    </div >
   );
 };
 

@@ -23,7 +23,7 @@ const Nosotros = () => {
           setContent(prev => ({ ...prev, ...data }));
         }
       })
-      .catch(err => console.warn('Usando textos por defecto.'));
+      .catch(() => console.warn('Usando textos por defecto.'));
   }, []);
 
   const renderParagraphs = (paragraphs) => {
