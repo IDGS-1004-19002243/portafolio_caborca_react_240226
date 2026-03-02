@@ -59,18 +59,18 @@ const Footer = () => {
         <div className="grid md:grid-cols-[2fr_1fr_1fr_1fr] gap-12 mb-8 text-center md:text-left">
           <div>
             <img src={LogoImg} alt="Caborca Boots" className="h-20 mb-3 mx-auto md:mx-0 object-contain" />
-            <p className="text-caborca-cafe text-xs leading-relaxed font-bold">{labels.desc}</p>
+            <p className="text-caborca-cafe text-xs leading-relaxed">{labels.desc}</p>
           </div>
           <div>
             <h4 className="font-bold mb-4 text-caborca-cafe text-sm">{labels.quick}</h4>
-            <ul className="space-y-2 text-caborca-negro text-sm font-bold">
+            <ul className="space-y-2 text-caborca-negro text-sm">
               <li><Link to="/" className="hover:text-caborca-cafe">{labels.inicio}</Link></li>
               <li><Link to="/contacto" className="hover:text-caborca-cafe">{labels.cont}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-4 text-caborca-cafe text-sm">{labels.more}</h4>
-            <ul className="space-y-2 text-caborca-negro text-sm font-bold">
+            <ul className="space-y-2 text-caborca-negro text-sm">
               <li><Link to="/nosotros" className="hover:text-caborca-cafe">{labels.us}</Link></li>
               <li><Link to="/responsabilidad-ambiental" className="hover:text-caborca-cafe">{labels.env}</Link></li>
               <li><a href="#" className="hover:text-caborca-cafe">{labels.terms}</a></li>
@@ -78,7 +78,7 @@ const Footer = () => {
           </div>
           <div>
             <h4 className="font-bold mb-4 text-caborca-cafe text-sm">{labels.customer}</h4>
-            <ul className="space-y-2 text-caborca-negro text-sm font-bold">
+            <ul className="space-y-2 text-caborca-negro text-sm">
               <li><a href="#" className="hover:text-caborca-cafe">{labels.faq}</a></li>
               <li><a href="#" className="hover:text-caborca-cafe">{labels.privacy}</a></li>
               <li><Link to="/distribuidores" className="hover:text-caborca-cafe">{labels.dist}</Link></li>
@@ -87,7 +87,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="bg-caborca-cafe py-4">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-xs text-white font-bold">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-xs text-white">
           <p>© 2025 Caborca Boots. {labels.rights}</p>
           <div className="flex gap-4 mt-3 md:mt-0">
             {visibleSocialEntries.map(([key, data]) => {
