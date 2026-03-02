@@ -12,7 +12,7 @@ const DetalleProducto = () => {
   const [imagenPrincipal, setImagenPrincipal] = useState('https://blocks.astratic.com/img/general-img-landscape.png');
   const [imagenSeleccionadaIndex, setImagenSeleccionadaIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [relatedProducts, setRelatedProducts] = useState([]);
+
 
   useEffect(() => {
     setLoading(true);
@@ -52,12 +52,7 @@ const DetalleProducto = () => {
           setImagenPrincipal(found.imagen);
         }
 
-        // Get related (other products in same catalog)
-        const others = all
-          .filter(p => p.catalogoPadre === found.catalogoPadre && String(p.id) !== String(id))
-          .sort(() => 0.5 - Math.random()) // Shuffle
-          .slice(0, 4);
-        setRelatedProducts(others);
+
       }
       setLoading(false);
     });
@@ -264,44 +259,7 @@ const DetalleProducto = () => {
         </div>
       </section>
 
-      {/* PRODUCTOS RELACIONADOS */}
-      {relatedProducts.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-7xl mx-auto">
-              <h3 className="text-3xl sm:text-4xl font-serif text-caborca-beige-fuerte mb-4 text-center font-bold">
-                {language === 'es' ? 'También te puede interesar' : 'You may also like'}
-              </h3>
-              <div className="w-16 h-1 bg-caborca-beige-fuerte mx-auto mb-12"></div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-                {relatedProducts.map((p) => (
-                  // Updated Link tag to use the new route format
-                  <Link to={`/producto/${p.catalogoPadre}/${p.id}`} key={p.id} className="group">
-                    <div className="bg-white shadow-sm hover:shadow-lg transition-all duration-300 group rounded-xl overflow-hidden border border-gray-100">
-                      {/* Image Area */}
-                      <div className="relative bg-white h-48 sm:h-64 overflow-hidden flex items-center justify-center">
-                        <img
-                          src={(p.imagenes && p.imagenes[0]) || p.imagen || "https://blocks.astratic.com/img/general-img-landscape.png"}
-                          alt={t(p, 'nombre')}
-                          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                      {/* Content Area - Dark Footer */}
-                      <div className="bg-white p-3 sm:p-4 border-t border-gray-50 text-center">
-                        <h3 className="text-xs sm:text-sm font-serif text-caborca-beige-fuerte font-bold truncate group-hover:text-caborca-cafe transition-colors">
-                          {t(p, 'nombre')}
-                        </h3>
-                        {p.sku && <p className="text-[10px] text-gray-400 mt-0.5">{p.sku}</p>}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       <PieDePagina />
     </div>
