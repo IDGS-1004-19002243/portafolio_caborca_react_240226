@@ -128,7 +128,7 @@ const Nosotros = () => {
                 </div>
               </div>
               <div className="relative">
-                <img src={content.origen?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Origen" className="rounded-2xl shadow-2xl w-full" />
+                <img src={content.origen?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Origen" className="rounded-2xl shadow-2xl w-full aspect-[3/2] object-cover" />
               </div>
             </div>
           </div>
@@ -139,7 +139,7 @@ const Nosotros = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1">
-                <img src={content.crecimiento?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Crecimiento" className="rounded-2xl shadow-2xl w-full" />
+                <img src={content.crecimiento?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Crecimiento" className="rounded-2xl shadow-2xl w-full aspect-[3/2] object-cover" />
               </div>
               <div className="order-1 lg:order-2">
                 <div className="inline-block bg-white px-4 py-2 rounded-full mb-6 text-caborca-cafe font-bold text-sm tracking-wider uppercase">
@@ -185,7 +185,7 @@ const Nosotros = () => {
               </div>
             </div>
             <div>
-              <img src={content.artesania?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Artesanía" className="rounded-2xl shadow-xl w-full" />
+              <img src={content.artesania?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Artesanía" className="rounded-2xl shadow-xl w-full aspect-[3/2] object-cover" />
             </div>
           </div>
         </section>
@@ -194,7 +194,7 @@ const Nosotros = () => {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4 max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1">
-              <img src={content.proceso?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Proceso" className="rounded-2xl shadow-xl w-full" />
+              <img src={content.proceso?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Proceso" className="rounded-2xl shadow-xl w-full aspect-[3/2] object-cover" />
             </div>
             <div className="order-1 lg:order-2">
               <div className="inline-block bg-caborca-beige-suave px-6 py-2 rounded-full mb-6 uppercase font-bold text-sm text-caborca-cafe">

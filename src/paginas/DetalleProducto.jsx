@@ -144,7 +144,7 @@ const DetalleProducto = () => {
                   <img
                     src={imagenPrincipal}
                     alt={t(producto, 'nombre')}
-                    className="w-full h-[300px] sm:h-[500px] object-contain transition-transform duration-200 ease-out sm:group-hover:scale-150"
+                    className="w-full aspect-square object-contain transition-transform duration-200 ease-out sm:group-hover:scale-150"
                     style={{
                       transformOrigin: 'var(--zoom-x, 50%) var(--zoom-y, 50%)'
                     }}
@@ -168,7 +168,7 @@ const DetalleProducto = () => {
                       <img
                         src={img}
                         alt={`Vista ${idx + 1}`}
-                        className="w-full h-20 sm:h-24 object-contain hover:opacity-75 transition"
+                        className="w-full aspect-square object-contain hover:opacity-75 transition"
                       />
                     </div>
                   ))}

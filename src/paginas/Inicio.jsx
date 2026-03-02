@@ -284,7 +284,7 @@ const Inicio = () => {
                             {productosCatalogoDestacados.length > 0 ? (
                                 productosCatalogoDestacados.map((producto, idx) => (
                                     <Link key={idx} to={`/producto/${producto.catalogoPadre || 'catalogo'}/${producto.id}`} className="block text-center group cursor-pointer">
-                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80 relative">
+                                        <div className="bg-gray-100 overflow-hidden aspect-square w-full relative">
                                             <img
                                                 src={(producto.imagenes && producto.imagenes[0]) || producto.imagen || "https://blocks.astratic.com/img/general-img-landscape.png"}
                                                 alt={producto.nombre}
@@ -302,7 +302,7 @@ const Inicio = () => {
                                 <>
                                     {/* Fallback estático cuando no hay destacados */}
                                     <div className="text-center group">
-                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
+                                        <div className="bg-gray-100 overflow-hidden aspect-square w-full">
                                             <img
                                                 src="https://blocks.astratic.com/img/general-img-landscape.png"
                                                 alt="Diseño Exclusivo"
@@ -312,7 +312,7 @@ const Inicio = () => {
                                         <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
                                     </div>
                                     <div className="text-center group">
-                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
+                                        <div className="bg-gray-100 overflow-hidden aspect-square w-full">
                                             <img
                                                 src="https://blocks.astratic.com/img/general-img-landscape.png"
                                                 alt="Diseño Exclusivo"
@@ -322,7 +322,7 @@ const Inicio = () => {
                                         <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
                                     </div>
                                     <div className="text-center group">
-                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
+                                        <div className="bg-gray-100 overflow-hidden aspect-square w-full">
                                             <img
                                                 src="https://blocks.astratic.com/img/general-img-landscape.png"
                                                 alt="Diseño Exclusivo"
@@ -332,7 +332,7 @@ const Inicio = () => {
                                         <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte">DISEÑO EXCLUSIVO</h3>
                                     </div>
                                     <div className="text-center group">
-                                        <div className="bg-gray-100 overflow-hidden h-64 sm:h-80">
+                                        <div className="bg-gray-100 overflow-hidden aspect-square w-full">
                                             <img
                                                 src="https://blocks.astratic.com/img/general-img-landscape.png"
                                                 alt="Edición Limitada"

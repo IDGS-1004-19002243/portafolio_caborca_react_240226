@@ -17,18 +17,18 @@ const ProductCard = ({
   const sizes = {
     sm: {
       container: 'text-center group',
-      image: 'h-48 lg:h-56',
+      image: 'aspect-square w-full',
       title: 'text-sm lg:text-base',
       price: 'text-sm'
     },
     default: {
       container: 'text-center group',
-      image: 'h-64 lg:h-72',
+      image: 'aspect-square w-full',
       title: 'text-base lg:text-lg',
     },
     lg: {
       container: 'text-center group',
-      image: 'h-72 lg:h-80',
+      image: 'aspect-square w-full',
       title: 'text-lg lg:text-xl',
       price: 'text-lg lg:text-xl'
     }
