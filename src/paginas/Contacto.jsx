@@ -172,32 +172,32 @@ const Contacto = () => {
               <form onSubmit={manejarEnvioFormulario} className="space-y-4">
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.nombre}</label>
+                    <label className="block text-xs font-semibold text-caborca-beige-fuerte mb-2">{labels.nombre}</label>
                     <input type="text" name="nombreCompleto" value={formulario.nombreCompleto} onChange={manejarCambioFormulario}
-                      placeholder={labels.nombrePlaceholder} className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all font-bold" required />
+                      placeholder={labels.nombrePlaceholder} className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" required />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.correo}</label>
+                    <label className="block text-xs font-semibold text-caborca-beige-fuerte mb-2">{labels.correo}</label>
                     <input type="email" name="correoElectronico" value={formulario.correoElectronico} onChange={manejarCambioFormulario}
-                      placeholder="correo@ejemplo.com" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all font-bold" required />
+                      placeholder="correo@ejemplo.com" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" required />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.telefono}</label>
+                    <label className="block text-xs font-semibold text-caborca-beige-fuerte mb-2">{labels.telefono}</label>
                     <input type="tel" name="telefono" value={formulario.telefono} onChange={manejarCambioFormulario}
-                      placeholder="+52 (555) 123-4567" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all font-bold" required />
+                      placeholder="+52 (555) 123-4567" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" required />
                   </div>
                 </div>
                 {/* Asunto */}
                 <div>
-                  <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.asunto}</label>
+                  <label className="block text-xs font-semibold text-caborca-beige-fuerte mb-2">{labels.asunto}</label>
                   <input type="text" name="asunto" value={formulario.asunto} onChange={manejarCambioFormulario}
-                    placeholder={labels.asuntoPlaceholder} className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all font-bold" />
+                    placeholder={labels.asuntoPlaceholder} className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.mensaje}</label>
+                  <label className="block text-xs font-semibold text-caborca-beige-fuerte mb-2">{labels.mensaje}</label>
                   <textarea name="mensaje" value={formulario.mensaje} onChange={manejarCambioFormulario}
                     placeholder={labels.mensajePlaceholder} rows="5"
-                    className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-beige-fuerte focus:ring-2 focus:ring-caborca-beige-fuerte/20 transition-all resize-none font-bold" required />
+                    className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-beige-fuerte focus:ring-2 focus:ring-caborca-beige-fuerte/20 transition-all resize-none" required />
                 </div>
                 <div className="text-center pt-2 space-y-4">
                   {/* Banner de resultado */}

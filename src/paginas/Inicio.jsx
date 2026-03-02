@@ -658,11 +658,11 @@ const Inicio = () => {
                                 }}>
                                     <div className="grid md:grid-cols-3 gap-3">
                                         <div>
-                                            <label className="block text-xs font-medium text-caborca-cafe mb-1 font-bold">Nombre completo</label>
+                                            <label className="block text-xs font-medium text-caborca-cafe mb-1">Nombre completo</label>
                                             <input type="text" value={formInicio.nombreCompleto} onChange={e => setFormInicio(p => ({ ...p, nombreCompleto: e.target.value }))} placeholder="Tu nombre" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-caborca-cafe mb-1 font-bold">Correo electrónico</label>
+                                            <label className="block text-xs font-medium text-caborca-cafe mb-1">Correo electrónico</label>
                                             <input type="email" value={formInicio.correoElectronico} onChange={e => setFormInicio(p => ({ ...p, correoElectronico: e.target.value }))} placeholder="correo@ejemplo.com" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
                                         </div>
                                         <div>
@@ -672,11 +672,11 @@ const Inicio = () => {
                                     </div>
                                     <div className="grid md:grid-cols-3 gap-3">
                                         <div>
-                                            <label className="block text-xs font-medium text-caborca-cafe mb-1 font-bold">Ciudad</label>
+                                            <label className="block text-xs font-medium text-caborca-cafe mb-1">Ciudad</label>
                                             <input type="text" value={formInicio.ciudad} onChange={e => setFormInicio(p => ({ ...p, ciudad: e.target.value }))} placeholder="Tu ciudad" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
                                         </div>
                                         <div className="md:col-span-2">
-                                            <label className="block text-xs font-medium text-caborca-cafe mb-1 font-bold">Mensaje</label>
+                                            <label className="block text-xs font-medium text-caborca-cafe mb-1">Mensaje</label>
                                             <textarea value={formInicio.mensaje} onChange={e => setFormInicio(p => ({ ...p, mensaje: e.target.value }))} placeholder="Cuéntanos sobre tu negocio..." rows="2" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors resize-none"></textarea>
                                         </div>
                                     </div>
