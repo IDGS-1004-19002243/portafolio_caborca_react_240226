@@ -144,7 +144,7 @@ const ResponsabilidadAmbiental = () => {
                   {renderTitle(t(content.compania, 'title'))}
                 </h2>
                 <div className="w-24 h-1 bg-caborca-beige-fuerte"></div>
-                <div className="space-y-4 text-caborca-negro/80 leading-relaxed font-bold">
+                <div className="space-y-4 text-caborca-negro/80 leading-relaxed font-medium">
                   <p>{t(content.compania, 'p1')}</p>
                   <p>{t(content.compania, 'p2')}</p>
                   <p className="text-caborca-beige-fuerte">{t(content.compania, 'highlight')}</p>
@@ -181,7 +181,7 @@ const ResponsabilidadAmbiental = () => {
                 </div>
                 <h2 className="text-4xl md:text-5xl font-serif text-caborca-cafe font-bold leading-tight">{renderTitle(t(content.energia, 'title'))}</h2>
                 <div className="w-24 h-1 bg-yellow-400"></div>
-                <div className="space-y-4 text-gray-600 leading-relaxed font-bold">
+                <div className="space-y-4 text-gray-600 leading-relaxed">
                   <p>{t(content.energia, 'p1')}</p>
                   <p className="text-caborca-cafe">{t(content.energia, 'p2')}</p>
                 </div>
@@ -207,7 +207,7 @@ const ResponsabilidadAmbiental = () => {
               <div className="space-y-6">
                 <h2 className="text-4xl md:text-5xl font-serif text-caborca-cafe font-bold leading-tight">{renderTitle(t(content.pieles, 'title'))}</h2>
                 <div className="w-24 h-1 bg-green-500"></div>
-                <div className="space-y-4 text-gray-600 leading-relaxed font-bold">
+                <div className="space-y-4 text-gray-600 leading-relaxed">
                   <p>{t(content.pieles, 'p1')}</p>
                   <p className="text-caborca-cafe">{t(content.pieles, 'p2')}</p>
                 </div>
@@ -240,7 +240,7 @@ const ResponsabilidadAmbiental = () => {
             <div className="text-center mb-16">
               <h2 className="text-5xl font-serif text-caborca-cafe font-bold mb-4">{t(content.shambhala, 'title')}</h2>
               <p className="text-3xl font-serif text-green-700 font-bold mb-6">Shambhala</p>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto font-bold">{t(content.shambhala, 'subtitle')}</p>
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">{t(content.shambhala, 'subtitle')}</p>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 items-start">
               <div className="space-y-6">
@@ -251,7 +251,7 @@ const ResponsabilidadAmbiental = () => {
                 ].map((k, i) => (
                   <div key={i} className="bg-white p-8 rounded-2xl shadow-lg border border-green-100">
                     <h3 className="font-serif text-xl text-caborca-cafe font-bold mb-2">{t(content.shambhala, k.t)}</h3>
-                    <p className="text-gray-600 font-bold">{t(content.shambhala, k.p)}</p>
+                    <p className="text-gray-600">{t(content.shambhala, k.p)}</p>
                   </div>
                 ))}
                 <div className="bg-green-700 p-8 rounded-2xl shadow-xl text-white flex items-center gap-6">

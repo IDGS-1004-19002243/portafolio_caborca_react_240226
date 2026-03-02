@@ -97,7 +97,7 @@ const Inicio = () => {
 
     // ── Mapeo de Contenido según Idioma ──────────────────────────────────────
     const distribuidores = useMemo(() => {
-        if (!rawContent?.distribuidoresLogos) return {
+        if (!rawContent?.distribuidoresLogos || (!rawContent.distribuidoresLogos.titulo && !rawContent.distribuidoresLogos.titulo_ES)) return {
             titulo: "Distribuidores Autorizados",
             subtitulo: "Encuentra nuestras colecciones exclusivas",
             textoBoton: "VER TODOS LOS DISTRIBUIDORES",
@@ -114,7 +114,7 @@ const Inicio = () => {
     }, [rawContent, language, t]);
 
     const sustentabilidad = useMemo(() => {
-        if (!rawContent?.sustentabilidad) return {
+        if (!rawContent?.sustentabilidad || (!rawContent.sustentabilidad.titulo && !rawContent.sustentabilidad.titulo_ES)) return {
             titulo: "Sustentabilidad",
             descripcion: "Nos comprometemos con el medio ambiente, utilizando procesos responsables y materiales sostenibles en cada etapa de producción.",
             textoBoton: "Conoce más",
@@ -141,7 +141,7 @@ const Inicio = () => {
     }, [rawContent, language, t]);
 
     const formDistribuidor = useMemo(() => {
-        if (!rawContent?.formDistribuidor) return {
+        if (!rawContent?.formDistribuidor || (!rawContent.formDistribuidor.titulo && !rawContent.formDistribuidor.titulo_ES)) return {
             titulo: "¿Quieres ser distribuidor?",
             descripcion: "Únete a nuestra red de distribuidores y forma parte de la familia Caborca.",
             textoBoton: "ENVIAR SOLICITUD",
@@ -161,7 +161,7 @@ const Inicio = () => {
     }, [rawContent, language, t]);
 
     const arteCreacion = useMemo(() => {
-        if (!rawContent?.arteCreacion) return {
+        if (!rawContent?.arteCreacion || (!rawContent.arteCreacion.titulo && !rawContent.arteCreacion.titulo_ES)) return {
             badge: "ARTESANÍA MEXICANA",
             titulo: "El arte de la creación",
             anosExperiencia: 40,
@@ -189,7 +189,7 @@ const Inicio = () => {
     }, [rawContent, language, t]);
 
     const dondeComprar = useMemo(() => {
-        if (!rawContent?.dondeComprar) return {
+        if (!rawContent?.dondeComprar || (!rawContent.dondeComprar.titulo && !rawContent.dondeComprar.titulo_ES)) return {
             titulo: "¿Dónde comprar?",
             descripcion: "Encuentra nuestras tiendas y distribuidores autorizados en todo el mundo.",
             textoBoton: "VER TODOS LOS DISTRIBUIDORES",
