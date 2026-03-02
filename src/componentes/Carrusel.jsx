@@ -1,17 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import homeService from '../api/homeService';
+import { useLanguage } from '../context/LanguageContext';
 
 // Datos por defecto (fallback si la API no responde)
 const SLIDES_DEFAULT = [
-  { titulo: "Colección Premium", subtitulo: "BOTAS DE LUJO HECHAS A MANO", imagen: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton: "Descubre Más" },
-  { titulo: "Elegancia Mexicana", subtitulo: "TRADICIÓN Y ESTILO", imagen: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton: "Descubre Más" },
-  { titulo: "Botas Caborca", subtitulo: "SOMOS LO QUE HACEMOS", imagen: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton: "Descubre Más" }
+  { titulo_ES: "Colección Premium", titulo_EN: "Premium Collection", subtitulo_ES: "BOTAS DE LUJO HECHAS A MANO", subtitulo_EN: "HANDMADE LUXE BOOTS", imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton_ES: "Descubre Más", textoBoton_EN: "Discover More" },
+  { titulo_ES: "Elegancia Mexicana", titulo_EN: "Mexican Elegance", subtitulo_ES: "TRADICIÓN Y ESTILO", subtitulo_EN: "TRADITION AND STYLE", imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton_ES: "Descubre Más", textoBoton_EN: "Discover More" },
+  { titulo_ES: "Botas Caborca", titulo_EN: "Caborca Boots", subtitulo_ES: "SOMOS LO QUE HACEMOS", subtitulo_EN: "WE ARE WHAT WE DO", imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png", textoBoton_ES: "Descubre Más", textoBoton_EN: "Discover More" }
 ];
 
 const Carrusel = () => {
+  const { t, language } = useLanguage();
   const [diapositivaActual, setDiapositivaActual] = useState(0);
   const [posicionMouse, setPosicionMouse] = useState({ x: 0.5, y: 0.5 });
-  const [diapositivas, setDiapositivas] = useState(SLIDES_DEFAULT);
+  const [rawSlides, setRawSlides] = useState(SLIDES_DEFAULT);
   const intervalRef = useRef(null);
 
   // Cargar datos de la API
@@ -19,22 +21,23 @@ const Carrusel = () => {
     homeService.getHomeContent()
       .then(data => {
         if (data?.carousel?.length > 0) {
-          const slides = data.carousel
-            .sort((a, b) => a.orden - b.orden)
-            .map(s => ({
-              titulo: s.titulo_ES || s.titulo,
-              subtitulo: s.subtitulo_ES || s.subtitulo,
-              imagen: s.imagenUrl || "https://blocks.astratic.com/img/general-img-landscape.png",
-              textoBoton: s.textoBoton_ES || "Descubre Más",
-              link: s.linkBoton || '#'
-            }));
-          setDiapositivas(slides);
+          setRawSlides(data.carousel.sort((a, b) => a.orden - b.orden));
         }
       })
       .catch(() => {
         console.warn('API no disponible, usando datos por defecto del carrusel.');
       });
   }, []);
+
+  const diapositivas = useMemo(() => {
+    return rawSlides.map(s => ({
+      titulo: t(s, 'titulo'),
+      subtitulo: t(s, 'subtitulo'),
+      imagen: s.imagenUrl || "https://blocks.astratic.com/img/general-img-landscape.png",
+      textoBoton: t(s, 'textoBoton'),
+      link: s.linkBoton || '#'
+    }));
+  }, [rawSlides, language, t]);
 
   useEffect(() => {
     const startAutoSlide = () => {

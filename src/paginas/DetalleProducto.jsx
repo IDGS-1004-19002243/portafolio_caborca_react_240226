@@ -1,17 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
 import homeService from '../api/homeService';
+import { useLanguage } from '../context/LanguageContext';
 
 const DetalleProducto = () => {
   const { id } = useParams();
+  const { language, t } = useLanguage();
   const [producto, setProducto] = useState(null);
   const [imagenPrincipal, setImagenPrincipal] = useState('https://blocks.astratic.com/img/general-img-landscape.png');
   const [imagenSeleccionadaIndex, setImagenSeleccionadaIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
       homeService.getCatalogoHombre().catch(() => null),
       homeService.getCatalogoMujer().catch(() => null)
@@ -19,21 +23,15 @@ const DetalleProducto = () => {
       let all = [];
 
       // Extract products from Hombre
-      let productosHombre = [];
       if (dataHombre) {
-        productosHombre = Array.isArray(dataHombre) ? dataHombre : (dataHombre.productos || []);
-      }
-      if (Array.isArray(productosHombre)) {
-        all = all.concat(productosHombre.map(p => ({ ...p, catalogoPadre: 'hombre' })));
+        const p = Array.isArray(dataHombre) ? dataHombre : (dataHombre.productos || []);
+        all = all.concat(p.map(x => ({ ...x, catalogoPadre: 'hombre' })));
       }
 
       // Extract products from Mujer
-      let productosMujer = [];
       if (dataMujer) {
-        productosMujer = Array.isArray(dataMujer) ? dataMujer : (dataMujer.productos || []);
-      }
-      if (Array.isArray(productosMujer)) {
-        all = all.concat(productosMujer.map(p => ({ ...p, catalogoPadre: 'mujer' })));
+        const p = Array.isArray(dataMujer) ? dataMujer : (dataMujer.productos || []);
+        all = all.concat(p.map(x => ({ ...x, catalogoPadre: 'mujer' })));
       }
 
       const found = all.find(p => String(p.id) === String(id));
@@ -44,10 +42,26 @@ const DetalleProducto = () => {
         } else if (found.imagen) {
           setImagenPrincipal(found.imagen);
         }
+
+        // Get related (other products in same catalog)
+        const others = all
+          .filter(p => p.catalogoPadre === found.catalogoPadre && String(p.id) !== String(id))
+          .sort(() => 0.5 - Math.random()) // Shuffle
+          .slice(0, 4);
+        setRelatedProducts(others);
       }
       setLoading(false);
     });
   }, [id]);
+
+  const breadcrumbs = useMemo(() => {
+    if (!producto) return [];
+    return [
+      { name: language === 'es' ? 'Inicio' : 'Home', path: '/' },
+      { name: language === 'es' ? `Botas ${producto.catalogoPadre === 'mujer' ? 'Dama' : 'Caballero'}` : `${producto.catalogoPadre === 'mujer' ? 'Women' : 'Men'}'s Boots`, path: `/catalogo/${producto.catalogoPadre}` },
+      { name: t(producto, 'nombre'), active: true }
+    ];
+  }, [producto, language, t]);
 
   if (loading) {
     return (
@@ -62,8 +76,12 @@ const DetalleProducto = () => {
       <div className="min-h-screen bg-white text-caborca-cafe font-sans">
         <Encabezado />
         <div className="pt-32 text-center h-screen flex flex-col items-center justify-center">
-          <h1 className="text-4xl text-caborca-cafe font-serif mb-4">Producto No Encontrado</h1>
-          <Link to="/" className="bg-caborca-cafe text-white px-6 py-2 rounded-lg">Volver al Inicio</Link>
+          <h1 className="text-4xl text-caborca-cafe font-serif mb-4">
+            {language === 'es' ? 'Producto No Encontrado' : 'Product Not Found'}
+          </h1>
+          <Link to="/" className="bg-caborca-cafe text-white px-6 py-2 rounded-lg">
+            {language === 'es' ? 'Volver al Inicio' : 'Back to Home'}
+          </Link>
         </div>
         <PieDePagina />
       </div>
@@ -81,15 +99,20 @@ const DetalleProducto = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
             <nav className="text-sm text-caborca-cafe flex items-center gap-2">
-              <Link to="/" className="font-medium hover:underline text-caborca-cafe font-semibold">Inicio</Link>
-              <svg className="w-4 h-4 text-caborca-cafe" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-              <Link to={`/catalogo/${producto.catalogoPadre || 'hombre'}`} className="font-medium hover:underline text-caborca-cafe font-semibold capitalize">Botas {producto.catalogoPadre || 'Hombre'}</Link>
-              <svg className="w-4 h-4 text-caborca-cafe" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-              <span className="text-caborca-cafe font-semibold">{producto.nombre}</span>
+              {breadcrumbs.map((bc, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  {bc.path ? (
+                    <Link to={bc.path} className="font-medium hover:underline text-caborca-cafe font-semibold text-xs sm:text-sm">{bc.name}</Link>
+                  ) : (
+                    <span className="text-caborca-cafe font-bold text-xs sm:text-sm truncate max-w-[150px]">{bc.name}</span>
+                  )}
+                  {idx < breadcrumbs.length - 1 && (
+                    <svg className="w-4 h-4 text-caborca-cafe opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  )}
+                </div>
+              ))}
             </nav>
           </div>
         </div>
@@ -102,11 +125,10 @@ const DetalleProducto = () => {
             <div className="grid lg:grid-cols-2 gap-16">
 
               {/* GALERÍA DE IMÁGENES */}
-              <div className="sticky top-24 h-fit">
-                {/* Imagen Principal */}
+              <div className="h-fit">
                 {/* Imagen Principal con Zoom */}
                 <div
-                  className="mb-6 rounded-xl overflow-hidden relative group cursor-zoom-in"
+                  className="mb-6 rounded-xl overflow-hidden relative group cursor-zoom-in bg-gray-50"
                   onMouseMove={(e) => {
                     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
                     const x = ((e.clientX - left) / width) * 100;
@@ -117,8 +139,8 @@ const DetalleProducto = () => {
                 >
                   <img
                     src={imagenPrincipal}
-                    alt={producto.nombre}
-                    className="w-full h-[500px] object-contain transition-transform duration-200 ease-out group-hover:scale-150"
+                    alt={t(producto, 'nombre')}
+                    className="w-full h-[300px] sm:h-[500px] object-contain transition-transform duration-200 ease-out sm:group-hover:scale-150"
                     style={{
                       transformOrigin: 'var(--zoom-x, 50%) var(--zoom-y, 50%)'
                     }}
@@ -136,13 +158,13 @@ const DetalleProducto = () => {
                       }}
                       className={`cursor-pointer rounded-lg overflow-hidden transition ${imagenSeleccionadaIndex === idx
                         ? 'border-2 border-caborca-cafe'
-                        : 'border border-transparent hover:border-gray-200'
+                        : 'border border-transparent hover:border-gray-200 bg-gray-50'
                         }`}
                     >
                       <img
                         src={img}
                         alt={`Vista ${idx + 1}`}
-                        className="w-full h-24 object-contain hover:opacity-75 transition"
+                        className="w-full h-20 sm:h-24 object-contain hover:opacity-75 transition"
                       />
                     </div>
                   ))}
@@ -153,63 +175,63 @@ const DetalleProducto = () => {
               <div>
                 <div className="mb-4">
                   {producto.badge && (
-                    <span className="bg-caborca-beige-fuerte text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mr-2">
+                    <span className="bg-caborca-beige-fuerte text-white text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mr-2">
                       {producto.badge}
                     </span>
                   )}
                   {producto.destacado && (
-                    <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
-                      Destacado
+                    <span className="bg-yellow-400 text-yellow-900 text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
+                      {language === 'es' ? 'Destacado' : 'Featured'}
                     </span>
                   )}
                 </div>
 
-                <h1 className="text-4xl md:text-5xl font-serif text-caborca-beige-fuerte font-bold mb-2">
-                  {producto.nombre}
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-caborca-beige-fuerte font-bold mb-2">
+                  {t(producto, 'nombre')}
                 </h1>
 
                 <p className="text-sm text-gray-500 mb-4 font-medium uppercase">
                   {producto.sku ? `SKU: ${producto.sku}` : `CAT: ${producto.categoria || ''}`}
                 </p>
 
-                <div className="text-gray-600 mb-8 leading-relaxed space-y-4 text-lg">
+                <div className="text-gray-600 mb-8 leading-relaxed space-y-4 text-base sm:text-lg">
                   <p>
-                    {producto.descripcion}
+                    {t(producto, 'descripcion')}
                   </p>
                 </div>
 
                 <div className="mb-10">
                   <h3 className="text-sm font-bold text-caborca-beige-fuerte uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">
-                    FICHA TÉCNICA
+                    {language === 'es' ? 'FICHA TÉCNICA' : 'TECHNICAL SPECIFICATIONS'}
                   </h3>
-                  <div className="grid grid-cols-2 gap-4 mb-8 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-sm">
                     {producto.materiales && producto.materiales.length > 0 && (
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 hover:border-caborca-beige-suave transition-colors">
-                        <span className="block text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Materiales</span>
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Materiales' : 'Materials'}</span>
                         <span className="font-bold text-caborca-cafe text-base capitalize">{producto.materiales.join(', ')}</span>
                       </div>
                     )}
                     {producto.materialCorte && (
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 hover:border-caborca-beige-suave transition-colors">
-                        <span className="block text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Material en Corte</span>
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Material en Corte' : 'Cut Material'}</span>
                         <span className="font-bold text-caborca-cafe text-base">{producto.materialCorte}</span>
                       </div>
                     )}
                     {producto.suela && (
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 hover:border-caborca-beige-suave transition-colors">
-                        <span className="block text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Suela</span>
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Suela' : 'Sole'}</span>
                         <span className="font-bold text-caborca-cafe text-base">{producto.suela}</span>
                       </div>
                     )}
                     {producto.construccion && (
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 hover:border-caborca-beige-suave transition-colors">
-                        <span className="block text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Construcción</span>
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Construcción' : 'Construction'}</span>
                         <span className="font-bold text-caborca-cafe text-base">{producto.construccion}</span>
                       </div>
                     )}
                     {producto.horma && (
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 hover:border-caborca-beige-suave transition-colors">
-                        <span className="block text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Horma</span>
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Horma' : 'Last'}</span>
                         <span className="font-bold text-caborca-cafe text-base">{producto.horma}</span>
                       </div>
                     )}
@@ -218,12 +240,12 @@ const DetalleProducto = () => {
                   <div className="flex flex-col gap-3">
                     <Link
                       to="/contacto"
-                      className="w-full flex items-center justify-center gap-2 bg-caborca-beige-fuerte text-white px-8 py-4 rounded-lg font-bold tracking-wider hover:bg-caborca-cafe transition shadow-md text-lg group"
+                      className="w-full flex items-center justify-center gap-2 bg-caborca-beige-fuerte text-white px-8 py-4 rounded-lg font-bold tracking-wider hover:bg-caborca-cafe transition shadow-md text-sm sm:text-base group text-center"
                     >
-                      <svg className="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      Obtener más información con nosotros
+                      {language === 'es' ? 'Obtener más información con nosotros' : 'Request more information from us'}
                     </Link>
                   </div>
                 </div>
@@ -234,39 +256,42 @@ const DetalleProducto = () => {
       </section>
 
       {/* PRODUCTOS RELACIONADOS */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            <h3 className="text-4xl font-serif text-caborca-beige-fuerte mb-4 text-center font-bold">
-              También te puede interesar
-            </h3>
-            <div className="w-24 h-1 bg-caborca-beige-fuerte mx-auto mb-12"></div>
+      {relatedProducts.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-7xl mx-auto">
+              <h3 className="text-3xl sm:text-4xl font-serif text-caborca-beige-fuerte mb-4 text-center font-bold">
+                {language === 'es' ? 'También te puede interesar' : 'You may also like'}
+              </h3>
+              <div className="w-16 h-1 bg-caborca-beige-fuerte mx-auto mb-12"></div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[1, 2, 3, 4].map((item) => (
-                <Link to={`/detalle-producto`} key={item} className="group">
-                  <div className="bg-white shadow-md hover:shadow-xl transition-all duration-300 group rounded-2xl overflow-hidden">
-                    {/* Image Area */}
-                    <div className="relative bg-gray-50 h-64 overflow-hidden flex items-center justify-center">
-                      <img
-                        src="https://blocks.astratic.com/img/general-img-portrait.png"
-                        alt="Producto relacionado"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+                {relatedProducts.map((p) => (
+                  <Link to={`/producto/${p.id}`} key={p.id} className="group">
+                    <div className="bg-white shadow-sm hover:shadow-lg transition-all duration-300 group rounded-xl overflow-hidden border border-gray-100">
+                      {/* Image Area */}
+                      <div className="relative bg-white h-48 sm:h-64 overflow-hidden flex items-center justify-center">
+                        <img
+                          src={(p.imagenes && p.imagenes[0]) || p.imagen || "https://blocks.astratic.com/img/general-img-landscape.png"}
+                          alt={t(p, 'nombre')}
+                          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      {/* Content Area - Dark Footer */}
+                      <div className="bg-white p-3 sm:p-4 border-t border-gray-50 text-center">
+                        <h3 className="text-xs sm:text-sm font-serif text-caborca-beige-fuerte font-bold truncate group-hover:text-caborca-cafe transition-colors">
+                          {t(p, 'nombre')}
+                        </h3>
+                        {p.sku && <p className="text-[10px] text-gray-400 mt-0.5">{p.sku}</p>}
+                      </div>
                     </div>
-                    {/* Content Area - Dark Footer */}
-                    <div className="bg-caborca-beige-suave p-4">
-                      <h3 className="text-lg font-serif text-caborca-beige-fuerte mb-2 font-bold transition-colors">
-                        Bota Vaquera Premium
-                      </h3>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <PieDePagina />
     </div>

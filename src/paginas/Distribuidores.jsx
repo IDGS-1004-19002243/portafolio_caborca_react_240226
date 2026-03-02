@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
 import { textosService } from '../api/textosService';
+import { useLanguage } from '../context/LanguageContext';
 
 // Fix Leaflet default marker icons broken by bundlers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -48,7 +49,6 @@ const createMapPin = (selected = false) => {
   });
 };
 
-// Component to fly map to coordinates
 const FlyToMarker = ({ center, zoom }) => {
   const map = useMap();
   useEffect(() => {
@@ -61,20 +61,6 @@ const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV
   ? 'https://localhost:7020/api'
   : 'https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api');
 
-// Static fallback demo distributors
-const DEMO_DISTRIBUIDORES = [
-  { nombre: 'AZ Boot Boutique', estado: 'arizona', ciudad: 'Phoenix', tipo: 'ambos', lat: 33.4484, lng: -112.0740 },
-  { nombre: 'Texas Boot Company', estado: 'texas', ciudad: 'Houston', tipo: 'tienda', lat: 29.7604, lng: -95.3698 },
-  { nombre: "Allens Boots", estado: 'texas', ciudad: 'Austin', tipo: 'ambos', lat: 30.2672, lng: -97.7431 },
-  { nombre: "Cavender's", estado: 'texas', ciudad: 'San Antonio', tipo: 'tienda', lat: 29.4241, lng: -98.4936 },
-  { nombre: 'Lost Creek', estado: 'california', ciudad: 'Los Angeles', tipo: 'online', lat: 34.0522, lng: -118.2437 },
-  { nombre: 'Melbelle', estado: 'cdmx', ciudad: 'Ciudad de México', tipo: 'ambos', lat: 19.4326, lng: -99.1332 },
-  { nombre: 'Boot Barn Jalisco', estado: 'jalisco', ciudad: 'Guadalajara', tipo: 'tienda', lat: 20.6597, lng: -103.3496 },
-  { nombre: 'Botas del Norte', estado: 'nuevo-leon', ciudad: 'Monterrey', tipo: 'ambos', lat: 25.6866, lng: -100.3161 },
-  { nombre: 'Caborca Sonora Store', estado: 'sonora', ciudad: 'Hermosillo', tipo: 'tienda', lat: 29.0729, lng: -110.9559 },
-  { nombre: 'Chihuahua Boots', estado: 'chihuahua', ciudad: 'Chihuahua', tipo: 'tienda', lat: 28.6353, lng: -106.0889 },
-];
-
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -85,6 +71,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 const Distribuidores = () => {
+  const { language, t } = useLanguage();
   const [formulario, setFormulario] = useState({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
   const [enviandoDist, setEnviandoDist] = useState(false);
   const [resultadoDist, setResultadoDist] = useState(null);
@@ -93,30 +80,38 @@ const Distribuidores = () => {
   const [resultados, setResultados] = useState([]);
   const [mensajeUbicacion, setMensajeUbicacion] = useState('');
   const [selectedStore, setSelectedStore] = useState(null);
-  const [mapCenter, setMapCenter] = useState([23.5, -102.3]); // Mexico centrado
+  const [mapCenter, setMapCenter] = useState([23.5, -102.3]);
   const [mapZoom, setMapZoom] = useState(5);
   const [allDistribuidores, setAllDistribuidores] = useState([]);
 
   const [hero, setHero] = useState({
-    badge: 'ÚNETE A NOSOTROS',
-    titulo: '¿Quieres ser distribuidor?',
-    subtitulo: 'Únete a nuestra red de distribuidores y forma parte de la familia Caborca',
+    badge_ES: 'ÚNETE A NOSOTROS',
+    badge_EN: 'JOIN US',
+    titulo_ES: '¿Quieres ser distribuidor?',
+    titulo_EN: 'Do you want to be a distributor?',
+    subtitulo_ES: 'Únete a nuestra red de distribuidores y forma parte de la familia Caborca',
+    subtitulo_EN: 'Join our network of distributors and become part of the Caborca family',
     imagen: 'https://blocks.astratic.com/img/general-img-landscape.png'
   });
   const [formDist, setFormDist] = useState({
-    titulo: '¿Quieres ser distribuidor?',
-    subtitulo: 'Si estás interesado, déjanos tus datos y nuestro equipo se pondrá en contacto contigo.',
-    submitLabel: 'ENVIAR SOLICITUD',
-    responseTime: 'Respuesta en 24-48 hrs',
+    titulo_ES: '¿Quieres ser distribuidor?',
+    titulo_EN: 'Do you want to be a distributor?',
+    subtitulo_ES: 'Si estás interesado, déjanos tus datos y nuestro equipo se pondrá en contacto contigo.',
+    subtitulo_EN: 'If you are interested, leave us your details and our team will contact you.',
+    submitLabel_ES: 'ENVIAR SOLICITUD',
+    submitLabel_EN: 'SEND REQUEST',
+    responseTime_ES: 'Respuesta en 24-48 hrs',
+    responseTime_EN: 'Response in 24-48 hrs',
     distribuidores: '+500',
     estados: '20+',
   });
   const [mapInfo, setMapInfo] = useState({
-    mapTitle: 'Encuéntranos en el mapa',
-    mapText: 'Visita nuestras tiendas y distribuidores autorizados en todo México.',
+    mapTitle_ES: 'Encuéntranos en el mapa',
+    mapTitle_EN: 'Find us on the map',
+    mapText_ES: 'Visita nuestras tiendas y distribuidores autorizados en todo México.',
+    mapText_EN: 'Visit our stores and authorized distributors throughout Mexico.',
   });
 
-  // Load CMS text content
   useEffect(() => {
     textosService.getTextos('distribuidores')
       .then(data => {
@@ -124,15 +119,14 @@ const Distribuidores = () => {
         if (data.hero) setHero(prev => ({ ...prev, ...data.hero }));
         if (data.formulario || data.counters) {
           setFormDist(prev => ({
-            titulo: data.formulario?.titulo || prev.titulo,
-            subtitulo: data.formulario?.subtitulo || prev.subtitulo,
-            submitLabel: data.formulario?.submitLabel || prev.submitLabel,
-            responseTime: data.formulario?.responseTime || prev.responseTime,
+            ...prev,
+            ...data.formulario,
             distribuidores: data.counters?.distribuidores || prev.distribuidores,
             estados: data.counters?.estados || prev.estados,
           }));
         }
         setMapInfo(prev => ({
+          ...prev,
           mapTitle: data.mapTitle || prev.mapTitle,
           mapText: data.mapText || prev.mapText,
         }));
@@ -140,7 +134,6 @@ const Distribuidores = () => {
       .catch(() => { });
   }, []);
 
-  // Load real distributors from ConfiguracionGeneral
   useEffect(() => {
     fetch(`${API_URL}/Settings/ConfiguracionGeneral`)
       .then(r => r.ok ? r.json() : null)
@@ -174,7 +167,6 @@ const Distribuidores = () => {
       .catch(() => { });
   }, []);
 
-  // Derived dynamic filter options
   const regionesList = useMemo(() => {
     const seen = new Set();
     return allDistribuidores
@@ -190,17 +182,45 @@ const Distribuidores = () => {
       .map(d => d.tipo);
   }, [allDistribuidores]);
 
+  const labels = {
+    nombre: language === 'es' ? 'Nombre completo' : 'Full name',
+    nombrePlaceholder: language === 'es' ? 'Tu nombre' : 'Your name',
+    correo: language === 'es' ? 'Correo electrónico' : 'Email address',
+    telefono: language === 'es' ? 'Teléfono' : 'Phone',
+    ciudad: language === 'es' ? 'Ciudad' : 'City',
+    mensaje: language === 'es' ? 'Mensaje' : 'Message',
+    mensajePlaceholder: language === 'es' ? 'Cuéntanos sobre tu negocio...' : 'Tell us about your business...',
+    enviando: language === 'es' ? 'ENVIANDO...' : 'SENDING...',
+    exito: language === 'es' ? '¡Solicitud enviada! Nos pondremos en contacto contigo pronto.' : 'Request sent! We will contact you soon.',
+    distribuidoresLabel: language === 'es' ? 'Distribuidores' : 'Distributors',
+    estadosLabel: language === 'es' ? 'Estados' : 'States',
+    tipoCompra: language === 'es' ? 'Tipo de compra' : 'Purchase type',
+    todosTipos: language === 'es' ? 'Todos los tipos' : 'All types',
+    tiendaFisica: language === 'es' ? 'Tienda física' : 'Physical store',
+    enLinea: language === 'es' ? 'En línea' : 'Online',
+    ambos: language === 'es' ? 'Física y en línea' : 'Physical and online',
+    region: language === 'es' ? 'Estado / Región' : 'State / Region',
+    seleccionaRegion: language === 'es' ? 'Selecciona una región' : 'Select a region',
+    usarUbicacion: language === 'es' ? 'Usar mi ubicación' : 'Use my location',
+    ubicacionObteniendo: language === 'es' ? 'Obteniendo ubicación...' : 'Getting location...',
+    ubicacionError: language === 'es' ? '✗ No se pudo obtener la ubicación' : '✗ Could not get location',
+    encontrados: language === 'es' ? 'distribuidores encontrados' : 'distributors found',
+    tiendaMini: language === 'es' ? '🏪 Tienda' : '🏪 Store',
+    onlineMini: language === 'es' ? '🌐 Online' : '🌐 Online',
+    ambosMini: language === 'es' ? '🏪🌐 Ambas' : '🏪🌐 Both',
+    intlMini: language === 'es' ? '🌍 Intl.' : '🌍 Intl.',
+  };
 
   const manejarUbicarme = () => {
-    setMensajeUbicacion('Obteniendo ubicación...');
+    setMensajeUbicacion(labels.ubicacionObteniendo);
     if (!navigator.geolocation) {
-      setMensajeUbicacion('✗ Geolocalización no soportada');
+      setMensajeUbicacion(language === 'es' ? '✗ Geolocalización no soportada' : '✗ Geolocation not supported');
       return;
     }
     navigator.geolocation.getCurrentPosition(
       pos => {
         const { latitude: uLat, longitude: uLng } = pos.coords;
-        setMensajeUbicacion('✓ Ubicación obtenida');
+        setMensajeUbicacion('✓');
         const sorted = [...allDistribuidores]
           .map(s => ({ ...s, distance: calculateDistance(uLat, uLng, s.lat, s.lng) }))
           .sort((a, b) => a.distance - b.distance)
@@ -212,7 +232,7 @@ const Distribuidores = () => {
           setMapZoom(12);
         }
       },
-      () => setMensajeUbicacion('✗ No se pudo obtener la ubicación')
+      () => setMensajeUbicacion(labels.ubicacionError)
     );
   };
 
@@ -250,331 +270,174 @@ const Distribuidores = () => {
   return (
     <div className="bg-white text-caborca-cafe font-sans">
       <Encabezado />
-
       <main>
         {/* HERO */}
         <section className="relative pt-[95px] bg-gray-50">
           <div className="relative w-full overflow-hidden shadow-2xl">
-            <img
-              src={hero.imagen} alt="Distribuidores Caborca Boots"
-              className="w-full h-[600px] object-cover"
-              onError={e => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }}
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <div className="text-center text-white px-4">
+            <img src={hero.imagen} alt="Caborca" className="w-full h-[600px] object-cover" />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4">
+              <div>
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
-                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{hero.badge}</p>
+                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(hero, 'badge')}</p>
                 </div>
-                <h1 className="text-5xl md:text-7xl font-serif mb-6">{hero.titulo}</h1>
-                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{hero.subtitulo}</p>
+                <h1 className="text-5xl md:text-7xl font-serif mb-6 text-white">{t(hero, 'titulo')}</h1>
+                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{t(hero, 'subtitulo')}</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* FORMULARIO SOLICITUD */}
+        {/* SOLICITUD */}
         <section className="py-16 bg-caborca-beige-suave">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl sm:text-3xl font-serif text-caborca-beige-fuerte font-bold mb-2">{formDist.titulo}</h3>
-                  <p className="text-lg text-caborca-cafe/90 max-w-3xl mx-auto">{formDist.subtitulo}</p>
-                </div>
-                <br />
-                <form onSubmit={async e => {
-                  e.preventDefault();
-                  setEnviandoDist(true);
-                  setResultadoDist(null);
-                  try {
-                    await contactoService.enviarSolicitudDistribuidor(formulario);
-                    setResultadoDist({ tipo: 'exito', mensaje: '¡Solicitud enviada! Nos pondremos en contacto contigo pronto.' });
-                    setFormulario({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
-                  } catch (err) {
-                    setResultadoDist({ tipo: 'error', mensaje: err.message || 'No se pudo enviar. Intenta de nuevo.' });
-                  } finally {
-                    setEnviandoDist(false);
-                  }
-                }} className="space-y-6">
-                  <div className="grid md:grid-cols-3 gap-6">
-                    {[
-                      { label: 'Nombre completo', name: 'nombreCompleto', type: 'text', placeholder: 'Tu nombre' },
-                      { label: 'Correo electrónico', name: 'correoElectronico', type: 'email', placeholder: 'correo@ejemplo.com' },
-                      { label: 'Teléfono', name: 'telefono', type: 'tel', placeholder: '(123) 456-7890' },
-                    ].map(f => (
-                      <div key={f.name}>
-                        <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">{f.label}</label>
-                        <input type={f.type} name={f.name} value={formulario[f.name]}
-                          onChange={e => setFormulario(p => ({ ...p, [e.target.name]: e.target.value }))}
-                          placeholder={f.placeholder} required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">Ciudad</label>
-                      <input type="text" name="ciudad" value={formulario.ciudad}
-                        onChange={e => setFormulario(p => ({ ...p, ciudad: e.target.value }))}
-                        placeholder="Tu ciudad" required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-caborca-beige-fuerte mb-2">Mensaje</label>
-                      <textarea rows="1" name="mensaje" value={formulario.mensaje}
-                        onChange={e => setFormulario(p => ({ ...p, mensaje: e.target.value }))}
-                        placeholder="Cuéntanos sobre tu negocio..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-caborca-cafe resize-none" />
-                    </div>
-                  </div>
-                  <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
-                    <div className="flex flex-col gap-2 items-start">
-                      {resultadoDist && (
-                        <div className={`px-4 py-2 rounded-lg text-sm font-semibold ${resultadoDist.tipo === 'exito' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
-                          {resultadoDist.tipo === 'exito' ? '✓ ' : '✗ '}{resultadoDist.mensaje}
-                        </div>
-                      )}
-                      <button type="submit" disabled={enviandoDist}
-                        className="bg-caborca-beige-fuerte text-white px-8 py-3 rounded-lg font-bold hover:bg-caborca-cafe transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
-                        {enviandoDist ? (
-                          <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>ENVIANDO...</>
-                        ) : formDist.submitLabel}
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-3 text-caborca-bronce/70">
-                      <svg className="w-5 h-5 text-caborca-bronce" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                      </svg>
-                      <span className="text-sm text-caborca-bronce">{formDist.responseTime}</span>
-                    </div>
-                    <div className="flex items-center gap-8">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-caborca-bronce">{formDist.distribuidores}</div>
-                        <div className="text-xs text-caborca-bronce/60">Distribuidores</div>
-                      </div>
-                      <div className="w-16 h-16 bg-caborca-bronce rounded-full flex items-center justify-center">
-                        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                        </svg>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-caborca-bronce">{formDist.estados}</div>
-                        <div className="text-xs text-caborca-bronce/60">Estados</div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
+          <div className="container mx-auto px-4 max-w-6xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+              <div className="text-center mb-10">
+                <h3 className="text-3xl font-serif text-caborca-cafe font-bold mb-4">{t(formDist, 'titulo')}</h3>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">{t(formDist, 'subtitulo')}</p>
               </div>
+              <form onSubmit={async e => {
+                e.preventDefault();
+                setEnviandoDist(true);
+                try {
+                  await contactoService.enviarSolicitudDistribuidor(formulario);
+                  setResultadoDist({ tipo: 'exito', mensaje: labels.exito });
+                  setFormulario({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
+                } catch (err) {
+                  setResultadoDist({ tipo: 'error', mensaje: err.message });
+                } finally { setEnviandoDist(false); }
+              }} className="space-y-6">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.nombre}</label>
+                    <input type="text" value={formulario.nombreCompleto} onChange={e => setFormulario({ ...formulario, nombreCompleto: e.target.value })} placeholder={labels.nombrePlaceholder} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caborca-cafe outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.correo}</label>
+                    <input type="email" value={formulario.correoElectronico} onChange={e => setFormulario({ ...formulario, correoElectronico: e.target.value })} placeholder="email@ejemplo.com" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caborca-cafe outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.telefono}</label>
+                    <input type="tel" value={formulario.telefono} onChange={e => setFormulario({ ...formulario, telefono: e.target.value })} placeholder="(123) 456-7890" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caborca-cafe outline-none" />
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.ciudad}</label>
+                    <input type="text" value={formulario.ciudad} onChange={e => setFormulario({ ...formulario, ciudad: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caborca-cafe outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.mensaje}</label>
+                    <textarea value={formulario.mensaje} onChange={e => setFormulario({ ...formulario, mensaje: e.target.value })} placeholder={labels.mensajePlaceholder} rows="1" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caborca-cafe outline-none resize-none" />
+                  </div>
+                </div>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-6 border-t border-gray-100">
+                  <div className="flex flex-col gap-4">
+                    {resultadoDist && (
+                      <div className={`px-4 py-2 rounded-lg text-sm font-bold ${resultadoDist.tipo === 'exito' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {resultadoDist.mensaje}
+                      </div>
+                    )}
+                    <button type="submit" disabled={enviandoDist} className="bg-caborca-cafe text-white px-10 py-4 rounded-xl font-bold hover:scale-105 transition-transform disabled:opacity-50">
+                      {enviandoDist ? labels.enviando : t(formDist, 'submitLabel')}
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-10">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-caborca-cafe">{formDist.distribuidores}</div>
+                      <div className="text-xs text-gray-400 uppercase font-bold">{labels.distribuidoresLabel}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-caborca-cafe">{formDist.estados}</div>
+                      <div className="text-xs text-gray-400 uppercase font-bold">{labels.estadosLabel}</div>
+                    </div>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </section>
 
-        {/* MAPA REACT-LEAFLET */}
-        <section className="py-8 bg-gray-100">
-          <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-serif mb-3 text-caborca-beige-fuerte font-bold text-center">{mapInfo.mapTitle}</h2>
-            <p className="text-center mb-8 text-caborca-cafe font-bold">{mapInfo.mapText}</p>
-
-            {/* Filtros */}
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-6 max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Tipo */}
-                <div className="flex flex-col">
-                  <label className="block text-sm font-bold text-caborca-beige-fuerte mb-2">Tipo de compra</label>
-                  <select value={tipoCompra} onChange={e => setTipoCompra(e.target.value)}
-                    className="border-2 border-gray-300 rounded py-2 px-4 focus:border-caborca-cafe focus:outline-none">
-                    <option value="">Todos los tipos</option>
-                    {tiposList.includes('tienda') && <option value="tienda">Tienda física</option>}
-                    {tiposList.includes('online') && <option value="online">En línea</option>}
-                    {(tiposList.includes('ambas') || tiposList.includes('ambos')) && <option value="ambas">Física y en línea</option>}
-                    {tiposList.length === 0 && (
-                      <>
-                        <option value="tienda">Tienda física</option>
-                        <option value="online">En línea</option>
-                        <option value="ambas">Física y en línea</option>
-                      </>
-                    )}
-                  </select>
-                </div>
-                {/* Estado */}
-                <div className="flex flex-col">
-                  <label className="block text-sm font-bold text-caborca-beige-fuerte mb-2">Estado / Región</label>
-                  <select value={estadoFiltro} onChange={e => setEstadoFiltro(e.target.value)}
-                    className="border-2 border-gray-300 rounded py-2 px-4 focus:border-caborca-cafe focus:outline-none">
-                    <option value="">Selecciona una región</option>
-                    {regionesList.map(r => (
-                      <option key={r} value={r}>{r}</option>
-                    ))}
-                  </select>
-                </div>
-                {/* Ubicarme */}
-                <div className="flex flex-col justify-end">
-                  <button onClick={manejarUbicarme}
-                    className="bg-caborca-beige-fuerte text-white py-2 px-4 rounded hover:bg-caborca-cafe transition-colors w-full flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    Usar mi ubicación
-                  </button>
-                  {mensajeUbicacion && (
-                    <p className={`text-xs mt-1 ${mensajeUbicacion.includes('✓') ? 'text-green-600' : 'text-red-500'}`}>{mensajeUbicacion}</p>
-                  )}
-                </div>
-                {/* Acciones */}
-                <div className="flex flex-col justify-end">
-                  <div className="flex gap-2">
-                    <button onClick={manejarLimpiarFiltros}
-                      className="bg-gray-200 text-caborca-beige-fuerte py-2 px-3 rounded hover:bg-gray-300 transition-colors flex-1" title="Limpiar">
-                      <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                    <button onClick={manejarAplicarFiltros}
-                      className="bg-caborca-beige-fuerte text-white py-2 px-3 rounded hover:bg-caborca-cafe transition-colors flex-1" title="Buscar">
-                      <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Resultados */}
-              {resultados.length > 0 && (
-                <div className="mt-6 border-t-2 border-gray-200 pt-4">
-                  <p className="text-xs font-bold text-caborca-beige-fuerte mb-3">
-                    {resultados.length} distribuidor{resultados.length > 1 ? 'es' : ''} encontrado{resultados.length > 1 ? 's' : ''}:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {resultados.map((store, idx) => {
-                      const CardWrapper = store.sitioWeb ? 'a' : 'div';
-                      const linkProps = store.sitioWeb ? {
-                        href: store.sitioWeb.startsWith('http') ? store.sitioWeb : `https://${store.sitioWeb}`,
-                        target: "_blank",
-                        rel: "noopener noreferrer"
-                      } : {};
-
-                      return (
-                        <CardWrapper key={idx}
-                          {...linkProps}
-                          onClick={() => seleccionarTienda(store)}
-                          className={`p-3 rounded-lg cursor-pointer transition-all border-2 block ${selectedStore === store ? 'border-caborca-cafe bg-caborca-cafe/5' : 'border-gray-200 bg-gray-50 hover:border-caborca-cafe/50'}`}>
-                          <div className="flex items-center gap-2 mb-1">
-                            {store.logo && (
-                              <img src={store.logo} alt={store.nombre} className="w-8 h-8 object-contain rounded border border-gray-200 bg-white p-0.5 flex-shrink-0" />
-                            )}
-                            <p className="font-semibold text-caborca-cafe text-sm truncate">{store.nombre}</p>
-                          </div>
-                          <p className="text-xs text-gray-500 truncate">{[store.ciudad, store.estado].filter(Boolean).join(', ')}</p>
-                          <div className="flex items-center gap-1 mt-1 flex-wrap">
-                            <span className="text-xs px-2 py-0.5 bg-caborca-beige-fuerte text-white rounded">
-                              {store.tipo === 'tienda' ? '🏪 Tienda' : store.tipo === 'online' ? '🌐 Online' : '🏪🌐 Ambas'}
-                            </span>
-                            {store.clasificacion === 'internacional' && (
-                              <span className="text-xs px-2 py-0.5 bg-blue-500 text-white rounded">🌍 Intl.</span>
-                            )}
-                          </div>
-                          {store.distance && (
-                            <p className="text-xs text-gray-400 mt-1">{store.distance.toFixed(0)} km</p>
-                          )}
-                        </CardWrapper>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+        {/* MAPA */}
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4 max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-serif text-caborca-cafe font-bold mb-4">{t(mapInfo, 'mapTitle')}</h2>
+              <p className="text-lg text-gray-600">{t(mapInfo, 'mapText')}</p>
             </div>
 
-            {/* MAPA */}
-            <div style={{ isolation: 'isolate', position: 'relative' }}
-              className="rounded-xl overflow-hidden shadow-2xl max-w-7xl mx-auto">
-              <div style={{ height: '520px' }}>
-                <MapContainer
-                  center={mapCenter}
-                  zoom={mapZoom}
-                  style={{ height: '100%', width: '100%' }}
-                  scrollWheelZoom={true}
-                  attributionControl={false}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <FlyToMarker center={mapCenter} zoom={mapZoom} />
-
-                  {displayedMarkers.map((store, idx) => (
-                    <Marker
-                      key={idx}
-                      position={[store.lat, store.lng]}
-                      icon={createMapPin(selectedStore === store)}
-                      eventHandlers={{ click: () => seleccionarTienda(store) }}
-                    >
-                      <Popup minWidth={250} maxWidth={320}>
-                        <div style={{ fontFamily: 'sans-serif' }}>
-                          {/* Header: logo + nombre */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            {store.logo && (
-                              <img src={store.logo} alt={store.nombre}
-                                style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 6, background: '#f9f5f0', border: '1px solid #e5e0d8', padding: 2, flexShrink: 0 }}
-                              />
-                            )}
-                            <div>
-                              <p style={{ fontWeight: 700, fontSize: 14, margin: 0, color: '#4a3728' }}>{store.nombre}</p>
-                            </div>
-                          </div>
-
-                          {/* Badges */}
-                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
-                            <span style={{ fontSize: 11, background: '#8B6A42', color: 'white', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>
-                              {store.tipo === 'tienda' ? '🏪 Tienda física' : store.tipo === 'online' ? '🌐 En línea' : '🏪🌐 Física y Online'}
-                            </span>
-                            {store.clasificacion === 'internacional' && (
-                              <span style={{ fontSize: 11, background: '#3b82f6', color: 'white', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>🌍 Internacional</span>
-                            )}
-                          </div>
-
-                          {/* Dirección */}
-                          {[store.calle, store.numeroExt, store.colonia, store.ciudad, store.estado, store.cp, store.pais].some(Boolean) && (
-                            <p style={{ fontSize: 12, color: '#666', margin: '0 0 6px', lineHeight: 1.4 }}>
-                              📍 {[store.calle && `${store.calle}${store.numeroExt ? ' ' + store.numeroExt : ''}`, store.colonia, store.ciudad, store.estado, store.cp, store.pais].filter(Boolean).join(', ')}
-                            </p>
-                          )}
-
-                          {/* Contacto */}
-                          {(store.telefono || store.email || store.sitioWeb) && (
-                            <div style={{ borderTop: '1px solid #eee', paddingTop: 6 }}>
-                              {store.telefono && (
-                                <p style={{ fontSize: 12, margin: '3px 0' }}>
-                                  📞 <a href={`tel:${store.telefono}`} style={{ color: '#7C5C3E', textDecoration: 'none', fontWeight: 500 }}>{store.telefono}</a>
-                                </p>
-                              )}
-                              {store.email && (
-                                <p style={{ fontSize: 12, margin: '3px 0' }}>
-                                  ✉️ <a href={`mailto:${store.email}`} style={{ color: '#7C5C3E', textDecoration: 'none', fontWeight: 500 }}>{store.email}</a>
-                                </p>
-                              )}
-                              {store.sitioWeb && (
-                                <p style={{ fontSize: 12, margin: '3px 0' }}>
-                                  🌐 <a href={store.sitioWeb.startsWith('http') ? store.sitioWeb : `https://${store.sitioWeb}`} target="_blank" rel="noreferrer" style={{ color: '#7C5C3E', fontWeight: 500 }}>{store.sitioWeb.replace(/^https?:\/\//, '')}</a>
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </Popup>
-                    </Marker>
-                  ))}
-                </MapContainer>
+            <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 grid lg:grid-cols-4 gap-6 items-end">
+              <div>
+                <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.tipoCompra}</label>
+                <select value={tipoCompra} onChange={e => setTipoCompra(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg outline-none">
+                  <option value="">{labels.todosTipos}</option>
+                  <option value="tienda">{labels.tiendaFisica}</option>
+                  <option value="online">{labels.enLinea}</option>
+                  <option value="ambas">{labels.ambos}</option>
+                </select>
               </div>
+              <div>
+                <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.region}</label>
+                <select value={estadoFiltro} onChange={e => setEstadoFiltro(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg outline-none">
+                  <option value="">{labels.seleccionaRegion}</option>
+                  {regionesList.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+              <button onClick={manejarUbicarme} className="bg-white border-2 border-caborca-cafe text-caborca-cafe p-3 rounded-lg font-bold hover:bg-caborca-cafe hover:text-white transition-colors flex items-center justify-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                {labels.usarUbicacion}
+              </button>
+              <div className="flex gap-2">
+                <button onClick={manejarLimpiarFiltros} className="flex-1 bg-gray-100 p-3 rounded-lg hover:bg-gray-200 transition-colors">
+                  <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <button onClick={manejarAplicarFiltros} className="flex-1 bg-caborca-cafe text-white p-3 rounded-lg hover:opacity-90 transition-opacity">
+                  <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </button>
+              </div>
+            </div>
+
+            {resultados.length > 0 && (
+              <div className="mb-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {resultados.map((store, i) => (
+                  <div key={i} onClick={() => seleccionarTienda(store)} className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedStore === store ? 'border-caborca-cafe bg-white shadow-lg' : 'border-transparent bg-white/50 hover:border-gray-300'}`}>
+                    <div className="flex gap-4 items-center mb-2">
+                      {store.logo && <img src={store.logo} alt="logo" className="w-10 h-10 object-contain rounded bg-white p-1" />}
+                      <p className="font-bold text-caborca-cafe truncate">{store.nombre}</p>
+                    </div>
+                    <p className="text-sm text-gray-500 mb-2 truncate">{store.ciudad}, {store.estado}</p>
+                    <span className="text-[10px] px-2 py-1 bg-gray-100 text-gray-600 rounded-full font-bold uppercase">
+                      {store.tipo === 'tienda' ? labels.tiendaMini : store.tipo === 'online' ? labels.onlineMini : labels.ambosMini}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="h-[600px] rounded-3xl overflow-hidden shadow-2xl relative z-10">
+              <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <FlyToMarker center={mapCenter} zoom={mapZoom} />
+                {displayedMarkers.map((store, i) => (
+                  <Marker key={i} position={[store.lat, store.lng]} icon={createMapPin(selectedStore === store)} eventHandlers={{ click: () => seleccionarTienda(store) }}>
+                    <Popup minWidth={250}>
+                      <div className="p-2">
+                        <p className="font-bold text-lg mb-1">{store.nombre}</p>
+                        <p className="text-sm text-gray-600 mb-3">{[store.calle, store.colonia, store.ciudad].filter(Boolean).join(', ')}</p>
+                        <div className="flex flex-col gap-2">
+                          {store.telefono && <a href={`tel:${store.telefono}`} className="text-sm text-caborca-cafe font-bold flex items-center gap-2">📞 {store.telefono}</a>}
+                          {store.sitioWeb && <a href={store.sitioWeb} target="_blank" rel="noreferrer" className="text-sm text-caborca-cafe font-bold flex items-center gap-2">🌐 {store.sitioWeb.replace(/^https?:\/\//, '')}</a>}
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
             </div>
           </div>
         </section>
       </main>
-
       <PieDePagina />
-    </div >
+    </div>
   );
 };
 

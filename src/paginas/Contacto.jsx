@@ -1,33 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
 import { textosService } from '../api/textosService';
 import { contactoService } from '../api/contactoService';
+import { useLanguage } from '../context/LanguageContext';
 
 const Contacto = () => {
+  const { language, t } = useLanguage();
   const [formulario, setFormulario] = useState({
     nombreCompleto: '', correoElectronico: '', telefono: '', asunto: '', mensaje: ''
   });
   const [enviando, setEnviando] = useState(false);
-  const [resultado, setResultado] = useState(null); // { tipo: 'exito'|'error', mensaje: '' }
+  const [resultado, setResultado] = useState(null);
 
   const [hero, setHero] = useState({
-    badge: 'ESTAMOS AQUÍ PARA TI',
-    titulo: 'Contacto',
-    subtitulo: 'Nos encantaría saber de ti. Completa el formulario y nos pondremos en contacto contigo',
+    badge_ES: 'ESTAMOS AQUÍ PARA TI',
+    badge_EN: 'WE ARE HERE FOR YOU',
+    titulo_ES: 'Contacto',
+    titulo_EN: 'Contact',
+    subtitulo_ES: 'Nos encantaría saber de ti. Completa el formulario y nos pondremos en contacto contigo',
+    subtitulo_EN: 'We would love to hear from you. Fill out the form and we will get in touch with you',
     imagen: 'https://blocks.astratic.com/img/general-img-landscape.png'
   });
 
   const [cards, setCards] = useState([
-    { id: 'telefono', title: 'Teléfono', lines: ['+52 (555) 123-4567', 'Lun - Vie: 9:00 AM - 6:00 PM'] },
-    { id: 'email', title: 'Correo Electrónico', lines: ['contacto@caborcaboots.com', 'Respuesta en 24-48 hrs'] },
-    { id: 'ubicacion', title: 'Ubicación', lines: ['León, Guanajuato, México', 'Capital del calzado mexicano'] },
-    { id: 'social', title: 'Síguenos', lines: ['instagram.com/caborca', 'facebook.com/caborca', 'tiktok.com/@caborca'] }
+    { id: 'telefono', title_ES: 'Teléfono', title_EN: 'Phone', lines_ES: ['+52 (555) 123-4567', 'Lun - Vie: 9:00 AM - 6:00 PM'], lines_EN: ['+52 (555) 123-4567', 'Mon - Fri: 9:00 AM - 6:00 PM'] },
+    { id: 'email', title_ES: 'Correo Electrónico', title_EN: 'Email', lines_ES: ['contacto@caborcaboots.com', 'Respuesta en 24-48 hrs'], lines_EN: ['contacto@caborcaboots.com', 'Response in 24-48 hrs'] },
+    { id: 'ubicacion', title_ES: 'Ubicación', title_EN: 'Location', lines_ES: ['León, Guanajuato, México', 'Capital del calzado mexicano'], lines_EN: ['León, Guanajuato, Mexico', 'The Mexican footwear capital'] },
+    { id: 'social', title_ES: 'Síguenos', title_EN: 'Follow Us', lines_ES: ['@caborca'], lines_EN: ['@caborca'] }
   ]);
 
   const [formPreview, setFormPreview] = useState({
-    titulo: 'Envíanos un mensaje',
-    descripcion: 'Completa el formulario y nos pondremos en contacto contigo'
+    titulo_ES: 'Envíanos un mensaje',
+    titulo_EN: 'Send us a message',
+    descripcion_ES: 'Completa el formulario y nos pondremos en contacto contigo',
+    descripcion_EN: 'Complete the form and we will get in touch with you'
   });
 
   useEffect(() => {
@@ -40,6 +47,23 @@ const Contacto = () => {
       })
       .catch(() => console.warn('Contacto: usando datos por defecto'));
   }, []);
+
+  const labels = {
+    ayuda: language === 'es' ? '¿Cómo podemos ayudarte?' : 'How can we help you?',
+    equipo: language === 'es' ? 'Nuestro equipo está listo para responder todas tus preguntas.' : 'Our team is ready to answer all your questions.',
+    nombre: language === 'es' ? 'Nombre Completo' : 'Full Name',
+    nombrePlaceholder: language === 'es' ? 'Tu nombre' : 'Your name',
+    correo: language === 'es' ? 'Correo Electrónico' : 'Email address',
+    telefono: language === 'es' ? 'Teléfono' : 'Phone',
+    asunto: language === 'es' ? 'Asunto' : 'Subject',
+    asuntoPlaceholder: language === 'es' ? '¿En qué podemos ayudarte?' : 'How can we help you?',
+    mensaje: language === 'es' ? 'Mensaje' : 'Message',
+    mensajePlaceholder: language === 'es' ? 'Cuéntanos cómo podemos ayudarte...' : 'Tell us how we can help you...',
+    enviarMensaje: language === 'es' ? 'ENVIAR MENSAJE' : 'SEND MESSAGE',
+    enviando: language === 'es' ? 'ENVIANDO...' : 'SENDING...',
+    exito: language === 'es' ? '¡Mensaje enviado! Nos pondremos en contacto contigo pronto.' : 'Message sent! We will contact you soon.',
+    error: language === 'es' ? 'No se pudo enviar el mensaje. Intenta de nuevo.' : 'Could not send message. Please try again.'
+  };
 
   const manejarCambioFormulario = (evento) => {
     const { name, value } = evento.target;
@@ -58,10 +82,10 @@ const Contacto = () => {
         asunto: formulario.asunto,
         mensaje: formulario.mensaje,
       });
-      setResultado({ tipo: 'exito', mensaje: '¡Mensaje enviado! Nos pondremos en contacto contigo pronto.' });
+      setResultado({ tipo: 'exito', mensaje: labels.exito });
       setFormulario({ nombreCompleto: '', correoElectronico: '', telefono: '', asunto: '', mensaje: '' });
     } catch (err) {
-      setResultado({ tipo: 'error', mensaje: err.message || 'No se pudo enviar el mensaje. Intenta de nuevo.' });
+      setResultado({ tipo: 'error', mensaje: err.message || labels.error });
     } finally {
       setEnviando(false);
     }
@@ -97,10 +121,10 @@ const Contacto = () => {
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <div className="text-center text-white px-4">
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
-                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{hero.badge}</p>
+                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(hero, 'badge')}</p>
                 </div>
-                <h1 className="text-5xl md:text-7xl font-serif mb-6">{hero.titulo}</h1>
-                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{hero.subtitulo}</p>
+                <h1 className="text-5xl md:text-7xl font-serif mb-6">{t(hero, 'titulo')}</h1>
+                <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{t(hero, 'subtitulo')}</p>
               </div>
             </div>
           </div>
@@ -112,10 +136,10 @@ const Contacto = () => {
             <div className="mb-10">
               <div className="text-center mb-8">
                 <h2 className="text-2xl sm:text-3xl font-serif text-caborca-beige-fuerte font-bold mb-3">
-                  ¿Cómo podemos ayudarte?
+                  {labels.ayuda}
                 </h2>
                 <p className="text-caborca-cafe font-semibold text-sm leading-relaxed max-w-2xl mx-auto">
-                  Nuestro equipo está listo para responder todas tus preguntas sobre nuestros productos, servicios o cualquier consulta que tengas.
+                  {labels.equipo}
                 </p>
               </div>
 
@@ -129,8 +153,8 @@ const Contacto = () => {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-bold text-caborca-cafe text-sm mb-1">{card.title}</h3>
-                      {card.lines.map((line, i) => (
+                      <h3 className="font-bold text-caborca-cafe text-sm mb-1">{t(card, 'title')}</h3>
+                      {(language === 'es' ? (card.lines_ES || card.lines) : (card.lines_EN || card.lines_ES || card.lines))?.map((line, i) => (
                         <p key={i} className={`text-sm ${i === 0 ? 'text-caborca-cafe' : 'text-gray-500 text-xs mt-1'}`}>{line}</p>
                       ))}
                     </div>
@@ -142,38 +166,38 @@ const Contacto = () => {
             {/* Contact Form */}
             <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
               <div className="text-center mb-6">
-                <h3 className="text-2xl sm:text-3xl font-serif text-caborca-beige-fuerte font-bold mb-2">{formPreview.titulo}</h3>
-                <p className="text-sm text-caborca-cafe font-semibold">{formPreview.descripcion}</p>
+                <h3 className="text-2xl sm:text-3xl font-serif text-caborca-beige-fuerte font-bold mb-2">{t(formPreview, 'titulo')}</h3>
+                <p className="text-sm text-caborca-cafe font-semibold">{t(formPreview, 'descripcion')}</p>
               </div>
               <form onSubmit={manejarEnvioFormulario} className="space-y-4">
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">Nombre Completo</label>
+                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.nombre}</label>
                     <input type="text" name="nombreCompleto" value={formulario.nombreCompleto} onChange={manejarCambioFormulario}
-                      placeholder="Tu nombre" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" required />
+                      placeholder={labels.nombrePlaceholder} className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all font-bold" required />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">Correo Electrónico</label>
+                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.correo}</label>
                     <input type="email" name="correoElectronico" value={formulario.correoElectronico} onChange={manejarCambioFormulario}
-                      placeholder="correo@ejemplo.com" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" required />
+                      placeholder="correo@ejemplo.com" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all font-bold" required />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">Teléfono</label>
+                    <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.telefono}</label>
                     <input type="tel" name="telefono" value={formulario.telefono} onChange={manejarCambioFormulario}
-                      placeholder="+52 (555) 123-4567" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" required />
+                      placeholder="+52 (555) 123-4567" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all font-bold" required />
                   </div>
                 </div>
                 {/* Asunto */}
                 <div>
-                  <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">Asunto</label>
+                  <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.asunto}</label>
                   <input type="text" name="asunto" value={formulario.asunto} onChange={manejarCambioFormulario}
-                    placeholder="¿En qué podemos ayudarte?" className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all" />
+                    placeholder={labels.asuntoPlaceholder} className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-cafe focus:ring-2 focus:ring-caborca-cafe/20 transition-all font-bold" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">Mensaje</label>
+                  <label className="block text-xs font-semibold text-caborca-beige-fuerte font-bold mb-2">{labels.mensaje}</label>
                   <textarea name="mensaje" value={formulario.mensaje} onChange={manejarCambioFormulario}
-                    placeholder="Cuéntanos cómo podemos ayudarte..." rows="5"
-                    className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-beige-fuerte focus:ring-2 focus:ring-caborca-beige-fuerte/20 transition-all resize-none" required />
+                    placeholder={labels.mensajePlaceholder} rows="5"
+                    className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-caborca-beige-fuerte focus:ring-2 focus:ring-caborca-beige-fuerte/20 transition-all resize-none font-bold" required />
                 </div>
                 <div className="text-center pt-2 space-y-4">
                   {/* Banner de resultado */}
@@ -196,9 +220,9 @@ const Contacto = () => {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                         </svg>
-                        ENVIANDO...
+                        {labels.enviando}
                       </>
-                    ) : 'ENVIAR MENSAJE'}
+                    ) : labels.enviarMensaje}
                   </button>
                 </div>
               </form>

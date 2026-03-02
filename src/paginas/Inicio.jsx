@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -8,6 +8,7 @@ import Carrusel from '../componentes/Carrusel';
 import PieDePagina from '../componentes/PieDePagina';
 import homeService from '../api/homeService';
 import { contactoService } from '../api/contactoService';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'https://localhost:7020/api' : 'https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api');
 
@@ -63,76 +64,153 @@ const DEMO_MARKERS = [
 ];
 
 const Inicio = () => {
+    const { language, t } = useLanguage();
     const [activeFilter, setActiveFilter] = useState('todos');
     const [formInicio, setFormInicio] = useState({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
     const [enviandoInicio, setEnviandoInicio] = useState(false);
     const [resultadoInicio, setResultadoInicio] = useState(null);
 
     // ── Estados dinámicos del CMS ──────────────────────────────────────────────
-    const [distribuidores, setDistribuidores] = useState({
-        titulo: "Distribuidores Autorizados",
-        subtitulo: "Encuentra nuestras colecciones exclusivas",
-        textoBoton: "VER TODOS LOS DISTRIBUIDORES",
-        linkBoton: "/distribuidores",
-        logos: []  // logos dinámicos
-    });
-    const [sustentabilidad, setSustentabilidad] = useState({
-        titulo: "Sustentabilidad",
-        descripcion: "Nos comprometemos con el medio ambiente, utilizando procesos responsables y materiales sostenibles en cada etapa de producción.",
-        textoBoton: "Conoce más",
-        linkBoton: "/responsabilidad-ambiental",
-        imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png",
-        badge: "COMPROMISO AMBIENTAL",
-        tituloDerecho: "Nuestro compromiso con el planeta",
-        notaCertificacion: "Certificado por prácticas sustentables"
-    });
-    const [formDistribuidor, setFormDistribuidor] = useState({
-        titulo: "¿Quieres ser distribuidor?",
-        descripcion: "Únete a nuestra red de distribuidores y forma parte de la familia Caborca.",
-        textoBoton: "ENVIAR SOLICITUD",
-        notaTiempo: "Respuesta en 24-48 hrs",
-        statDistribuidores: "+500",
-        statEstados: "20+"
-    });
-    const [arteCreacion, setArteCreacion] = useState({
-        badge: "ARTESANÍA MEXICANA",
-        titulo: "El arte de la creación",
-        anosExperiencia: 40,
-        features: [
-            { titulo: "Maestros Talabarteros", descripcion: "Cada par es creado con pasión y dedicación por artesanos con décadas de experiencia." },
-            { titulo: "Materiales Premium", descripcion: "Utilizamos los mejores materiales y técnicas tradicionales para garantizar calidad excepcional." },
-            { titulo: "Excelencia Garantizada", descripcion: "Nuestro compromiso con la excelencia nos ha convertido en líderes en calzado vaquero de lujo." }
-        ],
-        boton: "CONOCE NUESTRA HISTORIA",
-        nota: "Calidad certificada",
-        imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png"
-    });
-    const [dondeComprar, setDondeComprar] = useState({
-        titulo: "¿Dónde comprar?",
-        descripcion: "Encuentra nuestras tiendas y distribuidores autorizados en todo el mundo.",
-        textoBoton: "VER TODOS LOS DISTRIBUIDORES",
-        linkBoton: "/distribuidores",
-        mapaUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120615.72236587609!2d-99.2840989!3d19.432608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce0026db097507%3A0x54061076265ee841!2sCiudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx",
-        nota: "Conoce la ubicación y contacto de todos nuestros distribuidores autorizados"
-    });
-    const [productosDestacados, setProductosDestacados] = useState({
-        titulo: "Conoce nuestros nuevos estilos"
-    });
-
-    // ── Logos de distribuidores desde ConfiguracionGeneral ─────────────────────
-    const [logosConfig, setLogosConfig] = useState([]);
+    const [rawContent, setRawContent] = useState(null);
+    const [configGeneral, setConfigGeneral] = useState(null);
 
     // Cargar logos de distribuidores de la configuración general
     useEffect(() => {
         fetch(`${API_URL}/Settings/ConfiguracionGeneral`)
             .then(r => r.ok ? r.json() : null)
             .then(data => {
-                if (data && Array.isArray(data.distribuidoresList) && data.distribuidoresList.length > 0) {
-                    setLogosConfig(data.distribuidoresList);
-                }
+                if (data) setConfigGeneral(data);
             })
             .catch(() => { });
     }, []);
+
+    // Cargar datos dinámicos de la API
+    useEffect(() => {
+        homeService.getHomeContent()
+            .then(data => {
+                if (data) setRawContent(data);
+            })
+            .catch(() => {
+                console.warn('API no disponible, usando textos por defecto.');
+            });
+    }, []);
+
+    // ── Mapeo de Contenido según Idioma ──────────────────────────────────────
+    const distribuidores = useMemo(() => {
+        if (!rawContent?.distribuidoresLogos) return {
+            titulo: "Distribuidores Autorizados",
+            subtitulo: "Encuentra nuestras colecciones exclusivas",
+            textoBoton: "VER TODOS LOS DISTRIBUIDORES",
+            linkBoton: "/distribuidores",
+            logos: []
+        };
+        return {
+            titulo: t(rawContent.distribuidoresLogos, 'titulo'),
+            subtitulo: t(rawContent.distribuidoresLogos, 'subtitulo') || "Encuentra nuestras colecciones exclusivas",
+            textoBoton: t(rawContent.distribuidoresLogos, 'textoBoton') || "VER TODOS LOS DISTRIBUIDORES",
+            linkBoton: "/distribuidores",
+            logos: rawContent.distribuidoresLogos.logos || []
+        };
+    }, [rawContent, language, t]);
+
+    const sustentabilidad = useMemo(() => {
+        if (!rawContent?.sustentabilidad) return {
+            titulo: "Sustentabilidad",
+            descripcion: "Nos comprometemos con el medio ambiente, utilizando procesos responsables y materiales sostenibles en cada etapa de producción.",
+            textoBoton: "Conoce más",
+            linkBoton: "/responsabilidad-ambiental",
+            imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png",
+            badge: "COMPROMISO AMBIENTAL",
+            tituloDerecho: "Nuestro compromiso con el planeta",
+            notaCertificacion: "Certificado por prácticas sustentables"
+        };
+        const data = rawContent.sustentabilidad;
+        return {
+            titulo: t(data, 'titulo'),
+            descripcion: t(data, 'descripcion'),
+            textoBoton: t(data, 'textoBoton'),
+            linkBoton: data.linkBoton || "/responsabilidad-ambiental",
+            imagenUrl: data.imagenUrl || "https://blocks.astratic.com/img/general-img-landscape.png",
+            badge: t(data, 'badge'),
+            tituloDerecho: t(data, 'tituloDerecho'),
+            notaCertificacion: t(data, 'notaCertificacion'),
+            features: data.features?.length > 0
+                ? data.features.map(f => ({ titulo: t(f, 'titulo'), descripcion: t(f, 'descripcion') }))
+                : []
+        };
+    }, [rawContent, language, t]);
+
+    const formDistribuidor = useMemo(() => {
+        if (!rawContent?.formDistribuidor) return {
+            titulo: "¿Quieres ser distribuidor?",
+            descripcion: "Únete a nuestra red de distribuidores y forma parte de la familia Caborca.",
+            textoBoton: "ENVIAR SOLICITUD",
+            notaTiempo: "Respuesta en 24-48 hrs",
+            statDistribuidores: "+500",
+            statEstados: "20+"
+        };
+        const data = rawContent.formDistribuidor;
+        return {
+            titulo: t(data, 'titulo'),
+            descripcion: t(data, 'descripcion'),
+            textoBoton: t(data, 'textoBoton'),
+            notaTiempo: t(data, 'notaTiempo'),
+            statDistribuidores: data.statDistribuidores || "+500",
+            statEstados: data.statEstados || "20+"
+        };
+    }, [rawContent, language, t]);
+
+    const arteCreacion = useMemo(() => {
+        if (!rawContent?.arteCreacion) return {
+            badge: "ARTESANÍA MEXICANA",
+            titulo: "El arte de la creación",
+            anosExperiencia: 40,
+            features: [
+                { titulo: "Maestros Talabarteros", descripcion: "Cada par es creado con pasión y dedicación por artesanos con décadas de experiencia." },
+                { titulo: "Materiales Premium", descripcion: "Utilizamos los mejores materiales y técnicas tradicionales para garantizar calidad excepcional." },
+                { titulo: "Excelencia Garantizada", descripcion: "Nuestro compromiso con la excelencia nos ha convertido en líderes en calzado vaquero de lujo." }
+            ],
+            boton: "CONOCE NUESTRA HISTORIA",
+            nota: "Calidad certificada",
+            imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png"
+        };
+        const data = rawContent.arteCreacion;
+        return {
+            badge: t(data, 'badge'),
+            titulo: t(data, 'titulo'),
+            anosExperiencia: data.anosExperiencia || 40,
+            features: data.features?.length > 0
+                ? data.features.map(f => ({ titulo: t(f, 'titulo'), descripcion: t(f, 'descripcion') }))
+                : [],
+            boton: t(data, 'boton'),
+            nota: t(data, 'nota'),
+            imagenUrl: data.imagenUrl || "https://blocks.astratic.com/img/general-img-landscape.png"
+        };
+    }, [rawContent, language, t]);
+
+    const dondeComprar = useMemo(() => {
+        if (!rawContent?.dondeComprar) return {
+            titulo: "¿Dónde comprar?",
+            descripcion: "Encuentra nuestras tiendas y distribuidores autorizados en todo el mundo.",
+            textoBoton: "VER TODOS LOS DISTRIBUIDORES",
+            linkBoton: "/distribuidores",
+            mapaUrl: "",
+            nota: "Conoce la ubicación y contacto de todos nuestros distribuidores autorizados"
+        };
+        const data = rawContent.dondeComprar;
+        return {
+            titulo: t(data, 'titulo'),
+            descripcion: t(data, 'descripcion'),
+            textoBoton: t(data, 'textoBoton'),
+            linkBoton: "/distribuidores",
+            mapaUrl: data.mapaUrl || "",
+            nota: t(data, 'nota')
+        };
+    }, [rawContent, language, t]);
+
+    const productosDestacadosTitulo = useMemo(() => {
+        return t(rawContent?.productosDestacados, 'titulo') || "Conoce nuestros nuevos estilos";
+    }, [rawContent, language, t]);
 
     const [productosCatalogoDestacados, setProductosCatalogoDestacados] = useState([]);
 
@@ -142,141 +220,40 @@ const Inicio = () => {
             homeService.getCatalogoMujer().catch(() => null)
         ]).then(([dataHombre, dataMujer]) => {
             let all = [];
-
-            // Extract products from Hombre
-            let productosHombre = [];
             if (dataHombre) {
-                productosHombre = Array.isArray(dataHombre) ? dataHombre : (dataHombre.productos || []);
+                const p = Array.isArray(dataHombre) ? dataHombre : (dataHombre.productos || []);
+                all = all.concat(p.map(x => ({ ...x, catalogoPadre: 'hombre' })));
             }
-            if (Array.isArray(productosHombre)) {
-                all = all.concat(productosHombre.map(p => ({ ...p, catalogoPadre: 'hombre' })));
-            }
-
-            // Extract products from Mujer
-            let productosMujer = [];
             if (dataMujer) {
-                productosMujer = Array.isArray(dataMujer) ? dataMujer : (dataMujer.productos || []);
+                const p = Array.isArray(dataMujer) ? dataMujer : (dataMujer.productos || []);
+                all = all.concat(p.map(x => ({ ...x, catalogoPadre: 'mujer' })));
             }
-            if (Array.isArray(productosMujer)) {
-                all = all.concat(productosMujer.map(p => ({ ...p, catalogoPadre: 'mujer' })));
-            }
-            const destacados = all.filter(p => p.destacado);
-            setProductosCatalogoDestacados(destacados.slice(0, 4));
+            setProductosCatalogoDestacados(all.filter(p => p.destacado).slice(0, 4));
         });
     }, []);
 
-    // Cargar datos dinámicos de la API
-    useEffect(() => {
-        homeService.getHomeContent()
-            .then(data => {
-                // 1. Logos Distribuidores
-                if (data?.distribuidoresLogos?.titulo_ES) {
-                    setDistribuidores({
-                        titulo: data.distribuidoresLogos.titulo_ES,
-                        subtitulo: data.distribuidoresLogos.subtitulo_ES || "Encuentra nuestras colecciones exclusivas",
-                        textoBoton: data.distribuidoresLogos.textoBoton_ES || "VER TODOS LOS DISTRIBUIDORES",
-                        linkBoton: "/distribuidores",
-                        logos: data.distribuidoresLogos.logos || []
-                    });
-                }
-                // 2. Sustentabilidad
-                if (data?.sustentabilidad) {
-                    setSustentabilidad(prev => ({
-                        titulo: data.sustentabilidad.titulo_ES || prev.titulo,
-                        descripcion: data.sustentabilidad.descripcion_ES || prev.descripcion,
-                        textoBoton: data.sustentabilidad.textoBoton_ES || prev.textoBoton,
-                        linkBoton: data.sustentabilidad.linkBoton || prev.linkBoton,
-                        imagenUrl: data.sustentabilidad.imagenUrl || prev.imagenUrl,
-                        badge: data.sustentabilidad.badge_ES || prev.badge,
-                        tituloDerecho: data.sustentabilidad.tituloDerecho_ES || prev.tituloDerecho,
-                        notaCertificacion: data.sustentabilidad.notaCertificacion_ES || prev.notaCertificacion,
-                        features: data.sustentabilidad.features?.length > 0
-                            ? data.sustentabilidad.features.map(f => ({ titulo: f.titulo_ES, descripcion: f.descripcion_ES }))
-                            : prev.features || []
-                    }));
-                }
-                // 3. Formulario Distribuidor
-                if (data?.formDistribuidor) {
-                    setFormDistribuidor(prev => ({
-                        titulo: data.formDistribuidor.titulo_ES || prev.titulo,
-                        descripcion: data.formDistribuidor.descripcion_ES || prev.descripcion,
-                        textoBoton: data.formDistribuidor.textoBoton_ES || prev.textoBoton,
-                        notaTiempo: data.formDistribuidor.notaTiempo_ES || prev.notaTiempo,
-                        statDistribuidores: data.formDistribuidor.statDistribuidores || prev.statDistribuidores,
-                        statEstados: data.formDistribuidor.statEstados || prev.statEstados
-                    }));
-                }
-                // 4. Arte de la Creación
-                if (data?.arteCreacion?.titulo_ES) {
-                    setArteCreacion(prev => ({
-                        badge: data.arteCreacion.badge_ES || prev.badge,
-                        titulo: data.arteCreacion.titulo_ES,
-                        anosExperiencia: data.arteCreacion.anosExperiencia || prev.anosExperiencia,
-                        features: data.arteCreacion.features?.length > 0
-                            ? data.arteCreacion.features.map(f => ({ titulo: f.titulo_ES, descripcion: f.descripcion_ES }))
-                            : prev.features,
-                        boton: data.arteCreacion.boton_ES || prev.boton,
-                        nota: data.arteCreacion.nota_ES || prev.nota,
-                        imagenUrl: data.arteCreacion.imagenUrl || prev.imagenUrl
-                    }));
-                }
-                // 5. Productos Destacados
-                if (data?.productosDestacados?.titulo_ES) {
-                    setProductosDestacados(prev => ({
-                        titulo: data.productosDestacados.titulo_ES || prev.titulo
-                    }));
-                }
-                // 6. Donde Comprar
-                if (data?.dondeComprar?.titulo_ES) {
-                    setDondeComprar(prev => ({
-                        titulo: data.dondeComprar.titulo_ES || prev.titulo,
-                        descripcion: data.dondeComprar.descripcion_ES || prev.descripcion,
-                        textoBoton: data.dondeComprar.textoBoton_ES || prev.textoBoton,
-                        mapaUrl: data.dondeComprar.mapaUrl || prev.mapaUrl,
-                        nota: data.dondeComprar.nota_ES || prev.nota
-                    }));
-                }
-            })
-            .catch(() => {
-                console.warn('API no disponible, usando textos por defecto.');
-            });
-    }, []);
-
-    // Logos estáticos de respaldo (se usan si la API no tiene logos todavía)
-    const logosEstaticos = [
-        { id: 1, name: "El Palacio de Hierro", category: "destacados", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 2, name: "Liverpool", category: "nacional", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 3, name: "Boot Barn", category: "internacional", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 4, name: "Cavender's", category: "internacional", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 5, name: "Sears", category: "nacional", logo: "https://blocks.astratic.com/img/general-img-landscape.png" },
-        { id: 6, name: "Botas Caborca Store", category: "destacados", logo: "https://blocks.astratic.com/img/general-img-landscape.png" }
-    ];
-
-    // Logos: prioridad ConfiguracionGeneral → distribuidoresLogos del Home → estáticos
-    const distribuidoresLogos = (() => {
+    const filteredDistributors = useMemo(() => {
+        const logosConfig = configGeneral?.distribuidoresList || [];
+        let items = [];
         if (logosConfig.length > 0) {
-            return logosConfig
-                .filter(l => l.logo)
-                .map((l, idx) => ({
-                    id: l.id || idx,
-                    name: l.negocioNombre || l.contactoNombre || 'Distribuidor',
-                    category: l.clasificacion || 'todos',
-                    logo: l.logo,
-                    sitioWeb: l.sitioWeb || null,
-                    destacado: l.destacado || false
-                }));
+            items = logosConfig.map((l, i) => ({
+                id: l.id || i,
+                name: l.negocioNombre || 'Distribuidor',
+                category: l.clasificacion || 'todos',
+                logo: l.logo,
+                sitioWeb: l.sitioWeb,
+                destacado: l.destacado
+            }));
+        } else if (distribuidores.logos?.length > 0) {
+            items = distribuidores.logos.map((l, i) => ({ id: i, name: 'Distribuidor', category: 'todos', logo: l.imagenUrl }));
         }
-        if (distribuidores.logos.length > 0) {
-            return distribuidores.logos.map((l, i) => ({ id: l.id, name: `Distribuidor ${i + 1}`, category: 'todos', logo: l.imagenUrl }));
-        }
-        return logosEstaticos;
-    })();
 
-    const filteredDistributors = activeFilter === 'todos'
-        ? distribuidoresLogos
-        : activeFilter === 'destacados'
-            ? distribuidoresLogos.filter(d => d.destacado)
-            : distribuidoresLogos.filter(d => d.category === activeFilter);
+        if (items.length === 0) return [];
+
+        if (activeFilter === 'todos') return items;
+        if (activeFilter === 'destacados') return items.filter(d => d.destacado);
+        return items.filter(d => d.category === activeFilter);
+    }, [configGeneral, distribuidores, activeFilter]);
 
     return (
         <div className="min-h-screen">
@@ -292,7 +269,7 @@ const Inicio = () => {
                 <section className="py-12 sm:py-16">
                     <div className="container mx-auto px-4">
                         <h2 className="text-center text-2xl sm:text-3xl font-serif font-bold mb-8 sm:mb-10 text-caborca-beige-fuerte">
-                            {productosDestacados.titulo}
+                            {productosDestacadosTitulo}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto">
                             {productosCatalogoDestacados.length > 0 ? (
