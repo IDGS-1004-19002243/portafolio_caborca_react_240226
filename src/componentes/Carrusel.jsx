@@ -10,9 +10,8 @@ const SLIDES_DEFAULT = [
 ];
 
 const Carrusel = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [diapositivaActual, setDiapositivaActual] = useState(0);
-  const [posicionMouse, setPosicionMouse] = useState({ x: 0.5, y: 0.5 });
   const [rawSlides, setRawSlides] = useState(SLIDES_DEFAULT);
   const intervalRef = useRef(null);
 
@@ -37,7 +36,7 @@ const Carrusel = () => {
       textoBoton: t(s, 'textoBoton'),
       link: s.linkBoton || '#'
     }));
-  }, [rawSlides, language, t]);
+  }, [rawSlides, t]);
 
   useEffect(() => {
     const startAutoSlide = () => {
@@ -55,17 +54,7 @@ const Carrusel = () => {
     };
   }, [diapositivas.length]);
 
-  const manejarMovimientoMouse = (e) => {
-    const mouseX = e.clientX / window.innerWidth;
-    const mouseY = e.clientY / window.innerHeight;
-    setPosicionMouse({ x: mouseX, y: mouseY });
-  };
-
-  const calcularTransformParallax = () => {
-    const moveX = (posicionMouse.x - 0.5) * 30;
-    const moveY = (posicionMouse.y - 0.5) * 30;
-    return `translate(${moveX}px, ${moveY}px) scale(1.1)`;
-  };
+  // Parallax removed
 
   const handleDotClick = (indice) => {
     setDiapositivaActual(indice);
@@ -78,17 +67,13 @@ const Carrusel = () => {
   };
 
   return (
-    <div
-      className="carousel-container"
-      onMouseMove={manejarMovimientoMouse}
-    >
+    <div className="carousel-container">
       {diapositivas.map((diapositiva, indice) => (
         <div key={indice} className={`carousel-slide ${indice === diapositivaActual ? 'active' : ''}`}>
           <div
             className="parallax-layer"
             style={{
               backgroundImage: `url('${diapositiva.imagen}')`,
-              transform: indice === diapositivaActual ? calcularTransformParallax() : 'translate(0, 0)'
             }}
           ></div>
           <div className="carousel-overlay"></div>

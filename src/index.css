@@ -1,11 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
-
 @import "tailwindcss";
+
+@theme {
+    --font-sans: 'Aleo', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Patua One', ui-serif, Georgia, serif;
+    --font-patua: 'Patua One', ui-serif, Georgia, serif;
+}
+
+@font-face {
+    font-family: 'Aleo';
+    src: url('/fonts/Aleo-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Aleo';
+    src: url('/fonts/Aleo-Italic-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Patua One';
+    src: url('/fonts/PatuaOne-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
 /* ============================================
    ESTILOS GLOBALES - PORTAFOLIO CABORCA
-   Based on MockUp V1 Styles
    ============================================ */
+@layer base {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-serif);
+    }
+
+    body {
+        font-family: var(--font-sans);
+        color: var(--caborca-cafe);
+        padding-top: 0;
+    }
+}
 
 /* Variables CSS */
 :root {
@@ -23,13 +67,6 @@ html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-    font-family: 'Montserrat', sans-serif;
-    color: var(--caborca-cafe);
-    padding-top: 0;
-    /* Reset padding to match mockup behavior with negative margin */
 }
 
 /* ============================================
@@ -154,12 +191,12 @@ body {
    HEADER & NAVEGACIÓN (navegacion.css)
    ============================================ */
 header {
-    background-color: rgba(51, 43, 30, 0.7) !important;
-    transition: background-color 0.4s ease !important;
+    background-color: rgba(51, 43, 30, 0.55);
+    transition: background-color 0.4s ease;
 }
 
 header:hover {
-    background-color: rgba(51, 43, 30, 0.95) !important;
+    background-color: rgba(28, 21, 9, 0.97);
 }
 
 header:hover nav a,
@@ -242,13 +279,15 @@ nav .group>div a:hover {
     color: var(--caborca-cafe) !important;
 }
 
-/* Links generales */
-a {
-    transition: color 0.3s ease;
+/* Links generales — excluye botones con fondo de color */
+a:not([class*="bg-"]):hover {
+    color: var(--caborca-cafe);
 }
 
-a:hover {
-    color: var(--caborca-cafe);
+/* Botones CTA — mantienen su color de texto en hover */
+a[class*="bg-caborca"]:hover,
+a[class*="bg-white"]:hover {
+    color: inherit;
 }
 
 
@@ -273,29 +312,25 @@ a:hover {
     height: 100%;
     opacity: 0;
     transition: opacity 1s ease-in-out;
-    background-size: contain;
+    background-size: cover;
     background-position: center;
     background-color: #1a1410;
-    /* Fondo oscuro para las áreas sin imagen */
 }
 
 .carousel-slide.active {
     opacity: 1;
 }
 
-/* Parallax Effect */
+/* Parallax Layer */
 .parallax-layer {
     position: absolute;
     width: 100%;
-    height: 120%;
-    top: -10%;
-    background-size: contain;
-    /* Sin estiramiento: la imagen se ve completa */
+    height: 100%;
+    top: 0;
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-color: #1a1410;
-    /* Fondo oscuro para áreas sin imagen */
-    transition: transform 0.1s ease-out;
 }
 
 .carousel-content {
@@ -322,10 +357,10 @@ a:hover {
 
 .carousel-title {
     font-size: 4rem;
-    font-weight: 700;
+    font-weight: 400;
     margin-bottom: 1rem;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-    font-family: 'Playfair Display', serif;
+    font-family: 'Patua One', serif;
 }
 
 .carousel-subtitle {

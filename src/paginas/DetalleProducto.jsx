@@ -56,7 +56,7 @@ const DetalleProducto = () => {
       }
       setLoading(false);
     });
-  }, [id]);
+  }, [id, catalogo]);
 
   const breadcrumbs = useMemo(() => {
     if (!producto) return [];
@@ -126,7 +126,7 @@ const DetalleProducto = () => {
       <section className="pt-8 pb-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
 
               {/* GALERÍA DE IMÁGENES */}
               <div className="h-fit">
@@ -152,7 +152,7 @@ const DetalleProducto = () => {
                 </div>
 
                 {/* Miniaturas */}
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-2 sm:gap-3">
                   {imagenes.map((img, idx) => (
                     <div
                       key={idx}
@@ -178,9 +178,9 @@ const DetalleProducto = () => {
               {/* INFORMACIÓN DEL PRODUCTO */}
               <div>
                 <div className="mb-4">
-                  {producto.badge && (
+                  {t(producto, 'badge') && (
                     <span className="bg-caborca-beige-fuerte text-white text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mr-2">
-                      {producto.badge}
+                      {t(producto, 'badge')}
                     </span>
                   )}
                   {producto.destacado && (
@@ -215,28 +215,28 @@ const DetalleProducto = () => {
                         <span className="font-bold text-caborca-cafe text-base capitalize">{producto.materiales.join(', ')}</span>
                       </div>
                     )}
-                    {producto.materialCorte && (
+                    {t(producto, 'materialCorte') && (
                       <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                         <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Material en Corte' : 'Cut Material'}</span>
-                        <span className="font-bold text-caborca-cafe text-base">{producto.materialCorte}</span>
+                        <span className="font-bold text-caborca-cafe text-base">{t(producto, 'materialCorte')}</span>
                       </div>
                     )}
-                    {producto.suela && (
+                    {t(producto, 'suela') && (
                       <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                         <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Suela' : 'Sole'}</span>
-                        <span className="font-bold text-caborca-cafe text-base">{producto.suela}</span>
+                        <span className="font-bold text-caborca-cafe text-base">{t(producto, 'suela')}</span>
                       </div>
                     )}
-                    {producto.construccion && (
+                    {t(producto, 'construccion') && (
                       <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                         <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Construcción' : 'Construction'}</span>
-                        <span className="font-bold text-caborca-cafe text-base">{producto.construccion}</span>
+                        <span className="font-bold text-caborca-cafe text-base">{t(producto, 'construccion')}</span>
                       </div>
                     )}
-                    {producto.horma && (
+                    {t(producto, 'horma') && (
                       <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                         <span className="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{language === 'es' ? 'Horma' : 'Last'}</span>
-                        <span className="font-bold text-caborca-cafe text-base">{producto.horma}</span>
+                        <span className="font-bold text-caborca-cafe text-base">{t(producto, 'horma')}</span>
                       </div>
                     )}
                   </div>

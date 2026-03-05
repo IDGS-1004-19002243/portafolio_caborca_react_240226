@@ -38,7 +38,7 @@ const createMapPin = (selected = false) => {
           </defs>
           <circle cx="16" cy="14" r="8" fill="white"/>
           <text x="16" y="18" text-anchor="middle"
-                font-family="Georgia, 'Playfair Display', serif"
+                font-family="'Patua One', Georgia, serif"
                 font-size="7.5" font-weight="bold" fill="${color}" letter-spacing="0.5">CB</text>
         </svg>
       </div>`,
@@ -175,12 +175,7 @@ const Distribuidores = () => {
       .sort((a, b) => a.localeCompare(b, 'es'));
   }, [allDistribuidores]);
 
-  const tiposList = useMemo(() => {
-    const seen = new Set();
-    return allDistribuidores
-      .filter(d => d.tipo && !seen.has(d.tipo) && seen.add(d.tipo))
-      .map(d => d.tipo);
-  }, [allDistribuidores]);
+
 
   const labels = {
     nombre: language === 'es' ? 'Nombre completo' : 'Full name',
@@ -272,10 +267,10 @@ const Distribuidores = () => {
       <Encabezado />
       <main>
         {/* HERO */}
-        <section className="relative pt-[95px] bg-gray-50">
+        <section className="relative bg-gray-50">
           <div className="relative w-full overflow-hidden shadow-2xl">
             <img src={hero.imagen} alt="Caborca" className="w-full h-[600px] object-cover" />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4">
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4 pt-20">
               <div>
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
                   <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(hero, 'badge')}</p>
@@ -306,7 +301,7 @@ const Distribuidores = () => {
                   setResultadoDist({ tipo: 'error', mensaje: err.message });
                 } finally { setEnviandoDist(false); }
               }} className="space-y-6">
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.nombre}</label>
                     <input type="text" value={formulario.nombreCompleto} onChange={e => setFormulario({ ...formulario, nombreCompleto: e.target.value })} placeholder={labels.nombrePlaceholder} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caborca-cafe outline-none" />
@@ -320,7 +315,7 @@ const Distribuidores = () => {
                     <input type="tel" value={formulario.telefono} onChange={e => setFormulario({ ...formulario, telefono: e.target.value })} placeholder="(123) 456-7890" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caborca-cafe outline-none" />
                   </div>
                 </div>
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.ciudad}</label>
                     <input type="text" value={formulario.ciudad} onChange={e => setFormulario({ ...formulario, ciudad: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caborca-cafe outline-none" />
@@ -365,7 +360,7 @@ const Distribuidores = () => {
               <p className="text-lg text-gray-600">{t(mapInfo, 'mapText')}</p>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 grid lg:grid-cols-4 gap-6 items-end">
+            <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 items-end">
               <div>
                 <label className="block text-sm font-bold text-caborca-cafe mb-2">{labels.tipoCompra}</label>
                 <select value={tipoCompra} onChange={e => setTipoCompra(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg outline-none">
@@ -384,7 +379,7 @@ const Distribuidores = () => {
               </div>
               <button onClick={manejarUbicarme} className="bg-white border-2 border-caborca-cafe text-caborca-cafe p-3 rounded-lg font-bold hover:bg-caborca-cafe hover:text-white transition-colors flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                {labels.usarUbicacion}
+                {mensajeUbicacion || labels.usarUbicacion}
               </button>
               <div className="flex gap-2">
                 <button onClick={manejarLimpiarFiltros} className="flex-1 bg-gray-100 p-3 rounded-lg hover:bg-gray-200 transition-colors">
@@ -414,7 +409,7 @@ const Distribuidores = () => {
             )}
 
             <div className="h-[600px] rounded-3xl overflow-hidden shadow-2xl relative z-10">
-              <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
+              <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false} dragging={!L.Browser.mobile}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <FlyToMarker center={mapCenter} zoom={mapZoom} />
                 {displayedMarkers.map((store, i) => (

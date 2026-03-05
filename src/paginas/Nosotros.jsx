@@ -99,10 +99,10 @@ const Nosotros = () => {
 
       <main>
         {/* HERO SECTION */}
-        <section className="relative pt-[95px] bg-gray-50">
+        <section className="relative bg-gray-50">
           <div className="relative w-full overflow-hidden shadow-2xl">
-            <img src={content.hero?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Nosotros Caborca" className="w-full h-[400px] md:h-[600px] object-cover" />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4">
+            <img src={content.hero?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Nosotros Caborca" className="w-full h-[500px] md:h-[600px] object-cover" />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4 pt-20">
               <div>
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
                   <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{content.hero?.badge}</p>
@@ -117,7 +117,7 @@ const Nosotros = () => {
         {/* ORIGEN */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div>
                 <div className="inline-block bg-caborca-beige-suave px-6 py-2 rounded-full mb-6">
                   <span className="text-caborca-cafe text-sm font-semibold tracking-wider uppercase">{content.origen?.badge}</span>
@@ -137,7 +137,7 @@ const Nosotros = () => {
         {/* CRECIMIENTO */}
         <section className="py-20 bg-caborca-beige-suave">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div className="order-2 lg:order-1">
                 <img src={content.crecimiento?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Crecimiento" className="rounded-2xl shadow-2xl w-full aspect-[3/2] object-cover" />
               </div>
@@ -159,10 +159,10 @@ const Nosotros = () => {
           <div className="container mx-auto px-4 max-w-6xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-serif mb-4 font-bold">{content.caborcaHoy?.title}</h2>
             <p className="text-white/80 text-xl mb-12">{content.caborcaHoy?.subtitle}</p>
-            <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-12">
               {content.caborcaHoy?.stats?.map((stat, i) => (
                 <div key={i}>
-                  <div className="text-5xl font-bold mb-2">{stat.value}</div>
+                  <div className="text-4xl md:text-5xl font-bold mb-2">{stat.value}</div>
                   <div className="text-white/70 text-sm uppercase tracking-widest font-bold">{stat.label}</div>
                 </div>
               ))}
@@ -173,7 +173,7 @@ const Nosotros = () => {
 
         {/* ARTESANIA */}
         <section className="py-20 bg-white">
-          <div className="container mx-auto px-4 max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <div className="container mx-auto px-4 max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <div>
               <div className="inline-block bg-caborca-beige-suave px-6 py-2 rounded-full mb-6 uppercase font-bold text-sm text-caborca-cafe">
                 {content.artesania?.badge}
@@ -192,7 +192,7 @@ const Nosotros = () => {
 
         {/* PROCESO */}
         <section className="py-20 bg-gray-50">
-          <div className="container mx-auto px-4 max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <div className="container mx-auto px-4 max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <div className="order-2 lg:order-1">
               <img src={content.proceso?.imagen || 'https://blocks.astratic.com/img/general-img-landscape.png'} alt="Proceso" className="rounded-2xl shadow-xl w-full aspect-[3/2] object-cover" />
             </div>
@@ -205,7 +205,7 @@ const Nosotros = () => {
                 {renderParagraphs(content.proceso?.paragraphs)}
               </div>
               <div className="bg-caborca-cafe text-white p-8 rounded-xl flex items-center gap-6">
-                <div className="text-6xl font-bold">{content.proceso?.stat}</div>
+                <div className="text-5xl md:text-6xl font-bold">{content.proceso?.stat}</div>
                 <div className="text-xl font-bold opacity-80 leading-tight uppercase">{content.proceso?.statLabel}</div>
               </div>
             </div>

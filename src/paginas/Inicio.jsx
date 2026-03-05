@@ -42,7 +42,7 @@ const createMapPin = (selected = false) => {
           </defs>
           <circle cx="16" cy="14" r="8" fill="white"/>
           <text x="16" y="18" text-anchor="middle"
-                font-family="Georgia,'Playfair Display',serif"
+                font-family="'Patua One', Georgia, serif"
                 font-size="7.5" font-weight="bold" fill="${color}" letter-spacing="0.5">CB</text>
         </svg>
       </div>`,
@@ -64,7 +64,7 @@ const DEMO_MARKERS = [
 ];
 
 const Inicio = () => {
-    const { language, t } = useLanguage();
+    const { t } = useLanguage();
     const [activeFilter, setActiveFilter] = useState('todos');
     const [formInicio, setFormInicio] = useState({ nombreCompleto: '', correoElectronico: '', telefono: '', ciudad: '', mensaje: '' });
     const [enviandoInicio, setEnviandoInicio] = useState(false);
@@ -116,7 +116,7 @@ const Inicio = () => {
                 { imagenUrl: "https://blocks.astratic.com/img/general-img-landscape.png" }
             ]
         };
-    }, [rawContent, language, t]);
+    }, [rawContent, t]);
 
     const sustentabilidad = useMemo(() => {
         if (!rawContent?.sustentabilidad || (!rawContent.sustentabilidad.titulo && !rawContent.sustentabilidad.titulo_ES)) return {
@@ -129,8 +129,10 @@ const Inicio = () => {
             tituloDerecho: "Nuestro compromiso con el planeta",
             notaCertificacion: "Certificado por prácticas sustentables",
             features: [
-                { titulo: "Materiales Ecólogicos", descripcion: "Seleccionamos las mejores pieles de proveedores responsables con el medio ambiente." },
-                { titulo: "Procesos Limpios", descripcion: "Optimizamos el consumo de agua y energía en la manufactura de cada par de botas." }
+                { titulo: "Materiales Sostenibles", descripcion: "Seleccionamos las mejores pieles de proveedores responsables con el medio ambiente." },
+                { titulo: "Reciclaje Responsable", descripcion: "Implementamos procesos de reciclaje en cada etapa de producción." },
+                { titulo: "Reducción de Huella", descripcion: "Optimizamos el consumo de agua y energía en la manufactura de cada par de botas." },
+                { titulo: "Producción Ética", descripcion: "Garantizamos condiciones laborales justas y responsables en toda nuestra cadena." }
             ]
         };
         const data = rawContent.sustentabilidad;
@@ -147,7 +149,7 @@ const Inicio = () => {
                 ? data.features.map(f => ({ titulo: t(f, 'titulo'), descripcion: t(f, 'descripcion') }))
                 : []
         };
-    }, [rawContent, language, t]);
+    }, [rawContent, t]);
 
     const formDistribuidor = useMemo(() => {
         if (!rawContent?.formDistribuidor || (!rawContent.formDistribuidor.titulo && !rawContent.formDistribuidor.titulo_ES)) return {
@@ -167,7 +169,7 @@ const Inicio = () => {
             statDistribuidores: data.statDistribuidores || "+500",
             statEstados: data.statEstados || "20+"
         };
-    }, [rawContent, language, t]);
+    }, [rawContent, t]);
 
     const arteCreacion = useMemo(() => {
         if (!rawContent?.arteCreacion || (!rawContent.arteCreacion.titulo && !rawContent.arteCreacion.titulo_ES)) return {
@@ -195,7 +197,7 @@ const Inicio = () => {
             nota: t(data, 'nota'),
             imagenUrl: data.imagenUrl || "https://blocks.astratic.com/img/general-img-landscape.png"
         };
-    }, [rawContent, language, t]);
+    }, [rawContent, t]);
 
     const dondeComprar = useMemo(() => {
         if (!rawContent?.dondeComprar || (!rawContent.dondeComprar.titulo && !rawContent.dondeComprar.titulo_ES)) return {
@@ -215,11 +217,11 @@ const Inicio = () => {
             mapaUrl: data.mapaUrl || "",
             nota: t(data, 'nota')
         };
-    }, [rawContent, language, t]);
+    }, [rawContent, t]);
 
     const productosDestacadosTitulo = useMemo(() => {
         return t(rawContent?.productosDestacados, 'titulo') || "Conoce nuestros nuevos estilos";
-    }, [rawContent, language, t]);
+    }, [rawContent, t]);
 
     const [productosCatalogoDestacados, setProductosCatalogoDestacados] = useState([]);
 
@@ -280,7 +282,7 @@ const Inicio = () => {
                         <h2 className="text-center text-2xl sm:text-3xl font-serif font-bold mb-8 sm:mb-10 text-caborca-beige-fuerte">
                             {productosDestacadosTitulo}
                         </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
                             {productosCatalogoDestacados.length > 0 ? (
                                 productosCatalogoDestacados.map((producto, idx) => (
                                     <Link key={idx} to={`/producto/${producto.catalogoPadre || 'catalogo'}/${producto.id}`} className="block text-center group cursor-pointer">
@@ -290,11 +292,11 @@ const Inicio = () => {
                                                 alt={producto.nombre}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                             />
-                                            {producto.badge && (
-                                                <span className="absolute top-2 right-2 bg-caborca-cafe text-white text-xs px-2 py-1 font-bold">{producto.badge}</span>
+                                            {t(producto, 'badge') && (
+                                                <span className="absolute top-2 right-2 bg-caborca-cafe text-white text-xs px-2 py-1 font-bold">{t(producto, 'badge')}</span>
                                             )}
                                         </div>
-                                        <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte uppercase">{producto.nombre}</h3>
+                                        <h3 className="mt-4 text-sm font-bold tracking-wide text-caborca-beige-fuerte uppercase">{t(producto, 'nombre')}</h3>
                                         {producto.sku && <p className="text-xs text-gray-400 mt-1">{producto.sku}</p>}
                                     </Link>
                                 ))
@@ -364,7 +366,7 @@ const Inicio = () => {
                                 {/* Badge decorativo */}
                                 <div className="absolute -bottom-4 -right-4 bg-gray-200 rounded-full p-6 shadow-xl hidden md:block">
                                     <div className="text-center">
-                                        <p className="text-3xl font-bold text-caborca-bronce">{arteCreacion.anosExperiencia}+</p>
+                                        <h2 className="text-3xl md:text-5xl font-serif text-caborca-cafe mb-4 text-center">{arteCreacion.anosExperiencia}+</h2>
                                         <p className="text-xs font-semibold tracking-wider text-caborca-bronce">AÑOS</p>
                                     </div>
                                 </div>
@@ -481,7 +483,7 @@ const Inicio = () => {
                         <div className="text-center mt-12">
                             <Link
                                 to={distribuidores.linkBoton}
-                                className="inline-block bg-caborca-beige-fuerte text-white font-bold tracking-widest text-xs px-10 py-4 rounded-lg hover:bg-caborca-beige-fuerte transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                                className="inline-block bg-caborca-beige-fuerte text-white font-bold tracking-widest text-xs px-10 py-4 rounded-lg shadow-lg"
                             >
                                 {distribuidores.textoBoton}
                             </Link>
@@ -500,74 +502,61 @@ const Inicio = () => {
                                 {dondeComprar.descripcion}
                             </p>
                         </div>
-                        <div className="w-full">
-                            {/* Mapa React-Leaflet */}
-                            <div style={{ isolation: 'isolate', position: 'relative' }}>
-                                <div className="rounded-xl overflow-hidden shadow-xl" style={{ height: '400px' }}>
-                                    <MapContainer
-                                        center={[23.5, -100]}
-                                        zoom={5}
-                                        style={{ height: '100%', width: '100%' }}
-                                        scrollWheelZoom={false}
-                                        zoomControl={true}
-                                        attributionControl={false}
+                    </div>
+                    {/* Mapa borde a borde sin bordes redondeados */}
+                    <div style={{ isolation: 'isolate', position: 'relative' }}>
+                        <div className="overflow-hidden" style={{ height: '400px' }}>
+                            <MapContainer center={[23.6345, -102.5528]} zoom={4} className="h-full w-full min-h-[400px]" scrollWheelZoom={false} dragging={!L.Browser.mobile}>
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                {/* Pines de distribuidores */}
+                                {(configGeneral?.distribuidoresList?.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng))).length > 0
+                                    ? configGeneral.distribuidoresList.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng)))
+                                    : DEMO_MARKERS
+                                ).map((d, idx) => (
+                                    <Marker
+                                        key={idx}
+                                        position={[parseFloat(d.lat), parseFloat(d.lng)]}
+                                        icon={createMapPin()}
                                     >
-                                        <TileLayer
-                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        />
-                                        {/* Pines de distribuidores */}
-                                        {(configGeneral?.distribuidoresList?.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng))).length > 0
-                                            ? configGeneral.distribuidoresList.filter(d => !isNaN(parseFloat(d.lat)) && !isNaN(parseFloat(d.lng)))
-                                            : DEMO_MARKERS
-                                        ).map((d, idx) => (
-                                            <Marker
-                                                key={idx}
-                                                position={[parseFloat(d.lat), parseFloat(d.lng)]}
-                                                icon={createMapPin()}
-                                            >
-                                                <Popup>
-                                                    <div className="min-w-[140px]">
-                                                        <p className="font-bold text-sm" style={{ color: '#7C5C3E' }}>
-                                                            {d.negocioNombre || d.nombre || 'Distribuidor'}
-                                                        </p>
-                                                        <p className="text-xs text-gray-500">{d.ciudad || ''}</p>
-                                                        <Link
-                                                            to="/distribuidores"
-                                                            className="text-xs font-semibold mt-1 inline-block"
-                                                            style={{ color: '#7C5C3E' }}
-                                                        >
-                                                            Ver detalles →
-                                                        </Link>
-                                                    </div>
-                                                </Popup>
-                                            </Marker>
-                                        ))}
-                                    </MapContainer>
-                                </div>
-                                {/* CTA to distributors page */}
-                                <div className="text-center mt-6">
-                                    <Link to={dondeComprar.linkBoton} className="inline-flex items-center gap-2 bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-8 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg group">
-                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L10 4.414l6.293 6.293a1 1 0 001.414-1.414l-7-7z" />
-                                        </svg>
-                                        <span>{dondeComprar.textoBoton}</span>
-                                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                        </svg>
-                                    </Link>
-                                    <p className="text-caborca-beige-fuerte text-xs mt-3">
-                                        {dondeComprar.nota}
-                                    </p>
-                                </div>
-                            </div>
+                                        <Popup>
+                                            <div className="w-full sm:w-auto min-w-[140px]">
+                                                <p className="font-bold text-sm" style={{ color: '#7C5C3E' }}>
+                                                    {d.negocioNombre || d.nombre || 'Distribuidor'}
+                                                </p>
+                                                <p className="text-xs text-gray-500">{d.ciudad || ''}</p>
+                                                <Link
+                                                    to="/distribuidores"
+                                                    className="text-xs font-semibold mt-1 inline-block"
+                                                    style={{ color: '#7C5C3E' }}
+                                                >
+                                                    Ver detalles →
+                                                </Link>
+                                            </div>
+                                        </Popup>
+                                    </Marker>
+                                ))}
+                            </MapContainer>
+                        </div>
+                    </div>
+                    {/* CTA */}
+                    <div className="container mx-auto px-4">
+                        <div className="text-center mt-6">
+                            <Link to={dondeComprar.linkBoton} className="inline-flex items-center gap-2 bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-8 py-3 rounded-lg shadow-md">
+                                <span>{dondeComprar.textoBoton}</span>
+                            </Link>
+                            <p className="text-caborca-beige-fuerte text-xs mt-3">
+                                {dondeComprar.nota}
+                            </p>
                         </div>
                     </div>
                 </section>
 
                 {/* 7. SUSTAINABILITY BANNER SECTION */}
                 <section className="relative overflow-hidden">
-                    <div className="grid md:grid-cols-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0">
                         {/* Left Side - Image */}
                         <div className="relative h-[400px] md:h-[500px]">
                             <img
@@ -587,7 +576,7 @@ const Inicio = () => {
                                         </div>
                                         <span className="text-sm font-semibold text-white tracking-wider">{sustentabilidad.badge}</span>
                                     </div>
-                                    <h2 className="text-4xl md:text-5xl font-serif font-bold mb-3 leading-tight text-white">
+                                    <h2 className="text-4xl md:text-5xl font-serif mb-3 leading-tight text-white">
                                         {sustentabilidad.titulo}
                                     </h2>
                                     <p className="text-base md:text-lg mb-6 text-gray-200 leading-relaxed">
@@ -600,21 +589,27 @@ const Inicio = () => {
                         {/* Right Side - Content */}
                         <div className="bg-caborca-beige-home p-8 md:p-12 flex flex-col justify-center" style={{ backgroundColor: '#ECE7DF' }}>
                             <div className="max-w-lg mx-auto">
-                                <h3 className="text-2xl md:text-4xl font-serif text-caborca-beige-fuerte font-bold mb-6">
+                                <h3 className="text-xl sm:text-2xl md:text-4xl font-serif text-caborca-beige-fuerte font-bold mb-6">
                                     {sustentabilidad.tituloDerecho}
                                 </h3>
 
                                 {/* Features Grid */}
-                                <div className="grid grid-cols-2 gap-4 mb-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
                                     {(sustentabilidad.features && sustentabilidad.features.length > 0) ? (
                                         sustentabilidad.features.map((feature, idx) => (
-                                            <div key={idx} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                                                <div className="text-caborca-beige-fuerte mb-2">
-                                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
-                                                    </svg>
+                                            <div
+                                                key={idx}
+                                                className="bg-white p-5 rounded-lg border border-gray-100"
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <span
+                                                        className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                                                        style={{ backgroundColor: '#9B8674' }}
+                                                    >
+                                                        {String(idx + 1).padStart(2, '0')}
+                                                    </span>
+                                                    <p className="text-sm font-semibold text-caborca-beige-fuerte leading-snug pt-1">{feature.titulo}</p>
                                                 </div>
-                                                <p className="text-sm font-semibold text-caborca-beige-fuerte">{feature.titulo}</p>
                                             </div>
                                         ))
                                     ) : (
@@ -624,11 +619,8 @@ const Inicio = () => {
 
                                 {/* CTA Button */}
                                 <div className="flex flex-col sm:flex-row gap-4 items-center">
-                                    <Link to={sustentabilidad.linkBoton} className="inline-flex items-center gap-2 bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-8 py-4 rounded-lg transition-all duration-300 shadow-lg group">
+                                    <Link to={sustentabilidad.linkBoton} className="inline-flex items-center gap-2 bg-caborca-beige-fuerte text-white font-bold tracking-wider text-sm px-8 py-4 rounded-lg shadow-lg">
                                         <span>{sustentabilidad.textoBoton}</span>
-                                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                        </svg>
                                     </Link>
                                     <div className="flex items-center gap-2 text-caborca-cafe text-sm">
                                         <svg className="w-5 h-5 text-caborca-bronce" fill="currentColor" viewBox="0 0 20 20">
@@ -647,7 +639,7 @@ const Inicio = () => {
                     <div className="container mx-auto px-4">
                         <div className="max-w-6xl mx-auto">
                             <div className="text-center mb-5">
-                                <h2 className="text-2xl sm:text-3xl font-serif mb-2 text-caborca-beige-fuerte font-bold">{formDistribuidor.titulo}</h2>
+                                <h2 className="text-4xl md:text-6xl font-serif mb-4 text-caborca-cafe font-bold">{sustentabilidad.tituloDerecho || sustentabilidad.titulo}</h2>
                                 <p className="text-caborca-cafe font-semibold text-sm sm:text-base">{formDistribuidor.descripcion}</p>
                             </div>
                             <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -665,7 +657,7 @@ const Inicio = () => {
                                         setEnviandoInicio(false);
                                     }
                                 }}>
-                                    <div className="grid md:grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-3">
                                         <div>
                                             <label className="block text-xs font-medium text-caborca-cafe mb-1">Nombre completo</label>
                                             <input type="text" value={formInicio.nombreCompleto} onChange={e => setFormInicio(p => ({ ...p, nombreCompleto: e.target.value }))} placeholder="Tu nombre" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
@@ -679,7 +671,7 @@ const Inicio = () => {
                                             <input type="tel" value={formInicio.telefono} onChange={e => setFormInicio(p => ({ ...p, telefono: e.target.value }))} placeholder="(123) 456-7890" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
                                         </div>
                                     </div>
-                                    <div className="grid md:grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-3">
                                         <div>
                                             <label className="block text-xs font-medium text-caborca-cafe mb-1">Ciudad</label>
                                             <input type="text" value={formInicio.ciudad} onChange={e => setFormInicio(p => ({ ...p, ciudad: e.target.value }))} placeholder="Tu ciudad" className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-caborca-beige-fuerte focus:ring-1 focus:ring-caborca-beige-fuerte transition-colors" required />
@@ -696,7 +688,7 @@ const Inicio = () => {
                                     )}
                                     <div className="grid md:grid-cols-2 gap-4 items-center pt-2">
                                         <div className="flex items-center gap-4">
-                                            <button type="submit" disabled={enviandoInicio} className="bg-caborca-beige-fuerte text-white font-bold tracking-wider text-xs px-8 py-3 rounded transition-colors shadow-md hover:shadow-lg disabled:opacity-60 flex items-center gap-2">
+                                            <button type="submit" disabled={enviandoInicio} className="bg-caborca-beige-fuerte text-white font-bold tracking-wider text-xs px-8 py-3 rounded shadow-md disabled:opacity-60 flex items-center gap-2">
                                                 {enviandoInicio ? (<><svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>ENVIANDO...</>) : formDistribuidor.textoBoton}
                                             </button>
                                             <div className="hidden sm:flex items-center gap-2 text-caborca-bronce text-xs">
@@ -729,13 +721,10 @@ const Inicio = () => {
                         </div>
                     </div>
                 </section>
-
             </main>
-
             <PieDePagina />
-        </div>
+        </div >
     );
 };
 
 export default Inicio;
-

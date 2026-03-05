@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext'
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false)
+  const [hovered, setHovered] = useState(false)
   const { language, setLanguage } = useLanguage()
 
   const toggleMobileMenu = () => {
@@ -24,9 +25,19 @@ const Header = () => {
     { name: { es: 'CONTACTO', en: 'CONTACT' }, path: '/contacto' }
   ];
 
+  const isVisible = hovered || mobileMenuOpen;
+
   return (
     <>
-      <header className="fixed top-0 w-full z-50 shadow-sm">
+      <header
+        className="fixed top-0 w-full z-50 transition-all duration-300"
+        style={{
+          backgroundColor: isVisible ? '#1C1509' : 'rgba(51, 43, 30, 0.55)',
+          boxShadow: isVisible ? '0 2px 12px rgba(0,0,0,0.3)' : 'none',
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
         <div className="container mx-auto px-4 sm:px-6 py-6 flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center ml-0 sm:ml-8 lg:ml-32">

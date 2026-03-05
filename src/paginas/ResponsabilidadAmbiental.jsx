@@ -114,10 +114,10 @@ const ResponsabilidadAmbiental = () => {
       <Encabezado />
       <main>
         {/* HERO IMAGE SECTION */}
-        <section className="relative pt-[95px] bg-gray-50">
+        <section className="relative bg-gray-50">
           <div className="relative w-full overflow-hidden shadow-2xl">
             <img src={content.hero.image} alt="Caborca" className="w-full h-[600px] object-cover" />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4">
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4 pt-20">
               <div>
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
                   <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(content.hero, 'badge')}</p>
@@ -132,7 +132,7 @@ const ResponsabilidadAmbiental = () => {
         {/* COMPAÑÍA RESPONSABLE */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-caborca-beige-fuerte rounded-full flex items-center justify-center">
@@ -140,7 +140,7 @@ const ResponsabilidadAmbiental = () => {
                   </div>
                   <span className="text-caborca-beige-fuerte font-bold tracking-wider text-sm uppercase">{labels.esr}</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-serif text-caborca-beige-fuerte font-bold leading-tight">
+                <h2 className="text-3xl md:text-5xl font-serif text-caborca-beige-fuerte font-bold leading-tight">
                   {renderTitle(t(content.compania, 'title'))}
                 </h2>
                 <div className="w-24 h-1 bg-caborca-beige-fuerte"></div>
@@ -165,7 +165,7 @@ const ResponsabilidadAmbiental = () => {
         {/* CONSUMO DE ELECTRICIDAD */}
         <section className="py-24 bg-gray-50">
           <div className="container mx-auto px-4 max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div className="relative order-2 lg:order-1">
                 <img src={content.energia.image} alt="..." className="relative rounded-2xl overflow-hidden shadow-2xl w-full h-[500px] object-cover" />
                 <div className="absolute -top-6 -left-6 w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
@@ -179,13 +179,13 @@ const ResponsabilidadAmbiental = () => {
                   </div>
                   <span className="text-caborca-cafe font-bold tracking-wider text-sm uppercase">{labels.cleanEnergy}</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-serif text-caborca-cafe font-bold leading-tight">{renderTitle(t(content.energia, 'title'))}</h2>
+                <h2 className="text-3xl md:text-5xl font-serif text-caborca-cafe font-bold leading-tight">{renderTitle(t(content.energia, 'title'))}</h2>
                 <div className="w-24 h-1 bg-yellow-400"></div>
                 <div className="space-y-4 text-gray-600 leading-relaxed">
                   <p>{t(content.energia, 'p1')}</p>
                   <p className="text-caborca-cafe">{t(content.energia, 'p2')}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-6 pt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 pt-6">
                   <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
                     <div className="text-3xl font-bold text-yellow-500 mb-2">{content.energia.stat1}</div>
                     <div className="text-sm text-gray-500 font-bold uppercase">{t(content.energia, 'stat1Label')}</div>
@@ -203,9 +203,9 @@ const ResponsabilidadAmbiental = () => {
         {/* PIELES */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div className="space-y-6">
-                <h2 className="text-4xl md:text-5xl font-serif text-caborca-cafe font-bold leading-tight">{renderTitle(t(content.pieles, 'title'))}</h2>
+                <h2 className="text-3xl md:text-5xl font-serif text-caborca-cafe font-bold leading-tight">{renderTitle(t(content.pieles, 'title'))}</h2>
                 <div className="w-24 h-1 bg-green-500"></div>
                 <div className="space-y-4 text-gray-600 leading-relaxed">
                   <p>{t(content.pieles, 'p1')}</p>
@@ -213,7 +213,7 @@ const ResponsabilidadAmbiental = () => {
                 </div>
                 <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
                   <h4 className="font-bold text-caborca-cafe mb-4">{labels.toxins}</h4>
-                  <div className="grid grid-cols-2 gap-3 text-sm text-gray-500 font-bold">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-500 font-bold">
                     {t(content.pieles, 'sustanciasText')?.split(',').map((s, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <span className="w-2 h-2 bg-red-400 rounded-full"></span>
@@ -238,11 +238,11 @@ const ResponsabilidadAmbiental = () => {
         <section className="py-24 bg-green-50">
           <div className="container mx-auto px-4 max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-5xl font-serif text-caborca-cafe font-bold mb-4">{t(content.shambhala, 'title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-serif text-caborca-cafe font-bold mb-4">{t(content.shambhala, 'title')}</h2>
               <p className="text-3xl font-serif text-green-700 font-bold mb-6">Shambhala</p>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto">{t(content.shambhala, 'subtitle')}</p>
             </div>
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
               <div className="space-y-6">
                 {[
                   { t: 'missionTitle', p: 'missionText' },
@@ -255,7 +255,7 @@ const ResponsabilidadAmbiental = () => {
                   </div>
                 ))}
                 <div className="bg-green-700 p-8 rounded-2xl shadow-xl text-white flex items-center gap-6">
-                  <div className="text-5xl font-bold">{content.shambhala.statNumber}</div>
+                  <div className="text-4xl md:text-5xl font-bold">{content.shambhala.statNumber}</div>
                   <div>
                     <div className="text-lg font-bold uppercase leading-tight">{renderTitle(t(content.shambhala, 'statLabel'))}</div>
                     <p className="text-white/80 text-sm mt-2">{t(content.shambhala, 'statDesc')}</p>

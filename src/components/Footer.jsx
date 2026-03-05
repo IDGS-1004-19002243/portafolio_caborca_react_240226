@@ -36,17 +36,14 @@ const Footer = () => {
     desc: language === 'es'
       ? 'Artesanía mexicana de lujo. Cada bota es una obra maestra hecha a mano con pasión y precisión.'
       : 'Luxury Mexican craftsmanship. Each boot is a handmade masterpiece crafted with passion and precision.',
-    quick: language === 'es' ? 'Enlaces Rápidos' : 'Quick Links',
+    quick: language === 'es' ? 'Navegación' : 'Navigation',
     inicio: language === 'es' ? 'Inicio' : 'Home',
+    catalogoH: language === 'es' ? 'Botas Hombre' : 'Men\'s Boots',
+    catalogoM: language === 'es' ? 'Botas Mujer' : 'Women\'s Boots',
     cont: language === 'es' ? 'Contacto' : 'Contact',
-    more: language === 'es' ? 'Más Información' : 'More Information',
+    more: language === 'es' ? 'La Marca' : 'The Brand',
     us: language === 'es' ? 'Nosotros' : 'About Us',
-    env: language === 'es' ? 'Responsabilidad ambiental' : 'Environmental responsibility',
-    terms: language === 'es' ? 'Términos y Condiciones' : 'Terms and Conditions',
-    customer: language === 'es' ? 'Atención al Cliente' : 'Customer Service',
-    faq: language === 'es' ? 'Preguntas Frecuentes' : 'FAQ',
-    use: language === 'es' ? 'Términos de Uso' : 'Terms of Use',
-    privacy: language === 'es' ? 'Aviso de Privacidad' : 'Privacy Notice',
+    env: language === 'es' ? 'Responsabilidad Ambiental' : 'Environmental Responsibility',
     dist: language === 'es' ? 'Distribuidores' : 'Distributors',
     rights: language === 'es' ? 'Todos los derechos reservados.' : 'All rights reserved.',
   };
@@ -56,7 +53,7 @@ const Footer = () => {
   return (
     <footer className="bg-caborca-beige-suave border-t border-gray-300 pt-10 pb-0">
       <div className="max-w-5xl mx-auto px-4">
-        <div className="grid md:grid-cols-[2fr_1fr_1fr_1fr] gap-12 mb-8 text-center md:text-left">
+        <div className="grid md:grid-cols-[2fr_1fr_1fr] gap-12 mb-8 text-center md:text-left">
           <div>
             <img src={LogoImg} alt="Caborca Boots" className="h-20 mb-3 mx-auto md:mx-0 object-contain" />
             <p className="text-caborca-cafe text-xs leading-relaxed">{labels.desc}</p>
@@ -64,24 +61,18 @@ const Footer = () => {
           <div>
             <h4 className="font-bold mb-4 text-caborca-cafe text-sm">{labels.quick}</h4>
             <ul className="space-y-2 text-caborca-negro text-sm">
-              <li><Link to="/" className="hover:text-caborca-cafe">{labels.inicio}</Link></li>
-              <li><Link to="/contacto" className="hover:text-caborca-cafe">{labels.cont}</Link></li>
+              <li><Link to="/" className="hover:text-caborca-cafe transition-colors">{labels.inicio}</Link></li>
+              <li><Link to="/catalogo/hombre" className="hover:text-caborca-cafe transition-colors">{labels.catalogoH}</Link></li>
+              <li><Link to="/catalogo/mujer" className="hover:text-caborca-cafe transition-colors">{labels.catalogoM}</Link></li>
+              <li><Link to="/contacto" className="hover:text-caborca-cafe transition-colors">{labels.cont}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-4 text-caborca-cafe text-sm">{labels.more}</h4>
             <ul className="space-y-2 text-caborca-negro text-sm">
-              <li><Link to="/nosotros" className="hover:text-caborca-cafe">{labels.us}</Link></li>
-              <li><Link to="/responsabilidad-ambiental" className="hover:text-caborca-cafe">{labels.env}</Link></li>
-              <li><a href="#" className="hover:text-caborca-cafe">{labels.terms}</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4 text-caborca-cafe text-sm">{labels.customer}</h4>
-            <ul className="space-y-2 text-caborca-negro text-sm">
-              <li><a href="#" className="hover:text-caborca-cafe">{labels.faq}</a></li>
-              <li><a href="#" className="hover:text-caborca-cafe">{labels.privacy}</a></li>
-              <li><Link to="/distribuidores" className="hover:text-caborca-cafe">{labels.dist}</Link></li>
+              <li><Link to="/nosotros" className="hover:text-caborca-cafe transition-colors">{labels.us}</Link></li>
+              <li><Link to="/responsabilidad-ambiental" className="hover:text-caborca-cafe transition-colors">{labels.env}</Link></li>
+              <li><Link to="/distribuidores" className="hover:text-caborca-cafe transition-colors">{labels.dist}</Link></li>
             </ul>
           </div>
         </div>
@@ -89,16 +80,33 @@ const Footer = () => {
       <div className="bg-caborca-cafe py-4">
         <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-xs text-white">
           <p>© 2025 Caborca Boots. {labels.rights}</p>
-          <div className="flex gap-4 mt-3 md:mt-0">
+          <div className="flex items-center gap-4 mt-3 md:mt-0">
             {visibleSocialEntries.map(([key, data]) => {
               if (!data || !data.url) return null;
+              const icon = socialIcons[key];
+              if (!icon) return null;
               const href = key === 'email' ? (data.url.startsWith('mailto:') ? data.url : `mailto:${data.url}`) : data.url;
               return (
-                <a key={key} href={href} target={key === 'email' ? '_self' : '_blank'} rel="noopener noreferrer" className="text-white hover:scale-110 transition-transform">
-                  {socialIcons[key] ?? null}
+                <a key={key} href={href} target={key === 'email' ? '_self' : '_blank'} rel="noopener noreferrer"
+                  className="text-white transition-all duration-300 hover:scale-110"
+                  style={{ transition: 'color 0.3s, transform 0.3s' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#C8A97E'}
+                  onMouseLeave={e => e.currentTarget.style.color = 'white'}
+                >
+                  {icon}
                 </a>
               );
             })}
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="ml-2 flex items-center justify-center w-8 h-8 rounded-full border border-white/40 text-white hover:bg-white/20 transition-colors"
+              title={language === 'es' ? 'Volver arriba' : 'Back to top'}
+              aria-label="Scroll to top"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
