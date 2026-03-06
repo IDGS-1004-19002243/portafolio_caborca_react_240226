@@ -33,8 +33,9 @@ const Carrusel = () => {
       titulo: t(s, 'titulo'),
       subtitulo: t(s, 'subtitulo'),
       imagen: s.imagenUrl || "https://blocks.astratic.com/img/general-img-landscape.png",
-      textoBoton: t(s, 'textoBoton'),
-      link: s.linkBoton || '#'
+      link: s.linkBoton || '#',
+      mostrarTitulo: s.mostrarTitulo !== false,
+      mostrarSubtitulo: s.mostrarSubtitulo !== false,
     }));
   }, [rawSlides, t]);
 
@@ -78,9 +79,12 @@ const Carrusel = () => {
           ></div>
           <div className="carousel-overlay"></div>
           <div className="carousel-content">
-            <h1 className="carousel-title font-serif">{diapositiva.titulo}</h1>
-            <p className="carousel-subtitle font-sans tracking-wider">{diapositiva.subtitulo}</p>
-            <button className="carousel-btn">{diapositiva.textoBoton}</button>
+            {diapositiva.mostrarTitulo && (
+              <h1 className="carousel-title font-serif">{diapositiva.titulo}</h1>
+            )}
+            {diapositiva.mostrarSubtitulo && (
+              <p className="carousel-subtitle font-sans tracking-wider">{diapositiva.subtitulo}</p>
+            )}
           </div>
         </div>
       ))}
