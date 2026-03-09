@@ -3,59 +3,74 @@ import { useState, useEffect } from 'react';
 import { textosService } from '../api/textosService';
 import { useLanguage } from '../context/LanguageContext';
 
+const defaultContent = {
+    titulo_ES: '¡Esa ruta no existe, vaquero!',
+    titulo_EN: 'That route doesn\'t exist, cowboy!',
+    mensaje_ES: 'Parece que te has alejado demasiado del camino.\nNo te preocupes, endereza las riendas y vuelve con nosotros.',
+    mensaje_EN: 'It seems you\'ve strayed too far from the path.\nDon\'t worry, straighten the reins and come back to us.',
+    textoBoton_ES: 'Volver al pueblito',
+    textoBoton_EN: 'Back to town',
+    imagenFondo: 'https://blocks.astratic.com/img/general-img-landscape.png'
+};
+
 const NotFound = () => {
-    const { t } = useLanguage();
-    const [content, setContent] = useState({
-        titulo_ES: '¡Esa ruta no existe, vaquero!',
-        titulo_EN: 'That route doesn\'t exist, cowboy!',
-        mensaje_ES: 'Parece que te has alejado demasiado del camino.\nNo te preocupes, endereza las riendas y vuelve con nosotros.',
-        mensaje_EN: 'It seems you\'ve strayed too far from the path.\nDon\'t worry, straighten the reins and come back to us.',
-        textoBoton_ES: 'Volver al pueblito',
-        textoBoton_EN: 'Back to town',
-        imagenFondo: 'https://blocks.astratic.com/img/general-img-landscape.png'
-    });
+    // eslint-disable-next-line no-unused-vars
+    const { language } = useLanguage();
+    // eslint-disable-next-line no-unused-vars
+    const [content, setContent] = useState(defaultContent);
 
     useEffect(() => {
         textosService.getTextos('notfound')
             .then(data => {
                 if (data && Object.keys(data).length > 0) {
-                    setContent(prev => ({ ...prev, ...data }));
+                    const merged = { ...defaultContent };
+                    for (const key in data) {
+                        if (data[key] && typeof data[key] === 'object' && Object.keys(data[key]).length > 0) {
+                            merged[key] = { ...merged[key], ...data[key] };
+                        } else if (data[key] && typeof data[key] !== 'object') {
+                            merged[key] = data[key];
+                        }
+                    }
+                    setContent(merged);
                 }
             })
             .catch(() => { });
     }, []);
 
     return (
-        <div className="relative min-h-screen flex items-center justify-center bg-gray-900 text-white font-sans overflow-hidden">
-            <div className="absolute inset-0 z-0">
-                <img src={content.imagenFondo} alt="404" className="w-full h-full object-cover opacity-50" />
-                <div className="absolute inset-0 bg-black/60"></div>
-            </div>
+        <div className="relative min-h-screen flex items-center justify-center font-sans overflow-hidden" style={{ backgroundColor: '#0B0D11' }}>
 
-            <div className="container mx-auto px-4 text-center relative z-10 flex flex-col items-center justify-center min-h-[60vh] mt-10">
-                {/* 404 de fondo */}
-                <div className="absolute inset-x-0 inset-y-0 flex items-center justify-center select-none pointer-events-none -mt-40 md:-mt-48 z-0">
-                    <h1 className="text-[14rem] sm:text-[20rem] md:text-[26rem] lg:text-[32rem] font-serif font-bold text-[#b58e5a] leading-none opacity-90 drop-shadow-2xl brightness-90">
+            {/* 404 Central Display Area matching image design */}
+            <div className="relative z-10 w-full max-w-5xl mx-auto flex justify-center items-center mt-8">
+                {/* The 404 Text */}
+                <div className="relative flex justify-center items-center">
+                    <h1
+                        className="text-[12rem] sm:text-[18rem] md:text-[24rem] lg:text-[28rem] font-serif font-black leading-none uppercase select-none tracking-tighter"
+                        style={{
+                            color: '#A07E52', // matching the exact brown from the image
+                            textShadow: '4px 4px 0px rgba(0,0,0,1), 8px 8px 16px rgba(0,0,0,0.4)',
+                            WebkitTextStroke: '2px rgba(160, 126, 82, 0.4)' // slight stroke to make it pop
+                        }}
+                    >
                         404
                     </h1>
-                </div>
 
-                {/* Contenido frontal */}
-                <div className="relative z-10 mt-12 md:mt-24">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] font-serif font-bold mb-8 text-white tracking-widest uppercase" style={{ textShadow: '4px 4px 6px rgba(0,0,0,0.8)' }}>
-                        {t(content, 'titulo')}
-                    </h2>
+                    {/* Overlay elements positioned exactly over the '0' */}
+                    <div className="absolute inset-0 flex flex-col justify-end items-center pb-[18%] md:pb-[14%]">
 
-                    <div className="w-24 md:w-32 h-1.5 md:h-2 bg-[#b58e5a] mx-auto mb-10 shadow-lg"></div>
+                        {/* Horizontal Line overlapping the zero */}
+                        <div className="w-[80px] sm:w-[120px] md:w-[160px] h-2 sm:h-3 md:h-4 lg:h-5 bg-[#A07E52] shadow-2xl z-20 mb-1 lg:mb-2 translate-y-1/2"></div>
 
-                    <p className="text-xl md:text-[1.6rem] text-white max-w-3xl mx-auto mb-14 leading-relaxed font-serif font-medium whitespace-pre-wrap" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
-                        {t(content, 'mensaje')}
-                    </p>
-
-                    <Link to="/" className="inline-flex items-center gap-3 bg-[#b58e5a] text-white font-bold tracking-widest text-sm md:text-base px-10 py-4 shadow-xl hover:bg-[#99764a] transition-colors uppercase group">
-                        <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        <span>{t(content, 'textoBoton')}</span>
-                    </Link>
+                        {/* Return Button inside the bottom of the zero */}
+                        <Link
+                            to="/"
+                            className="bg-[#A07E52] hover:bg-[#8F6F46] transition-colors flex items-center justify-center py-2 sm:py-3 md:py-4 px-6 sm:px-8 md:px-12 z-30 shadow-2xl mt-4 sm:mt-6 md:mt-10"
+                        >
+                            <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
