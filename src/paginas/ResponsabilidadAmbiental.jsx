@@ -4,85 +4,86 @@ import PieDePagina from '../componentes/PieDePagina';
 import { textosService } from '../api/textosService';
 import { useLanguage } from '../context/LanguageContext';
 
+const defaultContent = {
+  hero: {
+    badge_ES: 'COMPROMISO CON EL FUTURO',
+    badge_EN: 'COMMITMENT TO THE FUTURE',
+    title_ES: 'Responsabilidad Ambiental',
+    title_EN: 'Environmental Responsibility',
+    subtitle_ES: 'Nuestro compromiso con el planeta y las futuras generaciones a través de prácticas sostenibles',
+    subtitle_EN: 'Our commitment to the planet and future generations through sustainable practices',
+    image: 'https://blocks.astratic.com/img/general-img-landscape.png'
+  },
+  compania: {
+    title_ES: 'Compañía\nresponsable',
+    title_EN: 'Responsible\nCompany',
+    p1_ES: 'Como empresa, elegimos conscientemente preocuparnos por mejorar el mundo social, económico y ambiental que nos rodea.',
+    p1_EN: 'As a company, we consciously choose to care about improving the social, economic, and environmental world around us.',
+    p2_ES: 'También basamos nuestras decisiones en ideales éticos y valores humanos.',
+    p2_EN: 'We also base our decisions on ethical ideals and human values.',
+    highlight_ES: 'Hemos asumido la tarea de crear programas estratégicos para dar un destino a todos los elementos y materiales.',
+    highlight_EN: 'We have taken on the task of creating strategic programs to provide a destination for all elements and materials.',
+    image: 'https://blocks.astratic.com/img/general-img-landscape.png'
+  },
+  energia: {
+    title_ES: 'Consumo de\nelectricidad',
+    title_EN: 'Electricity\nConsumption',
+    p1_ES: 'Para reducir el impacto del calentamiento global, hemos instalado un sistema de paneles de energía solar.',
+    p1_EN: 'To reduce the impact of global warming, we have installed a solar energy panel system.',
+    p2_ES: 'La energía solar no genera residuos ni contaminación del agua.',
+    p2_EN: 'Solar energy does not generate waste or water pollution.',
+    stat1: '0%', stat1Label_ES: 'Emisiones CO₂', stat1Label_EN: 'CO₂ Emissions',
+    stat2: '100%', stat2Label_ES: 'Energía Limpia', stat2Label_EN: 'Clean Energy',
+    image: 'https://blocks.astratic.com/img/general-img-landscape.png'
+  },
+  video: {
+    title_ES: 'Nuestro compromiso en acción',
+    title_EN: 'Our Commitment in Action',
+    description_ES: 'Descubre cómo transformamos nuestros valores en acciones concretas cada día',
+    description_EN: 'Discover how we transform our values into concrete actions every day',
+    videoUrl: 'https://www.youtube.com/embed/3nT5QS6h-tY'
+  },
+  pieles: {
+    title_ES: 'Pieles libres de\nmetales pesados',
+    title_EN: 'Heavy Metal\nFree Leathers',
+    p1_ES: 'Tenemos nuestro propio analizador de metales X-MET7500.',
+    p1_EN: 'We have our own X-MET7500 metal analyzer.',
+    p2_ES: 'Realizamos inspecciones diarias en todas las pieles que recibimos de nuestros proveedores.',
+    p2_EN: 'We perform daily inspections on all the leathers we receive from our suppliers.',
+    sustanciasText_ES: 'Plomo, Arsénico, Cadmio, Cloroformo, Cromo hexavalente, Mercurio',
+    sustanciasText_EN: 'Lead, Arsenic, Cadmium, Chloroform, Hexavalent Chromium, Mercury',
+    image: 'https://blocks.astratic.com/img/general-img-landscape.png'
+  },
+  shambhala: {
+    title_ES: 'Un lugar para renacer',
+    title_EN: 'A Place to Rebirth',
+    subtitle_ES: 'Un ecosistema biodiverso donde la naturaleza y la producción sostenible se encuentran en perfecta armonía',
+    subtitle_EN: 'A biodiverse ecosystem where nature and sustainable production meet in perfect harmony',
+    missionTitle_ES: 'Nuestra Misión',
+    missionTitle_EN: 'Our Mission',
+    missionText_ES: 'Shambhala es un proyecto que nació con el objetivo de convertirse en parte de los pulmones del planeta Tierra.',
+    missionText_EN: 'Shambhala is a project born with the goal of becoming part of the Earth\'s lungs.',
+    granjaTitle_ES: 'Granja Biodinámica',
+    granjaTitle_EN: 'Biodynamic Farm',
+    granjaText_ES: 'Esta granja biodinámica es uno de nuestros mayores logros.',
+    granjaText_EN: 'This biodynamic farm is one of our greatest achievements.',
+    educTitle_ES: 'Educación Ambiental',
+    educTitle_EN: 'Environmental Education',
+    educText_ES: 'Realizamos talleres y charlas sobre ecología, reciclaje y concienciación.',
+    educText_EN: 'We conduct workshops and talks on ecology, recycling, and awareness.',
+    statNumber: '148',
+    statLabel_ES: 'ACRES DE ESPACIO\nAgroecológico',
+    statLabel_EN: 'ACRES OF SPACE\nAgroecological',
+    statDesc_ES: 'Un ciclo natural donde los desechos orgánicos enriquecen el suelo.',
+    statDesc_EN: 'A natural cycle where organic waste enriches the soil.',
+    image: 'https://blocks.astratic.com/img/general-img-landscape.png',
+    thumb1: 'https://blocks.astratic.com/img/general-img-landscape.png',
+    thumb2: 'https://blocks.astratic.com/img/general-img-landscape.png'
+  }
+};
+
 const ResponsabilidadAmbiental = () => {
   const { language, t } = useLanguage();
-  const defaultContent = {
-    hero: {
-      badge_ES: 'COMPROMISO CON EL FUTURO',
-      badge_EN: 'COMMITMENT TO THE FUTURE',
-      title_ES: 'Responsabilidad Ambiental',
-      title_EN: 'Environmental Responsibility',
-      subtitle_ES: 'Nuestro compromiso con el planeta y las futuras generaciones a través de prácticas sostenibles',
-      subtitle_EN: 'Our commitment to the planet and future generations through sustainable practices',
-      image: 'https://blocks.astratic.com/img/general-img-landscape.png'
-    },
-    compania: {
-      title_ES: 'Compañía\nresponsable',
-      title_EN: 'Responsible\nCompany',
-      p1_ES: 'Como empresa, elegimos conscientemente preocuparnos por mejorar el mundo social, económico y ambiental que nos rodea.',
-      p1_EN: 'As a company, we consciously choose to care about improving the social, economic, and environmental world around us.',
-      p2_ES: 'También basamos nuestras decisiones en ideales éticos y valores humanos.',
-      p2_EN: 'We also base our decisions on ethical ideals and human values.',
-      highlight_ES: 'Hemos asumido la tarea de crear programas estratégicos para dar un destino a todos los elementos y materiales.',
-      highlight_EN: 'We have taken on the task of creating strategic programs to provide a destination for all elements and materials.',
-      image: 'https://blocks.astratic.com/img/general-img-landscape.png'
-    },
-    energia: {
-      title_ES: 'Consumo de\nelectricidad',
-      title_EN: 'Electricity\nConsumption',
-      p1_ES: 'Para reducir el impacto del calentamiento global, hemos instalado un sistema de paneles de energía solar.',
-      p1_EN: 'To reduce the impact of global warming, we have installed a solar energy panel system.',
-      p2_ES: 'La energía solar no genera residuos ni contaminación del agua.',
-      p2_EN: 'Solar energy does not generate waste or water pollution.',
-      stat1: '0%', stat1Label_ES: 'Emisiones CO₂', stat1Label_EN: 'CO₂ Emissions',
-      stat2: '100%', stat2Label_ES: 'Energía Limpia', stat2Label_EN: 'Clean Energy',
-      image: 'https://blocks.astratic.com/img/general-img-landscape.png'
-    },
-    video: {
-      title_ES: 'Nuestro compromiso en acción',
-      title_EN: 'Our Commitment in Action',
-      description_ES: 'Descubre cómo transformamos nuestros valores en acciones concretas cada día',
-      description_EN: 'Discover how we transform our values into concrete actions every day',
-      videoUrl: 'https://www.youtube.com/embed/3nT5QS6h-tY'
-    },
-    pieles: {
-      title_ES: 'Pieles libres de\nmetales pesados',
-      title_EN: 'Heavy Metal\nFree Leathers',
-      p1_ES: 'Tenemos nuestro propio analizador de metales X-MET7500.',
-      p1_EN: 'We have our own X-MET7500 metal analyzer.',
-      p2_ES: 'Realizamos inspecciones diarias en todas las pieles que recibimos de nuestros proveedores.',
-      p2_EN: 'We perform daily inspections on all the leathers we receive from our suppliers.',
-      sustanciasText_ES: 'Plomo, Arsénico, Cadmio, Cloroformo, Cromo hexavalente, Mercurio',
-      sustanciasText_EN: 'Lead, Arsenic, Cadmium, Chloroform, Hexavalent Chromium, Mercury',
-      image: 'https://blocks.astratic.com/img/general-img-landscape.png'
-    },
-    shambhala: {
-      title_ES: 'Un lugar para renacer',
-      title_EN: 'A Place to Rebirth',
-      subtitle_ES: 'Un ecosistema biodiverso donde la naturaleza y la producción sostenible se encuentran en perfecta armonía',
-      subtitle_EN: 'A biodiverse ecosystem where nature and sustainable production meet in perfect harmony',
-      missionTitle_ES: 'Nuestra Misión',
-      missionTitle_EN: 'Our Mission',
-      missionText_ES: 'Shambhala es un proyecto que nació con el objetivo de convertirse en parte de los pulmones del planeta Tierra.',
-      missionText_EN: 'Shambhala is a project born with the goal of becoming part of the Earth\'s lungs.',
-      granjaTitle_ES: 'Granja Biodinámica',
-      granjaTitle_EN: 'Biodynamic Farm',
-      granjaText_ES: 'Esta granja biodinámica es uno de nuestros mayores logros.',
-      granjaText_EN: 'This biodynamic farm is one of our greatest achievements.',
-      educTitle_ES: 'Educación Ambiental',
-      educTitle_EN: 'Environmental Education',
-      educText_ES: 'Realizamos talleres y charlas sobre ecología, reciclaje y concienciación.',
-      educText_EN: 'We conduct workshops and talks on ecology, recycling, and awareness.',
-      statNumber: '148',
-      statLabel_ES: 'ACRES DE ESPACIO\nAgroecológico',
-      statLabel_EN: 'ACRES OF SPACE\nAgroecological',
-      statDesc_ES: 'Un ciclo natural donde los desechos orgánicos enriquecen el suelo.',
-      statDesc_EN: 'A natural cycle where organic waste enriches the soil.',
-      image: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      thumb1: 'https://blocks.astratic.com/img/general-img-landscape.png',
-      thumb2: 'https://blocks.astratic.com/img/general-img-landscape.png'
-    }
-  };
 
   const [content, setContent] = useState(defaultContent);
 
@@ -90,7 +91,13 @@ const ResponsabilidadAmbiental = () => {
     textosService.getTextos('responsabilidad')
       .then(data => {
         if (data && Object.keys(data).length > 0) {
-          setContent(prev => ({ ...prev, ...data }));
+          const merged = { ...defaultContent };
+          for (const key in data) {
+            if (data[key] && typeof data[key] === 'object' && Object.keys(data[key]).length > 0) {
+              merged[key] = { ...merged[key], ...data[key] };
+            }
+          }
+          setContent(merged);
         }
       })
       .catch(() => console.warn('Responsabilidad: usando datos por defecto'));
