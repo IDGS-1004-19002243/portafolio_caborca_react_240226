@@ -3,17 +3,19 @@ import { useState, useEffect } from 'react';
 import { textosService } from '../api/textosService';
 import { useLanguage } from '../context/LanguageContext';
 
+const defaultContent = {
+    titulo_ES: 'Página en Construcción',
+    titulo_EN: 'Page Under Construction',
+    subtitulo_ES: 'ESTAMOS PREPARANDO ALGO INCREÍBLE',
+    subtitulo_EN: 'WE ARE PREPARING SOMETHING AMAZING',
+    mensaje_ES: 'Estamos trabajando arduamente para traerte una experiencia renovada.',
+    mensaje_EN: 'We are working hard to bring you a renewed experience.',
+    imagenFondo: 'https://blocks.astratic.com/img/general-img-landscape.png'
+};
+
 const EnConstruccion = () => {
     const { t } = useLanguage();
-    const [content, setContent] = useState({
-        titulo_ES: 'Página en Construcción',
-        titulo_EN: 'Page Under Construction',
-        subtitulo_ES: 'ESTAMOS PREPARANDO ALGO INCREÍBLE',
-        subtitulo_EN: 'WE ARE PREPARING SOMETHING AMAZING',
-        mensaje_ES: 'Estamos trabajando arduamente para traerte una experiencia renovada.',
-        mensaje_EN: 'We are working hard to bring you a renewed experience.',
-        imagenFondo: 'https://blocks.astratic.com/img/general-img-landscape.png'
-    });
+    const [content, setContent] = useState(defaultContent);
 
     const [socials, setSocials] = useState({
         instagram: { url: 'https://instagram.com/caborcaboots', show: true },
@@ -28,7 +30,15 @@ const EnConstruccion = () => {
         textosService.getTextos('mantenimiento')
             .then(data => {
                 if (data && Object.keys(data).length > 0) {
-                    setContent(prev => ({ ...prev, ...data }));
+                    const merged = { ...defaultContent };
+                    for (const key in data) {
+                        if (data[key] && typeof data[key] === 'object' && Object.keys(data[key]).length > 0) {
+                            merged[key] = { ...merged[key], ...data[key] };
+                        } else if (data[key] && typeof data[key] !== 'object') {
+                            merged[key] = data[key];
+                        }
+                    }
+                    setContent(merged);
                 }
             })
             .catch(() => { });

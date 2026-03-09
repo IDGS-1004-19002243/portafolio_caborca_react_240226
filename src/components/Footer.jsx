@@ -73,6 +73,7 @@ const Footer = () => {
               <li><Link to="/nosotros" className="hover:text-caborca-cafe transition-colors">{labels.us}</Link></li>
               <li><Link to="/responsabilidad-ambiental" className="hover:text-caborca-cafe transition-colors">{labels.env}</Link></li>
               <li><Link to="/distribuidores" className="hover:text-caborca-cafe transition-colors">{labels.dist}</Link></li>
+              <li><Link to="/ruta-inexistente" className="hover:text-caborca-cafe transition-colors opacity-70 italic">{labels.notfound || (language === 'es' ? 'Prueba 404' : 'Test 404')}</Link></li>
             </ul>
           </div>
         </div>
