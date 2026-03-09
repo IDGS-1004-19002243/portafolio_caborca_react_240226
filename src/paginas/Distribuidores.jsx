@@ -269,11 +269,11 @@ const Distribuidores = () => {
         {/* HERO */}
         <section className="relative bg-gray-50">
           <div className="relative w-full overflow-hidden shadow-2xl">
-            <img src={hero.imagen} alt="Caborca" className="w-full h-[600px] object-cover" />
+            <img src={hero.imagen} alt="Caborca" className="w-full h-screen object-cover" />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4 pt-20">
               <div>
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
-                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(hero, 'badge')}</p>
+                  <span className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(hero, 'badge')}</span>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-serif mb-6 text-white">{t(hero, 'titulo')}</h1>
                 <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{t(hero, 'subtitulo')}</p>

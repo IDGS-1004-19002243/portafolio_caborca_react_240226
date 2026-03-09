@@ -359,7 +359,7 @@ const Inicio = () => {
                                     <img
                                         src={arteCreacion.imagenUrl}
                                         onError={(e) => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }}
-                                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="w-full aspect-[3/2] object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-caborca-cafe/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                 </div>
@@ -558,7 +558,7 @@ const Inicio = () => {
                 <section className="relative overflow-hidden">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0">
                         {/* Left Side - Image */}
-                        <div className="relative h-[400px] md:h-[500px]">
+                        <div className="relative aspect-[3/2] w-full">
                             <img
                                 src={sustentabilidad.imagenUrl}
                                 alt="Sustentabilidad Caborca"

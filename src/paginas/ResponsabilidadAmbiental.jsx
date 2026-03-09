@@ -116,11 +116,11 @@ const ResponsabilidadAmbiental = () => {
         {/* HERO IMAGE SECTION */}
         <section className="relative bg-gray-50">
           <div className="relative w-full overflow-hidden shadow-2xl">
-            <img src={content.hero.image} alt="Caborca" className="w-full h-[600px] object-cover" />
+            <img src={content.hero.image} alt="Caborca" className="w-full h-screen object-cover" />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4 pt-20">
               <div>
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
-                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(content.hero, 'badge')}</p>
+                  <span className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(content.hero, 'badge')}</span>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-serif mb-6 text-white">{t(content.hero, 'title')}</h1>
                 <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{t(content.hero, 'subtitle')}</p>
@@ -152,7 +152,7 @@ const ResponsabilidadAmbiental = () => {
               </div>
               <div className="relative">
                 <div className="absolute -top-8 -left-8 w-full h-full bg-caborca-cafe/5 rounded-2xl"></div>
-                <img src={content.compania.image} alt="..." className="relative rounded-2xl overflow-hidden shadow-2xl w-full h-[500px] object-cover" />
+                <img src={content.compania.image} alt="..." className="relative rounded-2xl overflow-hidden shadow-2xl w-full aspect-[3/2] object-cover" />
                 <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-xl border border-gray-100 text-center">
                   <div className="text-3xl font-bold text-caborca-beige-fuerte mb-1">ESR</div>
                   <div className="text-xs text-caborca-beige-fuerte uppercase tracking-wide font-bold">{labels.cert}</div>
@@ -167,7 +167,7 @@ const ResponsabilidadAmbiental = () => {
           <div className="container mx-auto px-4 max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div className="relative order-2 lg:order-1">
-                <img src={content.energia.image} alt="..." className="relative rounded-2xl overflow-hidden shadow-2xl w-full h-[500px] object-cover" />
+                <img src={content.energia.image} alt="..." className="relative rounded-2xl overflow-hidden shadow-2xl w-full aspect-[3/2] object-cover" />
                 <div className="absolute -top-6 -left-6 w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
                   <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" /></svg>
                 </div>
@@ -200,6 +200,38 @@ const ResponsabilidadAmbiental = () => {
           </div>
         </section>
 
+        {/* VIDEO */}
+        <section className="py-16 bg-caborca-cafe relative overflow-hidden">
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          </div>
+          <div className="container mx-auto px-4 relative z-10 max-w-7xl mx-auto">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                    </svg>
+                  </div>
+                  <span className="text-white/80 font-bold tracking-wider text-sm uppercase">{labels.commitment}</span>
+                </div>
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <h2 className="text-4xl md:text-5xl font-serif mb-4 text-white font-bold">{t(content.video, 'title')}</h2>
+                </div>
+                <div className="w-32 h-1 bg-white mx-auto mb-4"></div>
+                <p className="text-white/70 text-lg max-w-2xl mx-auto">{t(content.video, 'description')}</p>
+              </div>
+              <div className="relative group">
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10">
+                  <iframe width="100%" height="100%" src={content.video.videoUrl} title="Responsabilidad Ambiental Caborca Boots" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* PIELES */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 max-w-7xl mx-auto">
@@ -214,17 +246,17 @@ const ResponsabilidadAmbiental = () => {
                 <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
                   <h4 className="font-bold text-caborca-cafe mb-4">{labels.toxins}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-500 font-bold">
-                    {t(content.pieles, 'sustanciasText')?.split(',').map((s, i) => (
+                    {(t(content.pieles, 'sustanciasText') || '').split(',').map((s, i) => s.trim() ? (
                       <div key={i} className="flex items-center gap-2">
                         <span className="w-2 h-2 bg-red-400 rounded-full"></span>
                         {s.trim()}
                       </div>
-                    ))}
+                    ) : null)}
                   </div>
                 </div>
               </div>
               <div className="relative">
-                <img src={content.pieles.image} alt="..." className="relative rounded-2xl overflow-hidden shadow-2xl w-full h-[500px] object-cover" />
+                <img src={content.pieles.image} alt="..." className="relative rounded-2xl overflow-hidden shadow-2xl w-full aspect-[3/2] object-cover" />
                 <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-xl flex items-center gap-4">
                   <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">✓</div>
                   <div><div className="font-bold text-caborca-cafe">100%</div><div className="text-xs text-gray-400 font-bold uppercase">{labels.free}</div></div>
@@ -242,31 +274,37 @@ const ResponsabilidadAmbiental = () => {
               <p className="text-3xl font-serif text-green-700 font-bold mb-6">Shambhala</p>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto">{t(content.shambhala, 'subtitle')}</p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-              <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
+              <div className="flex flex-col justify-between gap-6 h-full">
                 {[
                   { t: 'missionTitle', p: 'missionText' },
                   { t: 'granjaTitle', p: 'granjaText' },
                   { t: 'educTitle', p: 'educText' }
                 ].map((k, i) => (
-                  <div key={i} className="bg-white p-8 rounded-2xl shadow-lg border border-green-100">
+                  <div key={i} className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-green-100 flex-1 flex flex-col justify-center">
                     <h3 className="font-serif text-xl text-caborca-cafe font-bold mb-2">{t(content.shambhala, k.t)}</h3>
                     <p className="text-gray-600">{t(content.shambhala, k.p)}</p>
                   </div>
                 ))}
-                <div className="bg-green-700 p-8 rounded-2xl shadow-xl text-white flex items-center gap-6">
-                  <div className="text-4xl md:text-5xl font-bold">{content.shambhala.statNumber}</div>
+                <div className="bg-green-700 p-6 sm:p-8 rounded-2xl shadow-xl text-white flex items-center gap-6">
+                  <div className="text-4xl md:text-5xl font-bold shrink-0">{content.shambhala.statNumber}</div>
                   <div>
                     <div className="text-lg font-bold uppercase leading-tight">{renderTitle(t(content.shambhala, 'statLabel'))}</div>
                     <p className="text-white/80 text-sm mt-2">{t(content.shambhala, 'statDesc')}</p>
                   </div>
                 </div>
               </div>
-              <div className="space-y-4">
-                <img src={content.shambhala.image} alt="..." className="rounded-2xl shadow-2xl w-full aspect-video object-cover" />
-                <div className="grid grid-cols-2 gap-4">
-                  <img src={content.shambhala.thumb1} alt="..." className="rounded-xl shadow-lg w-full aspect-square object-cover" />
-                  <img src={content.shambhala.thumb2} alt="..." className="rounded-xl shadow-lg w-full aspect-square object-cover" />
+              <div className="flex flex-col gap-4 sm:gap-6 h-full">
+                <div className="flex-1 min-h-[250px] relative rounded-2xl shadow-2xl overflow-hidden group">
+                  <img src={content.shambhala.image} alt="..." className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                </div>
+                <div className="grid grid-cols-2 gap-4 sm:gap-6 flex-1 min-h-[200px]">
+                  <div className="relative rounded-xl shadow-lg overflow-hidden group">
+                    <img src={content.shambhala.thumb1} alt="..." className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  </div>
+                  <div className="relative rounded-xl shadow-lg overflow-hidden group">
+                    <img src={content.shambhala.thumb2} alt="..." className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  </div>
                 </div>
               </div>
             </div>

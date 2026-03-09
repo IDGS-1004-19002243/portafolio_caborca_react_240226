@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Encabezado from '../componentes/Encabezado';
 import PieDePagina from '../componentes/PieDePagina';
 import { textosService } from '../api/textosService';
@@ -116,12 +116,12 @@ const Contacto = () => {
         {/* HERO */}
         <section className="relative bg-gray-40">
           <div className="relative w-full overflow-hidden shadow-2xl">
-            <img src={hero.imagen} alt="Contacto Caborca Boots" className="w-full h-[600px] object-cover"
+            <img src={hero.imagen} alt="Contacto Caborca Boots" className="w-full h-screen object-cover"
               onError={e => { e.target.src = 'https://blocks.astratic.com/img/general-img-landscape.png'; }} />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center pt-20">
               <div className="text-center text-white px-4">
                 <div className="inline-block bg-caborca-beige-fuerte px-6 py-2 rounded-lg mb-6">
-                  <p className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(hero, 'badge')}</p>
+                  <span className="text-sm md:text-base font-medium tracking-widest uppercase text-white">{t(hero, 'badge')}</span>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-serif mb-6">{t(hero, 'titulo')}</h1>
                 <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">{t(hero, 'subtitulo')}</p>
