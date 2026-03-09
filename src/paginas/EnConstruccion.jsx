@@ -33,8 +33,14 @@ const EnConstruccion = () => {
                     const merged = { ...defaultContent };
                     for (const key in data) {
                         if (data[key] && typeof data[key] === 'object' && Object.keys(data[key]).length > 0) {
-                            merged[key] = { ...merged[key], ...data[key] };
-                        } else if (data[key] && typeof data[key] !== 'object') {
+                            const validData = {};
+                            for (const innerKey in data[key]) {
+                                if (data[key][innerKey] !== "" && data[key][innerKey] !== null) {
+                                    validData[innerKey] = data[key][innerKey];
+                                }
+                            }
+                            merged[key] = { ...merged[key], ...validData };
+                        } else if (data[key] && data[key] !== "") {
                             merged[key] = data[key];
                         }
                     }
