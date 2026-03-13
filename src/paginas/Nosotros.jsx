@@ -135,7 +135,7 @@ const Nosotros = () => {
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div>
                 <div className="inline-block bg-caborca-beige-suave px-6 py-2 rounded-full mb-6">
-                  <span className="text-caborca-cafe text-sm font-semibold tracking-wider uppercase">{content.origen?.badge}</span>
+                  <span className="text-caborca-cafe text-sm font-bold tracking-wider uppercase">{content.origen?.badge}</span>
                 </div>
                 <h2 className="text-4xl md:text-5xl font-serif mb-6 text-caborca-cafe font-bold">{content.origen?.title}</h2>
                 <div className="space-y-4 text-gray-600 leading-relaxed text-lg">
