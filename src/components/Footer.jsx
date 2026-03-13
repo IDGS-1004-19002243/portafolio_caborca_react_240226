@@ -86,10 +86,14 @@ const Footer = () => {
           <p>© 2025 Caborca Boots. {labels.rights}</p>
           <div className="flex items-center gap-4 mt-3 md:mt-0">
             {visibleSocialEntries.map(([key, data]) => {
-              if (!data || !data.url) return null;
+              if (!data) return null;
               const icon = socialIcons[key];
               if (!icon) return null;
-              const href = key === 'email' ? (data.url.startsWith('mailto:') ? data.url : `mailto:${data.url}`) : data.url;
+              const fallbackUrl = '#';
+              const rawUrl = data.url || fallbackUrl;
+              const href = key === 'email' && rawUrl !== fallbackUrl
+                ? (rawUrl.startsWith('mailto:') ? rawUrl : `mailto:${rawUrl}`) 
+                : rawUrl;
               return (
                 <a key={key} href={href} target={key === 'email' ? '_self' : '_blank'} rel="noopener noreferrer"
                   className="text-white transition-all duration-300 hover:scale-110"
