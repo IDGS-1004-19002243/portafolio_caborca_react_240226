@@ -194,7 +194,9 @@ const Contacto = () => {
                               })}
                            </div>
                         : (language === 'es' ? (card.lines_ES || card.lines) : (card.lines_EN || card.lines_ES || card.lines))?.map((line, i) => (
-                        <p key={i} className={`text-sm ${i === 0 ? 'text-caborca-cafe' : 'text-gray-500 text-xs mt-1'}`}>{line}</p>
+                        <p key={i} className={`text-sm ${i === 0 ? 'text-caborca-cafe' : 'text-gray-500 text-xs mt-1'}`}>
+                          {card.id === 'email' && i === 0 && socials?.email?.url ? socials.email.url : line}
+                        </p>
                       ))}
                     </div>
                   </div>
