@@ -569,7 +569,7 @@ a[class*="bg-white"]:hover {
    FIX HOLLOW TEXT BUG PARA FUENTES VARIABLES (ALEO)
    ============================================ */
 .tracking-widest, .tracking-wider {
-    -webkit-text-stroke: 0.3px currentColor;
-    text-shadow: 0 0 1px currentColor;
-    -webkit-font-smoothing: antialiased;
+    font-family: "Patua One", serif !important;
+    text-shadow: none !important;
+    -webkit-text-stroke: 0 !important;
 }
