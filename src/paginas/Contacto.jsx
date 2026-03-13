@@ -5,6 +5,8 @@ import { textosService } from '../api/textosService';
 import { contactoService } from '../api/contactoService';
 import { useLanguage } from '../context/LanguageContext';
 
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'https://localhost:7020/api' : 'https://cms-api-caborca-gkfbcdffbqfpesfg.centralus-01.azurewebsites.net/api');
+
 const Contacto = () => {
   const { language, t } = useLanguage();
   const [formulario, setFormulario] = useState({
@@ -12,6 +14,7 @@ const Contacto = () => {
   });
   const [enviando, setEnviando] = useState(false);
   const [resultado, setResultado] = useState(null);
+  const [socials, setSocials] = useState(null);
 
   const [hero, setHero] = useState({
     badge_ES: 'ESTAMOS AQUÍ PARA TI',
@@ -36,6 +39,17 @@ const Contacto = () => {
     descripcion_ES: 'Completa el formulario y nos pondremos en contacto contigo',
     descripcion_EN: 'Complete the form and we will get in touch with you'
   });
+
+  useEffect(() => {
+    fetch(`${API_URL}/Settings/ConfiguracionGeneral`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.redesSociales) {
+          setSocials(data.redesSociales);
+        }
+      })
+      .catch(() => { });
+  }, []);
 
   useEffect(() => {
     textosService.getTextos('contacto')
@@ -154,7 +168,24 @@ const Contacto = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-caborca-cafe text-sm mb-1">{t(card, 'title')}</h3>
-                      {(language === 'es' ? (card.lines_ES || card.lines) : (card.lines_EN || card.lines_ES || card.lines))?.map((line, i) => (
+                      {card.id === 'social' && socials 
+                        ? Object.entries(socials)
+                            .filter(([key, data]) => data && data.show && key !== 'whatsapp' && key !== 'email')
+                            .map(([key, data]) => {
+                               const fallbackUrl = '#';
+                               const rawUrl = data.url || fallbackUrl;
+                               // Extract meaningful domain path like instagram.com/caborca
+                               const displayUrl = rawUrl === fallbackUrl ? '' : rawUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+                               
+                               if (!displayUrl) return null;
+                               
+                               return (
+                                 <a key={key} href={rawUrl} target="_blank" rel="noopener noreferrer" className="block text-sm text-gray-500 hover:text-caborca-cafe transition-colors mt-1">
+                                   {displayUrl}
+                                 </a>
+                               );
+                            })
+                        : (language === 'es' ? (card.lines_ES || card.lines) : (card.lines_EN || card.lines_ES || card.lines))?.map((line, i) => (
                         <p key={i} className={`text-sm ${i === 0 ? 'text-caborca-cafe' : 'text-gray-500 text-xs mt-1'}`}>{line}</p>
                       ))}
                     </div>
