@@ -23,6 +23,7 @@ const Contacto = () => {
   const [enviando, setEnviando] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [socials, setSocials] = useState(null);
+  const [generalConfig, setGeneralConfig] = useState(null);
 
   const [hero, setHero] = useState({
     badge_ES: 'ESTAMOS AQUÍ PARA TI',
@@ -52,8 +53,9 @@ const Contacto = () => {
     fetch(`${API_URL}/Settings/ConfiguracionGeneral`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data && data.redesSociales) {
-          setSocials(data.redesSociales);
+        if (data) {
+          if (data.redesSociales) setSocials(data.redesSociales);
+          if (data.general) setGeneralConfig(data.general);
         }
       })
       .catch(() => { });
@@ -195,7 +197,8 @@ const Contacto = () => {
                            </div>
                         : (language === 'es' ? (card.lines_ES || card.lines) : (card.lines_EN || card.lines_ES || card.lines))?.map((line, i) => (
                         <p key={i} className={`text-sm ${i === 0 ? 'text-caborca-cafe' : 'text-gray-500 text-xs mt-1'}`}>
-                          {card.id === 'email' && i === 0 && socials?.email?.url ? socials.email.url : line}
+                          {card.id === 'telefono' && i === 0 && generalConfig?.telefono ? generalConfig.telefono : 
+                           card.id === 'email' && i === 0 && socials?.email?.url ? socials.email.url : line}
                         </p>
                       ))}
                     </div>
