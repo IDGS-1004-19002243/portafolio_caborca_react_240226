@@ -23,13 +23,18 @@ const Footer = () => {
     facebook: { url: 'https://facebook.com/caborcaboots', show: true },
     whatsapp: { url: 'https://wa.me/525551234567', show: true }
   });
+  const [telefono, setTelefono] = useState('');
 
   useEffect(() => {
     fetch(`${API_URL}/Settings/ConfiguracionGeneral`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data && data.redesSociales) {
-          setSocials(data.redesSociales);
+        if (data) {
+          if (data.redesSociales || data.RedesSociales) {
+            setSocials(data.redesSociales || data.RedesSociales);
+          }
+          const tel = data.general?.telefono || data.General?.Telefono || data.telefono || data.Telefono;
+          if (tel) setTelefono(tel);
         }
       })
       .catch(() => { });
@@ -84,8 +89,22 @@ const Footer = () => {
       <div className="bg-caborca-cafe py-4">
         <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-xs text-white">
           <p>© 2025 Caborca Boots. {labels.rights}</p>
-          <div className="flex items-center gap-4 mt-3 md:mt-0">
-            {visibleSocialEntries.map(([key, data]) => {
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 mt-3 md:mt-0">
+            {telefono && (
+              <a href={`tel:${telefono}`} 
+                className="flex items-center gap-2 transition-all duration-300"
+                style={{ color: 'white' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#B8935F'}
+                onMouseLeave={e => e.currentTarget.style.color = 'white'}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span className="font-bold tracking-wider">{telefono}</span>
+              </a>
+            )}
+            <div className="flex items-center gap-4">
+              {visibleSocialEntries.map(([key, data]) => {
               if (!data) return null;
               const icon = socialIcons[key];
               if (!icon) return null;
@@ -98,13 +117,14 @@ const Footer = () => {
                 <a key={key} href={href} target={key === 'email' ? '_self' : '_blank'} rel="noopener noreferrer"
                   className="text-white transition-all duration-300 hover:scale-110"
                   style={{ transition: 'color 0.3s, transform 0.3s' }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#C8A97E'}
+                  onMouseEnter={e => e.currentTarget.style.color = '#B8935F'}
                   onMouseLeave={e => e.currentTarget.style.color = 'white'}
                 >
                   {icon}
                 </a>
               );
             })}
+            </div>
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="ml-2 flex items-center justify-center w-8 h-8 rounded-full border border-white/40 text-white hover:bg-white/20 transition-colors"
@@ -119,7 +139,7 @@ const Footer = () => {
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

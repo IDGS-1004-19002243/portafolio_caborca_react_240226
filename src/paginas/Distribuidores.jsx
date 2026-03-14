@@ -409,7 +409,7 @@ const Distribuidores = () => {
             )}
 
             <div className="h-[600px] rounded-3xl overflow-hidden shadow-2xl relative z-10">
-              <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false} dragging={!L.Browser.mobile}>
+              <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false} dragging={!L.Browser.mobile} attributionControl={false}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <FlyToMarker center={mapCenter} zoom={mapZoom} />
                 {displayedMarkers.map((store, i) => (

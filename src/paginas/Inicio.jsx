@@ -506,9 +506,8 @@ const Inicio = () => {
                     {/* Mapa borde a borde sin bordes redondeados */}
                     <div style={{ isolation: 'isolate', position: 'relative' }}>
                         <div className="overflow-hidden" style={{ height: '400px' }}>
-                            <MapContainer center={[23.6345, -102.5528]} zoom={4} className="h-full w-full min-h-[400px]" scrollWheelZoom={false} dragging={!L.Browser.mobile}>
+                            <MapContainer center={[23.6345, -102.5528]} zoom={4} className="h-full w-full min-h-[400px]" scrollWheelZoom={false} dragging={!L.Browser.mobile} attributionControl={false}>
                                 <TileLayer
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
                                 {/* Pines de distribuidores */}
